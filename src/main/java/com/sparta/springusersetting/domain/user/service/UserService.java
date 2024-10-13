@@ -36,6 +36,7 @@ public class UserService {
         return new UserResponse(user.getId(), user.getEmail());
     }
 
+
     // 유저 비밀번호 변경
     @Transactional
     public String changePassword(long userId, UserChangePasswordRequest userChangePasswordRequest) {
