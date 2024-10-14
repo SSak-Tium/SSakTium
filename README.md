@@ -69,3 +69,4 @@ application.yml 에서 spring.application.name 수정 후 $DB_URL 설정 후 사
 
 ### ⚽ Update
 > 2024.10.12 v1.0 
+# spring-user-setting-repo
