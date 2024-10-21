@@ -3,11 +3,11 @@ package com.sparta.springusersetting.domain.auth.dto.response;
 import lombok.Getter;
 
 @Getter
-public class SigninResponse {
+public class SigninResponseDto {
 
     private final String bearerToken;
 
-    public SigninResponse(String bearerToken) {
+    public SigninResponseDto(String bearerToken) {
         this.bearerToken = bearerToken;
     }
 }

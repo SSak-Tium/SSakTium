@@ -1,10 +1,10 @@
 package com.sparta.springusersetting.domain.auth.controller;
 
 import com.sparta.springusersetting.config.ApiResponse;
-import com.sparta.springusersetting.domain.auth.dto.request.SigninRequest;
-import com.sparta.springusersetting.domain.auth.dto.request.SignupRequest;
-import com.sparta.springusersetting.domain.auth.dto.response.SigninResponse;
-import com.sparta.springusersetting.domain.auth.dto.response.SignupResponse;
+import com.sparta.springusersetting.domain.auth.dto.request.SigninRequestDto;
+import com.sparta.springusersetting.domain.auth.dto.request.SignupRequestDto;
+import com.sparta.springusersetting.domain.auth.dto.response.SigninResponseDto;
+import com.sparta.springusersetting.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.springusersetting.domain.auth.service.AuthService;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
@@ -22,13 +22,13 @@ public class AuthController {
 
     // 회원가입
     @PostMapping("/auth/signup")
-    public ResponseEntity<ApiResponse<SignupResponse>> signup(@Valid @RequestBody SignupRequest signupRequest) {
-        return ResponseEntity.ok(ApiResponse.success(authService.signup(signupRequest)));
+    public ResponseEntity<ApiResponse<SignupResponseDto>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+        return ResponseEntity.ok(ApiResponse.success(authService.signup(signupRequestDto)));
     }
 
     // 로그인
     @PostMapping("/auth/signin")
-    public ResponseEntity<ApiResponse<SigninResponse>> signin(@Valid @RequestBody SigninRequest signinRequest) throws AuthException {
-        return ResponseEntity.ok(ApiResponse.success(authService.signin(signinRequest)));
+    public ResponseEntity<ApiResponse<SigninResponseDto>> signin(@Valid @RequestBody SigninRequestDto signinRequestDto) throws AuthException {
+        return ResponseEntity.ok(ApiResponse.success(authService.signin(signinRequestDto)));
     }
 }

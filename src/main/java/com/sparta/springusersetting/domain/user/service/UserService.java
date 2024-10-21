@@ -1,26 +1,18 @@
 package com.sparta.springusersetting.domain.user.service;
 
-import com.sparta.springusersetting.domain.common.exception.InvalidRequestException;
-import com.sparta.springusersetting.domain.user.dto.request.UserChangePasswordRequest;
-import com.sparta.springusersetting.domain.user.dto.response.UserResponse;
+import com.sparta.springusersetting.domain.auth.exception.InvalidPasswordFormatException;
+import com.sparta.springusersetting.domain.auth.exception.UnauthorizedPasswordException;
+import com.sparta.springusersetting.domain.user.dto.request.UserChangePasswordRequestDto;
+import com.sparta.springusersetting.domain.user.dto.request.UserCheckPasswordRequestDto;
+import com.sparta.springusersetting.domain.user.dto.response.UserResponseDto;
 import com.sparta.springusersetting.domain.user.entity.User;
-import com.sparta.springusersetting.domain.user.enums.UserRole;
+import com.sparta.springusersetting.domain.user.exception.DuplicatePasswordException;
+import com.sparta.springusersetting.domain.user.exception.NotFoundUserException;
 import com.sparta.springusersetting.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,41 +23,64 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     // 유저 조회 ( id )
-    public UserResponse getUser(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new InvalidRequestException("User not found"));
-        return new UserResponse(user.getId(), user.getEmail());
+    public UserResponseDto getUser(long userId) {
+        // 유저 조회
+        User user = findUser(userId);
+        return new UserResponseDto(user.getId(), user.getEmail());
     }
-
 
     // 유저 비밀번호 변경
     @Transactional
-    public String changePassword(long userId, UserChangePasswordRequest userChangePasswordRequest) {
-        validateNewPassword(userChangePasswordRequest);
+    public String changePassword(long userId, UserChangePasswordRequestDto userChangePasswordRequestDto) {
+        validateNewPassword(userChangePasswordRequestDto);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new InvalidRequestException("User not found"));
+        // 유저 조회
+        User user = findUser(userId);
 
-        if (passwordEncoder.matches(userChangePasswordRequest.getNewPassword(), user.getPassword())) {
-            throw new InvalidRequestException("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.");
+        // 새 비밀번호 확인
+        if (passwordEncoder.matches(userChangePasswordRequestDto.getNewPassword(), user.getPassword())) {
+            throw new DuplicatePasswordException();
         }
 
-        if (!passwordEncoder.matches(userChangePasswordRequest.getOldPassword(), user.getPassword())) {
-            throw new InvalidRequestException("잘못된 비밀번호입니다.");
+        // 이전 비밀번호 확인
+        if (!passwordEncoder.matches(userChangePasswordRequestDto.getOldPassword(), user.getPassword())) {
+            throw new UnauthorizedPasswordException();
         }
 
-        user.changePassword(passwordEncoder.encode(userChangePasswordRequest.getNewPassword()));
+        user.changePassword(passwordEncoder.encode(userChangePasswordRequestDto.getNewPassword()));
 
         return "비밀번호가 정상적으로 변경되었습니다.";
     }
 
+    // 유저 회원탈퇴
+    @Transactional
+    public String deleteUser(long userId, UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
+        // 유저 조회
+        User user = findUser(userId);
+
+        //비밀번호 확인
+        if (!passwordEncoder.matches(userCheckPasswordRequestDto.getPassword(), user.getPassword())) {
+            throw new UnauthorizedPasswordException();
+        }
+
+        // UserStatus DELETED 로 수정
+        user.delete();
+
+        return "회원탈퇴가 정상적으로 완료되었습니다.";
+    }
+
 
     // 패스워드 조건 확인 메서드
-    private static void validateNewPassword(UserChangePasswordRequest userChangePasswordRequest) {
-        if (userChangePasswordRequest.getNewPassword().length() < 8 ||
-                !userChangePasswordRequest.getNewPassword().matches(".*\\d.*") ||
-                !userChangePasswordRequest.getNewPassword().matches(".*[A-Z].*")) {
-            throw new InvalidRequestException("새 비밀번호는 8자 이상이어야 하고, 숫자와 대문자를 포함해야 합니다.");
+    private static void validateNewPassword(UserChangePasswordRequestDto userChangePasswordRequestDto) {
+        if (userChangePasswordRequestDto.getNewPassword().length() < 8 ||
+                !userChangePasswordRequestDto.getNewPassword().matches(".*\\d.*") ||
+                !userChangePasswordRequestDto.getNewPassword().matches(".*[A-Z].*")) {
+            throw new InvalidPasswordFormatException();
         }
     }
-}
 
+    // 유저 조회 메서드
+    public User findUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+    }
+}
