@@ -1,4 +1,4 @@
-# < Spring User Setting V0.1 >
+# < Spring User Setting v0.2 >
 
 > 프로젝트 시작 시 반복되는 회원가입, 로그인 기능 등을 쉽게 세팅하기 위해 구현한 Repository
 
@@ -28,9 +28,10 @@ application.yml 에서 spring.application.name 수정 후 $DB_URL 설정 후 사
   ![image](https://github.com/user-attachments/assets/ae42afd3-cc62-480c-b0a7-107bf7e5559c)
 
 - Spring Secrity, JWT Token 적용
-    - JWT Token 방식 [userId, email, userRole 암호화]
+    - JWT Token 방식 [userId, email, userName, userRole 암호화]
 
-  ![image](https://github.com/user-attachments/assets/96b56b5b-f009-4a55-9f5c-09774fd5ca55)
+  ![image](https://github.com/user-attachments/assets/673dec9b-be06-4f5a-a95f-f9057cc1cd95)
+
 
 - ApiResponse
     - 응답 형식 통일화
@@ -68,5 +69,7 @@ application.yml 에서 spring.application.name 수정 후 $DB_URL 설정 후 사
 ---
 
 ### ⚽ Update
-> 2024.10.12 v1.0 
-# spring-user-setting-repo
+- 2024.10.12 v0.1
+    - init
+- 2024.10.21 v0.2
+    - GlobalExceptionHandler 수정, 도메인별 Custom Exception 수정, User Entity, JWT Token userName 추가, 회원탈퇴 기능 추가 ( userStatus)
