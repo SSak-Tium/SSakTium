@@ -1,11 +1,11 @@
-package com.sparta.springusersetting.domain.user.controller;
+package com.sparta.springusersetting.domain.users.controller;
 
 import com.sparta.springusersetting.config.ApiResponse;
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
-import com.sparta.springusersetting.domain.user.dto.request.UserChangePasswordRequestDto;
-import com.sparta.springusersetting.domain.user.dto.request.UserCheckPasswordRequestDto;
-import com.sparta.springusersetting.domain.user.dto.response.UserResponseDto;
-import com.sparta.springusersetting.domain.user.service.UserService;
+import com.sparta.springusersetting.domain.users.dto.request.UserChangePasswordRequestDto;
+import com.sparta.springusersetting.domain.users.dto.request.UserCheckPasswordRequestDto;
+import com.sparta.springusersetting.domain.users.dto.response.UserResponseDto;
+import com.sparta.springusersetting.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

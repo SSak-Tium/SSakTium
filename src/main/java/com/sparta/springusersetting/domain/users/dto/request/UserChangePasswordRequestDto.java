@@ -1,4 +1,4 @@
-package com.sparta.springusersetting.domain.user.dto.request;
+package com.sparta.springusersetting.domain.users.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

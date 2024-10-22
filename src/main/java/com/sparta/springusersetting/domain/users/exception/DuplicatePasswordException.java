@@ -1,4 +1,4 @@
-package com.sparta.springusersetting.domain.user.exception;
+package com.sparta.springusersetting.domain.users.exception;
 
 import com.sparta.springusersetting.domain.common.exception.GlobalException;
 

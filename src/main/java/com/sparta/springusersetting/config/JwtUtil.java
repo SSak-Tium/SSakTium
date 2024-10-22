@@ -1,6 +1,6 @@
 package com.sparta.springusersetting.config;
 
-import com.sparta.springusersetting.domain.user.enums.UserRole;
+import com.sparta.springusersetting.domain.users.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

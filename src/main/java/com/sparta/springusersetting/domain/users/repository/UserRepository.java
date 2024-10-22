@@ -1,6 +1,6 @@
-package com.sparta.springusersetting.domain.user.repository;
+package com.sparta.springusersetting.domain.users.repository;
 
-import com.sparta.springusersetting.domain.user.entity.User;
+import com.sparta.springusersetting.domain.users.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

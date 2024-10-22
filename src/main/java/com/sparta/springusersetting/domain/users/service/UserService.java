@@ -1,14 +1,14 @@
-package com.sparta.springusersetting.domain.user.service;
+package com.sparta.springusersetting.domain.users.service;
 
 import com.sparta.springusersetting.domain.auth.exception.InvalidPasswordFormatException;
 import com.sparta.springusersetting.domain.auth.exception.UnauthorizedPasswordException;
-import com.sparta.springusersetting.domain.user.dto.request.UserChangePasswordRequestDto;
-import com.sparta.springusersetting.domain.user.dto.request.UserCheckPasswordRequestDto;
-import com.sparta.springusersetting.domain.user.dto.response.UserResponseDto;
-import com.sparta.springusersetting.domain.user.entity.User;
-import com.sparta.springusersetting.domain.user.exception.DuplicatePasswordException;
-import com.sparta.springusersetting.domain.user.exception.NotFoundUserException;
-import com.sparta.springusersetting.domain.user.repository.UserRepository;
+import com.sparta.springusersetting.domain.users.dto.request.UserChangePasswordRequestDto;
+import com.sparta.springusersetting.domain.users.dto.request.UserCheckPasswordRequestDto;
+import com.sparta.springusersetting.domain.users.dto.response.UserResponseDto;
+import com.sparta.springusersetting.domain.users.entity.User;
+import com.sparta.springusersetting.domain.users.exception.DuplicatePasswordException;
+import com.sparta.springusersetting.domain.users.exception.NotFoundUserException;
+import com.sparta.springusersetting.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

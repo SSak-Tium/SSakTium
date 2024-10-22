@@ -8,17 +8,15 @@ import com.sparta.springusersetting.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.springusersetting.domain.auth.exception.DeletedUserException;
 import com.sparta.springusersetting.domain.auth.exception.DuplicateEmailException;
 import com.sparta.springusersetting.domain.auth.exception.UnauthorizedPasswordException;
-import com.sparta.springusersetting.domain.user.entity.User;
-import com.sparta.springusersetting.domain.user.enums.UserRole;
-import com.sparta.springusersetting.domain.user.enums.UserStatus;
-import com.sparta.springusersetting.domain.user.exception.NotFoundUserException;
-import com.sparta.springusersetting.domain.user.repository.UserRepository;
+import com.sparta.springusersetting.domain.users.entity.User;
+import com.sparta.springusersetting.domain.users.enums.UserRole;
+import com.sparta.springusersetting.domain.users.enums.UserStatus;
+import com.sparta.springusersetting.domain.users.exception.NotFoundUserException;
+import com.sparta.springusersetting.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +36,13 @@ public class AuthService {
 
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
 
-        UserRole userRole = UserRole.of(signupRequestDto.getUserRole());
+        UserRole userRole = UserRole.of(UserRole.ROLE_USER.getUserRole());
 
         User newUser = new User(
                 signupRequestDto.getEmail(),
                 encodedPassword,
                 signupRequestDto.getUserName(),
+                signupRequestDto.getBirthDate(),
                 userRole
         );
         User savedUser = userRepository.save(newUser);
