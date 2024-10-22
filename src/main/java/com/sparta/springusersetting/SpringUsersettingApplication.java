@@ -9,6 +9,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class SpringUsersettingApplication {
 
     public static void main(String[] args) {
