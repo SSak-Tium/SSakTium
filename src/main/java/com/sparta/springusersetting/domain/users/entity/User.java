@@ -1,5 +1,6 @@
 package com.sparta.springusersetting.domain.users.entity;
 
+import com.sparta.springusersetting.domain.auth.dto.request.AdminSignupRequestDto;
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
 import com.sparta.springusersetting.domain.common.entity.Timestamped;
 import com.sparta.springusersetting.domain.users.enums.UserRole;
@@ -43,6 +44,14 @@ public class User extends Timestamped {
         this.userStatus = UserStatus.ACTIVE;
     }
 
+    public User(String email, String password, String userName, UserRole userRole) {
+        this.email = email;
+        this.password = password;
+        this.userName = userName;
+        this.userRole = userRole;
+        this.userStatus = UserStatus.ACTIVE;
+    }
+
     private User(Long id, String email, UserRole userRole) {
         this.id = id;
         this.email = email;
@@ -52,6 +61,10 @@ public class User extends Timestamped {
     public static User fromAuthUser(AuthUser authUser) {
         String roleName = authUser.getAuthorities().iterator().next().getAuthority();
         return new User(authUser.getUserId(), authUser.getEmail(), UserRole.of(roleName));
+    }
+
+    public static User addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
+        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), userRole);
     }
 
     // 유저 비밀번호 변경
