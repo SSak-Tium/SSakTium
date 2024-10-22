@@ -4,6 +4,7 @@ import com.sparta.springusersetting.domain.boards.dto.requestDto.BoardsSaveReque
 import com.sparta.springusersetting.domain.boards.dto.responseDto.BoardsDetailResponseDto;
 import com.sparta.springusersetting.domain.boards.dto.responseDto.BoardsSaveResponseDto;
 import com.sparta.springusersetting.domain.boards.entity.Boards;
+import com.sparta.springusersetting.domain.boards.exception.NotFoundBoardException;
 import com.sparta.springusersetting.domain.boards.repository.BoardsRepository;
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
 import com.sparta.springusersetting.domain.user.entity.User;
@@ -89,7 +90,7 @@ public class BoardsService {
 
     //Board 찾는 메서드
     public Boards findBoard(long id){
-       return boardsRepository.findById(id).orElseThrow(() -> new RuntimeException("aa"));
+       return boardsRepository.findById(id).orElseThrow(NotFoundBoardException::new);
     }
 
 }
