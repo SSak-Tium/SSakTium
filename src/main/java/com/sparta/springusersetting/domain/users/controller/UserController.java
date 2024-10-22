@@ -18,19 +18,19 @@ public class UserController {
     private final UserService userService;
 
     // 유저 조회 ( id )
-    @GetMapping("/user/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@PathVariable long userId) {
         return ResponseEntity.ok(ApiResponse.success(userService.getUser(userId)));
     }
 
     // 유저 비밀번호 변경
-    @PutMapping("/user")
+    @PutMapping("/users")
     public ResponseEntity<ApiResponse<String>> changePassword(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto) {
         return ResponseEntity.ok(ApiResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
     }
 
     // 유저 회원탈퇴
-    @DeleteMapping("/user")
+    @DeleteMapping("/users")
     public ResponseEntity<ApiResponse<String>> deleteUser(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
         return ResponseEntity.ok(ApiResponse.success(userService.deleteUser(authUser.getUserId(), userCheckPasswordRequestDto)));
     }

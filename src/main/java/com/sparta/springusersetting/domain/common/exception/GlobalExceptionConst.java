@@ -22,13 +22,14 @@ public enum GlobalExceptionConst {
     NOT_USER_OF_COMMENT(HttpStatus.FORBIDDEN, " 댓글 작성자가 아닙니다."),
     FILE_SAVE_FAILURE(HttpStatus.FORBIDDEN, "파일 저장중 오류가 발생하였습니다."),
 
-    // 상태코드 404git
+    // 상태코드 404
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, " 회원이 존재하지 않습니다."),
     NOT_FOUND_EMAIL(HttpStatus.NOT_FOUND, " 이메일을 확인해주세요."),
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, " 존재하지 않는 댓글입니다."),
     NOT_FOUND_CARD(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다."),
     NOT_FOUND_TITLE(HttpStatus.NOT_FOUND, " 제목이 없습니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, " 파일이 없습니다."),
+    NOT_FOUND_DICTIONARY(HttpStatus.NOT_FOUND, " 해당 식물이 없습니다."),
     DELETED_USER(HttpStatus.NOT_FOUND, " 탈퇴된 회원입니다."),
 
     // 상태코드 409
