@@ -5,17 +5,15 @@ import com.sparta.springusersetting.domain.boards.entity.PublicStatus;
 import lombok.Getter;
 
 @Getter
-public class BoardsResponseDto {
+public class BoardsSaveResponseDto {
 
     public final String title;
     public final String contents;
     public final String images;
-    public final PublicStatus publicStatus;
 
-    public BoardsResponseDto(Boards boards) {
+    public BoardsSaveResponseDto(Boards boards) {
         this.title = boards.getTitle();
         this.contents = boards.getContent();
         this.images = boards.getImage();
-        this.publicStatus = boards.getPublicStatus();
     }
 }

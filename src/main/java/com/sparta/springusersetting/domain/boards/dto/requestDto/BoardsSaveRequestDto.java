@@ -4,7 +4,7 @@ import com.sparta.springusersetting.domain.boards.entity.PublicStatus;
 import lombok.Getter;
 
 @Getter
-public class BoardsRequestDto {
+public class BoardsSaveRequestDto {
 
     private String title;
     private String contents;

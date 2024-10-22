@@ -1,7 +1,6 @@
 package com.sparta.springusersetting.domain.boards.entity;
 
-import com.sparta.springusersetting.domain.boards.dto.requestDto.BoardsRequestDto;
-import com.sparta.springusersetting.domain.boards.dto.responseDto.BoardsResponseDto;
+import com.sparta.springusersetting.domain.boards.dto.requestDto.BoardsSaveRequestDto;
 import com.sparta.springusersetting.domain.common.entity.Timestamped;
 import com.sparta.springusersetting.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -26,13 +25,29 @@ public class Boards extends Timestamped {
     @JoinColumn(name="user_id",nullable = false)
     private User user;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
 
-    public Boards (BoardsRequestDto boardsRequestDto){
-        this.title = boardsRequestDto.getTitle();
-        this.content = boardsRequestDto.getContents();
-        this.image = boardsRequestDto.getImages();
-        this.publicStatus = boardsRequestDto.getPublicStatus();
+    @Enumerated(EnumType.STRING)
+    private StatusEnum statusEnum;
+
+    public Boards (BoardsSaveRequestDto boardsSaveRequestDto){
+        this.title = boardsSaveRequestDto.getTitle();
+        this.content = boardsSaveRequestDto.getContents();
+        this.image = boardsSaveRequestDto.getImages();
+        this.publicStatus = boardsSaveRequestDto.getPublicStatus();
+        this.statusEnum = StatusEnum.ACTIVATED;
+    }
+
+    public void updateBoards(BoardsSaveRequestDto boardsSaveRequestDto){
+        this.title = boardsSaveRequestDto.getTitle();
+        this.content = boardsSaveRequestDto.getContents();
+        this.image = boardsSaveRequestDto.getImages();
+        this.publicStatus = boardsSaveRequestDto.getPublicStatus();
+        this.statusEnum = StatusEnum.ACTIVATED;
+    }
+
+    public void deleteBoards(){
+        this.statusEnum = StatusEnum.DELETED;
     }
 }
