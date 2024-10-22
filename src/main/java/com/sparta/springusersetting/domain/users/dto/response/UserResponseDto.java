@@ -1,4 +1,4 @@
-package com.sparta.springusersetting.domain.user.dto.response;
+package com.sparta.springusersetting.domain.users.dto.response;
 
 import lombok.Getter;
 

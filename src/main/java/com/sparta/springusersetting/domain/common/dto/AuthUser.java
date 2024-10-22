@@ -1,6 +1,6 @@
 package com.sparta.springusersetting.domain.common.dto;
 
-import com.sparta.springusersetting.domain.user.enums.UserRole;
+import com.sparta.springusersetting.domain.users.enums.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

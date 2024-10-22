@@ -1,4 +1,4 @@
-package com.sparta.springusersetting.domain.user.enums;
+package com.sparta.springusersetting.domain.users.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

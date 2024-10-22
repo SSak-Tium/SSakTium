@@ -1,7 +1,7 @@
 package com.sparta.springusersetting.config;
 
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
-import com.sparta.springusersetting.domain.user.enums.UserRole;
+import com.sparta.springusersetting.domain.users.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
