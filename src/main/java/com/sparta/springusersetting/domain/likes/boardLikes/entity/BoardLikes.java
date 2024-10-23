@@ -1,9 +1,7 @@
 package com.sparta.springusersetting.domain.likes.boardLikes.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.sparta.springusersetting.domain.boards.entity.Board;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +14,16 @@ public class BoardLikes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id", nullable =false)
+    private Board board;
 
+    @Column(name = "user_id",nullable = false)
+    private Long userId;
+
+    public BoardLikes(Board board, Long userId){
+        this.board = board;
+        this.userId = userId;
+    }
 
 }
