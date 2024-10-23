@@ -106,6 +106,12 @@ public class DictionaryService {
         // 식물도감 조회
         Dictionaries dictionaries = findDictionary(dictionaryId);
 
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        String menuImageName = s3Service.extractFileNameFromUrl(dictionaries.getImageUrl());
+
+        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
+        s3Service.s3Client.deleteObject(s3Service.bucket, menuImageName);
+
         // DB 삭제
         dictionaryRepository.delete(dictionaries);
 
