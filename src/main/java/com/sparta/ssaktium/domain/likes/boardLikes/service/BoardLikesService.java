@@ -49,7 +49,7 @@ public class BoardLikesService {
         BoardLikes boardLikes = new BoardLikes(board, authUser.getUserId());
         boardLikesRepository.save(boardLikes);
 
-        // 게시글에 나오는 좋아요 수 증가
+        // 게시글에 등록된 좋아요 수 증가
         board.incrementLikesCount();
         boardRepository.save(board);
 
