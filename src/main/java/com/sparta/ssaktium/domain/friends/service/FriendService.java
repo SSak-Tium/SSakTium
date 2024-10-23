@@ -5,6 +5,7 @@ import com.sparta.ssaktium.domain.friends.dto.responseDto.FriendPageResponseDto;
 import com.sparta.ssaktium.domain.friends.dto.responseDto.FriendResponseDto;
 import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.entity.Friends;
+import com.sparta.ssaktium.domain.friends.exception.*;
 import com.sparta.ssaktium.domain.friends.repository.FriendRepository;
 import com.sparta.ssaktium.domain.users.entity.Users;
 import com.sparta.ssaktium.domain.users.service.UserService;
@@ -33,12 +34,12 @@ public class FriendService {
         Users friendUser = userService.findUser(id);
 
         if (user.getId().equals(id)) {
-            throw new IllegalArgumentException("You cannot invite yourself");
+            throw new SelfRequestException();
         }
 
         Optional<Friends> checkAlreadyRequest = friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser.getId());
         if (checkAlreadyRequest.isPresent()) {
-            throw new IllegalArgumentException("해당 친구는 이미 요청을 보냈습니다.");
+            throw new FriendRequestAlreadySentException();
         }
 
         Friends friends = new Friends(user, friendUser);
@@ -55,17 +56,17 @@ public class FriendService {
         Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(user.getId(), id);
 
         if (friendRequest.isEmpty()) {
-            throw new IllegalArgumentException("해당 친구 요청을 찾을 수 없습니다.");
+            throw new NotFoundRequestFriendException();
         }
 
         Friends friends = friendRequest.get();
 
         if (!friends.getUserId().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("본인이 보낸 친구 요청만 취소할 수 있습니다.");
+            throw new UnauthorizedFriendRequestCancellationException();
         }
 
         if (friends.getFriendStatus() != FriendStatus.PENDING) {
-            throw new IllegalArgumentException("이미 수락했거나 거절된 친구 요청입니다.");
+            throw new InvalidFriendRequestStatusException();
         }
 
         friendRepository.delete(friends);
@@ -79,17 +80,17 @@ public class FriendService {
         Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
 
         if (friendRequest.isEmpty()) {
-            throw new IllegalArgumentException("해당 친구 요청을 찾을 수 없습니다.");
+            throw new NotFoundRequestFriendException();
         }
 
         Friends friends = friendRequest.get();
 
         if (!friends.getFriendUserId().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("본인이 받은 친구 요청만 수락할 수 있습니다.");
+            throw new UnauthorizedFriendRequestAcceptanceException();
         }
 
         if (friends.getFriendStatus() == FriendStatus.ACCEPTED) {
-            throw new IllegalArgumentException("이미 수락한 친구입니다.");
+            throw new AlreadyAcceptedFriendException();
         }
 
         friends.acceptFriend();
@@ -105,17 +106,17 @@ public class FriendService {
         Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
 
         if (friendRequest.isEmpty()) {
-            throw new IllegalArgumentException("해당 친구 요청을 찾을 수 없습니다.");
+            throw new NotFoundRequestFriendException();
         }
 
         Friends friends = friendRequest.get();
 
         if (!friends.getFriendUserId().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("본인이 받은 친구 요청만 수락할 수 있습니다.");
+            throw new UnauthorizedFriendRequestAcceptanceException();
         }
 
         if (friends.getFriendStatus() != FriendStatus.PENDING) {
-            throw new IllegalArgumentException("이미 수락 또는 거절한 친구입니다.");
+            throw new AlreadyAcceptedFriendException();
         }
 
         friends.rejectFriend();
@@ -163,7 +164,7 @@ public class FriendService {
 
         // 친구 관계가 존재하지 않는 경우 예외 처리
         if (friendRelationship.isEmpty()) {
-            throw new IllegalArgumentException("해당 친구 관계를 찾을 수 없습니다.");
+            throw new NotFoundFriendException();
         }
 
         // 친구 관계 삭제
