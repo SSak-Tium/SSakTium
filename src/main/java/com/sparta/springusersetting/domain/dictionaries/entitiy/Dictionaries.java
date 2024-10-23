@@ -19,11 +19,13 @@ public class Dictionaries {
     private String title;
     private String content;
     private String userName;
+    private String imageUrl;
 
-    public Dictionaries(DictionaryRequestDto dictionaryRequestDto, String userName) {
+    public Dictionaries(DictionaryRequestDto dictionaryRequestDto, String userName, String imageUrl) {
         this.title = dictionaryRequestDto.getTitle();
         this.content = dictionaryRequestDto.getContent();
         this.userName = userName;
+        this.imageUrl = imageUrl;
     }
 
     public void update(DictionaryUpdateRequestDto dictionaryUpdateRequestDto) {
