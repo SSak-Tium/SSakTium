@@ -28,8 +28,9 @@ public class Dictionaries {
         this.imageUrl = imageUrl;
     }
 
-    public void update(DictionaryUpdateRequestDto dictionaryUpdateRequestDto) {
+    public void update(DictionaryUpdateRequestDto dictionaryUpdateRequestDto, String imageUrl) {
         this.title = dictionaryUpdateRequestDto.getTitle();
         this.content = dictionaryUpdateRequestDto.getContent();
+        this.imageUrl = imageUrl;
     }
 }
