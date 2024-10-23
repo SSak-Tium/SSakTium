@@ -92,4 +92,30 @@ public class FriendService {
 
         return new FriendResponseDto(friends, friends.getFriendUserId(), friends.getUserId());
     }
+
+    public FriendResponseDto rejectFriend(AuthUser authUser, Long id) {
+        User user = User.fromAuthUser(authUser);
+        userService.findUser(user.getId());
+
+        Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
+
+        if (friendRequest.isEmpty()) {
+            throw new IllegalArgumentException("해당 친구 요청을 찾을 수 없습니다.");
+        }
+
+        Friends friends = friendRequest.get();
+
+        if (!friends.getFriendUserId().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("본인이 받은 친구 요청만 수락할 수 있습니다.");
+        }
+
+        if (friends.getFriendStatus() != FriendStatus.PENDING) {
+            throw new IllegalArgumentException("이미 수락 또는 거절한 친구입니다.");
+        }
+
+        friends.rejectFriend();
+        friendRepository.save(friends);
+
+        return new FriendResponseDto(friends, friends.getFriendUserId(), friends.getUserId());
+    }
 }

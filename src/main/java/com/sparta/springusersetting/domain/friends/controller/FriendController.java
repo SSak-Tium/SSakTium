@@ -16,10 +16,11 @@ public class FriendController {
     private final FriendService friendService;
 
     /**
-     * 친구 신청 API
+     * 친구요청 API
+     *
      * @param authUser
      * @param id
-     * @return "친구 요청 완료"
+     * @return
      */
     @PostMapping("/v1/users/{id}/friends")
     public ResponseEntity<ApiResponse<FriendResponseDto>> requestFriend(@AuthenticationPrincipal AuthUser authUser,
@@ -28,18 +29,48 @@ public class FriendController {
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
+    /**
+     * 친구 요청 취소 API
+     *
+     * @param authUser
+     * @param id
+     * @return
+     */
     @DeleteMapping("/v1/users/{id}/friends")
     public ResponseEntity<ApiResponse<String>> cancelFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
         friendService.cancelFriend(authUser, id);
         return ResponseEntity.ok(ApiResponse.success("친구 요청이 취소되었습니다."));
     }
 
+    /**
+     * 친구 요청 수락 API
+     *
+     * @param authUser
+     * @param id
+     * @return
+     */
     @PutMapping("v1/friends/{id}/accept")
     public ResponseEntity<ApiResponse<FriendResponseDto>> acceptFriend(@AuthenticationPrincipal AuthUser authUser,
-                                                                             @PathVariable Long id) {
+                                                                       @PathVariable Long id) {
         FriendResponseDto responseDto = friendService.acceptFriend(authUser, id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
+
+    /**
+     * 친구 요청 거절 API
+     * @param authUser
+     * @param id
+     * @return
+     */
+    @PutMapping("v1/friends/{id}/reject")
+    public ResponseEntity<ApiResponse<FriendResponseDto>> rejectFriend(@AuthenticationPrincipal AuthUser authUser,
+                                                                       @PathVariable Long id) {
+        FriendResponseDto responseDto = friendService.rejectFriend(authUser, id);
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
+    }
+
+
+
 
 
 }
