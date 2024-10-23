@@ -2,9 +2,11 @@ package com.sparta.springusersetting.domain.friends.controller;
 
 import com.sparta.springusersetting.config.ApiResponse;
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
+import com.sparta.springusersetting.domain.friends.dto.responseDto.FriendPageResponseDto;
 import com.sparta.springusersetting.domain.friends.dto.responseDto.FriendResponseDto;
 import com.sparta.springusersetting.domain.friends.service.FriendService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -62,15 +64,18 @@ public class FriendController {
      * @param id
      * @return
      */
-    @PutMapping("v1/friends/{id}/reject")
+    @PutMapping("/v1/friends/{id}/reject")
     public ResponseEntity<ApiResponse<FriendResponseDto>> rejectFriend(@AuthenticationPrincipal AuthUser authUser,
                                                                        @PathVariable Long id) {
         FriendResponseDto responseDto = friendService.rejectFriend(authUser, id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
-
-
-
-
+    @GetMapping("/v1/friends")
+    public ResponseEntity<ApiResponse<Page<FriendPageResponseDto>>> getFriends(@AuthenticationPrincipal AuthUser authUser,
+                                                                  @RequestParam(defaultValue = "1") int page,
+                                                                  @RequestParam(defaultValue = "10") int size) {
+        Page<FriendPageResponseDto> responseDtos = friendService.getFriends(authUser, page, size);
+        return ResponseEntity.ok(ApiResponse.success(responseDtos));
+    }
 }

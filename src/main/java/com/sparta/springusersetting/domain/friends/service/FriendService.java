@@ -1,6 +1,7 @@
 package com.sparta.springusersetting.domain.friends.service;
 
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
+import com.sparta.springusersetting.domain.friends.dto.responseDto.FriendPageResponseDto;
 import com.sparta.springusersetting.domain.friends.dto.responseDto.FriendResponseDto;
 import com.sparta.springusersetting.domain.friends.entity.FriendStatus;
 import com.sparta.springusersetting.domain.friends.entity.Friends;
@@ -9,12 +10,16 @@ import com.sparta.springusersetting.domain.users.entity.User;
 import com.sparta.springusersetting.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FriendService {
 
     private final UserService userService;
@@ -117,5 +122,25 @@ public class FriendService {
         friendRepository.save(friends);
 
         return new FriendResponseDto(friends, friends.getFriendUserId(), friends.getUserId());
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<FriendPageResponseDto> getFriends(AuthUser authUser, int page, int size) {
+
+        User user = User.fromAuthUser(authUser);
+        userService.findUser(user.getId());
+
+        // 친구 목록을 가져오는 쿼리
+        Page<Friends> friendsPage =
+                friendRepository.findByUserIdOrFriendId(user.getId(),user.getId(), PageRequest.of(page-1, size));
+
+        // DTO 변환
+        return friendsPage.map(friends -> {
+            Long friendId = friends.getFriendUserId().getId().equals(user.getId())
+                    ? friends.getUserId().getId()
+                    : friends.getFriendUserId().getId();
+            return new FriendPageResponseDto(friends, friendId);
+        });
     }
 }
