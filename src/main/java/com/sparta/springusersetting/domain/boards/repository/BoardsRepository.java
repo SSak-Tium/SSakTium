@@ -2,6 +2,7 @@ package com.sparta.springusersetting.domain.boards.repository;
 
 import com.sparta.springusersetting.domain.boards.entity.Boards;
 import com.sparta.springusersetting.domain.boards.entity.PublicStatus;
+import com.sparta.springusersetting.domain.boards.entity.StatusEnum;
 import com.sparta.springusersetting.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public interface BoardsRepository extends JpaRepository<Boards,Long> {
 
-    Page<Boards> findAllByUserId(Long id, Pageable pageable);
+    Page<Boards> findAllByUserIdAndStatusEnum(Long id, StatusEnum statusEnum, Pageable pageable);
 
     @Query("SELECT b FROM Boards b WHERE (b.user = :user) OR " +
             "(b.publicStatus = :friendsStatus AND b.user IN :friends) OR " +

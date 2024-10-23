@@ -3,11 +3,13 @@ package com.sparta.springusersetting.domain.boards.controller;
 import com.sparta.springusersetting.config.ApiResponse;
 import com.sparta.springusersetting.domain.boards.dto.responseDto.BoardsDetailResponseDto;
 import com.sparta.springusersetting.domain.boards.dto.requestDto.BoardsSaveRequestDto;
+import com.sparta.springusersetting.domain.boards.dto.responseDto.BoardsPageResponseDto;
 import com.sparta.springusersetting.domain.boards.dto.responseDto.BoardsSaveResponseDto;
 import com.sparta.springusersetting.domain.boards.service.BoardsService;
 import com.sparta.springusersetting.domain.common.dto.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -71,10 +73,10 @@ public class BoardsController {
      * @param size
      * 댓글 페이지네이션 빠져있음
      */
-    @GetMapping("/boards/myboards")
-    public ResponseEntity<ApiResponse<Page<BoardsDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
-                                                                                @RequestParam(defaultValue = "1") int page,
-                                                                                @RequestParam(defaultValue = "5") int size){
+    @GetMapping("/boards/me")
+    public ResponseEntity<ApiResponse<BoardsPageResponseDto>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
+                                                                          @RequestParam(defaultValue = "1") int page,
+                                                                          @RequestParam(defaultValue = "5") int size){
         return ResponseEntity.ok(ApiResponse.success(boardsService.getMyBoards(authUser,page,size)));
     }
 

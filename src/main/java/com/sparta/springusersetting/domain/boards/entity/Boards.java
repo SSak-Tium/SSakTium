@@ -31,11 +31,12 @@ public class Boards extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Boards (BoardsSaveRequestDto boardsSaveRequestDto){
+    public Boards (BoardsSaveRequestDto boardsSaveRequestDto,User user){
         this.title = boardsSaveRequestDto.getTitle();
         this.content = boardsSaveRequestDto.getContents();
         this.image = boardsSaveRequestDto.getImages();
         this.publicStatus = boardsSaveRequestDto.getPublicStatus();
+        this.user = user;
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
