@@ -21,7 +21,8 @@ public class BoardsController {
     /**
      * 게시글 작성
      * @param authUser
-     * @RequestBody requestDto
+     * @param requestDto
+     * @return
      */
     @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardsSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
