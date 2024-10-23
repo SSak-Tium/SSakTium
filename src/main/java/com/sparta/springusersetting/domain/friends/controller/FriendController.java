@@ -86,5 +86,16 @@ public class FriendController {
         return ResponseEntity.ok(ApiResponse.success(responseDtos));
     }
 
+    /**
+     * 친구 삭제 API
+     * @param authUser
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/v1/friends/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
+        friendService.deleteFriend(authUser, id);
+        return ResponseEntity.ok(ApiResponse.success("친구 삭제 성공"));
+    }
 
 }

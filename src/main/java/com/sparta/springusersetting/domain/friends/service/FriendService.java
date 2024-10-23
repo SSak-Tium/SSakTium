@@ -148,4 +148,25 @@ public class FriendService {
             return new FriendPageResponseDto(friends, friendId);
         });
     }
+
+    public void deleteFriend(AuthUser authUser, Long id) {
+        User user = User.fromAuthUser(authUser);
+        userService.findUser(user.getId());
+
+        // 친구 관계를 조회
+        Optional<Friends> friendRelationship = friendRepository.findByUserIdAndFriendId(user.getId(), id);
+
+        // 친구 관계가 없으면, 반대의 경우도 확인
+        if (friendRelationship.isEmpty()) {
+            friendRelationship = friendRepository.findByUserIdAndFriendId(id, user.getId());
+        }
+
+        // 친구 관계가 존재하지 않는 경우 예외 처리
+        if (friendRelationship.isEmpty()) {
+            throw new IllegalArgumentException("해당 친구 관계를 찾을 수 없습니다.");
+        }
+
+        // 친구 관계 삭제
+        friendRepository.delete(friendRelationship.get());
+    }
 }
