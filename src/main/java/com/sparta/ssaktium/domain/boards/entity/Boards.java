@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.boards.entity;
 
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
-import com.sparta.ssaktium.domain.user.entity.User;
+import com.sparta.ssaktium.domain.users.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class Boards extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)
-    private User user;
+    private Users user;
 
     @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
@@ -31,7 +31,7 @@ public class Boards extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Boards (BoardsSaveRequestDto boardsSaveRequestDto,User user){
+    public Boards (BoardsSaveRequestDto boardsSaveRequestDto,Users user){
         this.title = boardsSaveRequestDto.getTitle();
         this.content = boardsSaveRequestDto.getContents();
         this.image = boardsSaveRequestDto.getImages();

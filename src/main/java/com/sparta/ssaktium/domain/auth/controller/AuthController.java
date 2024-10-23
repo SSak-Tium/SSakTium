@@ -21,13 +21,13 @@ public class AuthController {
     private final AuthService authService;
 
     // 회원가입
-    @PostMapping("/auth/signup")
+    @PostMapping("/v1/auth/signup")
     public ResponseEntity<ApiResponse<SignupResponseDto>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
         return ResponseEntity.ok(ApiResponse.success(authService.signup(signupRequestDto)));
     }
 
     // 로그인
-    @PostMapping("/auth/signin")
+    @PostMapping("/v1/auth/signin")
     public ResponseEntity<ApiResponse<SigninResponseDto>> signin(@Valid @RequestBody SigninRequestDto signinRequestDto) throws AuthException {
         return ResponseEntity.ok(ApiResponse.success(authService.signin(signinRequestDto)));
     }
