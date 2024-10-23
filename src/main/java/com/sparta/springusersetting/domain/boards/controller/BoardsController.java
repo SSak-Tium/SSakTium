@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/boards")
+@RequestMapping("/v1")
 public class BoardsController {
 
     private final BoardsService boardsService;
@@ -26,7 +26,7 @@ public class BoardsController {
      * @param authUser
      * @RequestBody requestDto
      */
-    @PostMapping()
+    @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardsSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                         @RequestBody BoardsSaveRequestDto requestDto){
         return  ResponseEntity.ok(ApiResponse.success(boardsService.saveBoards(authUser,requestDto)));
@@ -38,7 +38,7 @@ public class BoardsController {
      * @param id
      * @param requestDto
      */
-    @PutMapping("/{id}")
+    @PutMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<BoardsSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                            @PathVariable Long id,
                                                                            @RequestBody BoardsSaveRequestDto requestDto){
@@ -50,7 +50,7 @@ public class BoardsController {
      * @param authUser
      * @param id
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
                                                        @PathVariable Long id){
         boardsService.deleteBoards(authUser,id);
@@ -58,7 +58,7 @@ public class BoardsController {
     }
 
     //게시글 단건 조회 (댓글 빠져있음)
-//    @GetMapping("/{id}")
+//    @GetMapping("/boards/{id}")
 //    public ResponseEntity<ApiResponse<BoardsDetailResponseDto>> getBoard(@PathVariable Long id){
 //        boardsService.getBoard();
 //        return ResponseEntity.ok(ApiResponse.success(boardsService.getBoard()));
@@ -71,7 +71,7 @@ public class BoardsController {
      * @param size
      * 댓글 페이지네이션 빠져있음
      */
-    @GetMapping("/my-boards")
+    @GetMapping("/boards/myboards")
     public ResponseEntity<ApiResponse<Page<BoardsDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
                                                                                 @RequestParam(defaultValue = "1") int page,
                                                                                 @RequestParam(defaultValue = "5") int size){

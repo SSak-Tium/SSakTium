@@ -43,7 +43,7 @@ public class BoardsService {
         //게시글 찾기
         Boards updateBoards = findBoard(id);
         //게시글 본인 확인
-       if(updateBoards.getUser().equals(user)){
+       if(!updateBoards.getUser().equals(user)){
            throw new RuntimeException();
        }
        //게시글 수정
