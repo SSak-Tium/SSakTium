@@ -50,8 +50,8 @@ public class DictionaryController {
     @PutMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestParam DictionaryUpdateRequestDto dictionaryUpdateRequestDto,
-            @RequestParam MultipartFile image,
+            @RequestPart DictionaryUpdateRequestDto dictionaryUpdateRequestDto,
+            @RequestPart MultipartFile image,
             @PathVariable long id) throws IOException {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, image, id)));
     }
