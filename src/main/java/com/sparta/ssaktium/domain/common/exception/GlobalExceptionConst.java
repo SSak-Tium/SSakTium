@@ -33,6 +33,7 @@ public enum GlobalExceptionConst {
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, " 파일이 없습니다."),
     DELETED_USER(HttpStatus.NOT_FOUND, " 탈퇴된 회원입니다."),
     NOT_FOUND_BOARD_LIKE(HttpStatus.NOT_FOUND, " 게시글에 해당 좋아요가 존재하지 않습니다."),
+    NOT_FOUND_COMMENT_LIKE(HttpStatus.NOT_FOUND, " 댓글에 해당 좋아요가 존재하지 않습니다."),
 
     // 상태코드 409
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, " 중복된 이메일입니다."),
