@@ -5,7 +5,7 @@ import com.sparta.springusersetting.domain.auth.exception.UnauthorizedPasswordEx
 import com.sparta.springusersetting.domain.users.dto.request.UserChangePasswordRequestDto;
 import com.sparta.springusersetting.domain.users.dto.request.UserCheckPasswordRequestDto;
 import com.sparta.springusersetting.domain.users.dto.response.UserResponseDto;
-import com.sparta.springusersetting.domain.users.entity.User;
+import com.sparta.springusersetting.domain.users.entity.Users;
 import com.sparta.springusersetting.domain.users.exception.DuplicatePasswordException;
 import com.sparta.springusersetting.domain.users.exception.NotFoundUserException;
 import com.sparta.springusersetting.domain.users.repository.UserRepository;
@@ -25,8 +25,8 @@ public class UserService {
     // 유저 조회 ( id )
     public UserResponseDto getUser(long userId) {
         // 유저 조회
-        User user = findUser(userId);
-        return new UserResponseDto(user.getId(), user.getEmail());
+        Users users = findUser(userId);
+        return new UserResponseDto(users.getId(), users.getEmail());
     }
 
     // 유저 비밀번호 변경
@@ -35,19 +35,19 @@ public class UserService {
         validateNewPassword(userChangePasswordRequestDto);
 
         // 유저 조회
-        User user = findUser(userId);
+        Users users = findUser(userId);
 
         // 새 비밀번호 확인
-        if (passwordEncoder.matches(userChangePasswordRequestDto.getNewPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(userChangePasswordRequestDto.getNewPassword(), users.getPassword())) {
             throw new DuplicatePasswordException();
         }
 
         // 이전 비밀번호 확인
-        if (!passwordEncoder.matches(userChangePasswordRequestDto.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userChangePasswordRequestDto.getOldPassword(), users.getPassword())) {
             throw new UnauthorizedPasswordException();
         }
 
-        user.changePassword(passwordEncoder.encode(userChangePasswordRequestDto.getNewPassword()));
+        users.changePassword(passwordEncoder.encode(userChangePasswordRequestDto.getNewPassword()));
 
         return "비밀번호가 정상적으로 변경되었습니다.";
     }
@@ -56,15 +56,15 @@ public class UserService {
     @Transactional
     public String deleteUser(long userId, UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
         // 유저 조회
-        User user = findUser(userId);
+        Users users = findUser(userId);
 
         //비밀번호 확인
-        if (!passwordEncoder.matches(userCheckPasswordRequestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userCheckPasswordRequestDto.getPassword(), users.getPassword())) {
             throw new UnauthorizedPasswordException();
         }
 
         // UserStatus DELETED 로 수정
-        user.delete();
+        users.delete();
 
         return "회원탈퇴가 정상적으로 완료되었습니다.";
     }
@@ -80,7 +80,7 @@ public class UserService {
     }
 
     // 유저 조회 메서드
-    public User findUser(long userId) {
+    public Users findUser(long userId) {
         return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
     }
 }

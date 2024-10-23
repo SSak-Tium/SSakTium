@@ -9,9 +9,13 @@ import com.sparta.springusersetting.domain.dictionaries.dto.response.DictionaryR
 import com.sparta.springusersetting.domain.dictionaries.service.DictionaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +24,12 @@ public class DictionaryController {
     private final DictionaryService dictionaryService;
 
     // 식물사전 등록
-    @PostMapping("/v1/dictionaries")
-    public ResponseEntity<ApiResponse<DictionaryResponseDto>> createDictionary(@AuthenticationPrincipal AuthUser authUser, @RequestBody DictionaryRequestDto dictionaryRequestDto) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto)));
+    @PostMapping(value = "/v1/dictionaries", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ApiResponse<DictionaryResponseDto>> createDictionary(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestPart DictionaryRequestDto dictionaryRequestDto,
+            @RequestPart MultipartFile image) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto, image)));
     }
 
     // 식물사전 단건 조회

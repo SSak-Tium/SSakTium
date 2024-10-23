@@ -1,6 +1,6 @@
 package com.sparta.springusersetting.domain.dictionaries.service;
 
-import com.sparta.springusersetting.domain.dictionaries.controller.DictionaryController;
+import com.sparta.springusersetting.domain.common.service.S3Service;
 import com.sparta.springusersetting.domain.dictionaries.dto.request.DictionaryRequestDto;
 import com.sparta.springusersetting.domain.dictionaries.dto.request.DictionaryUpdateRequestDto;
 import com.sparta.springusersetting.domain.dictionaries.dto.response.DictionaryListResponseDto;
@@ -8,7 +8,7 @@ import com.sparta.springusersetting.domain.dictionaries.dto.response.DictionaryR
 import com.sparta.springusersetting.domain.dictionaries.entitiy.Dictionaries;
 import com.sparta.springusersetting.domain.dictionaries.exception.NotFoundDictionaryException;
 import com.sparta.springusersetting.domain.dictionaries.repository.DictionaryRepository;
-import com.sparta.springusersetting.domain.users.entity.User;
+import com.sparta.springusersetting.domain.users.entity.Users;
 import com.sparta.springusersetting.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +27,24 @@ public class DictionaryService {
 
     private final DictionaryRepository dictionaryRepository;
     private final UserService userService;
+    private final S3Service s3Service;
 
     // 식물사전 등록
-    public DictionaryResponseDto createDictionary(long userId, DictionaryRequestDto dictionaryRequestDto) {
+    public DictionaryResponseDto createDictionary(long userId, DictionaryRequestDto dictionaryRequestDto, MultipartFile image) throws IOException {
         // 유저 조회
-        User user = userService.findUser(userId);
+        Users users = userService.findUser(userId);
+
+        // 업로드한 파일의 S3 URL 주소
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
         // Entity 생성
-        Dictionaries dictionaries = new Dictionaries(dictionaryRequestDto, user.getUserName());
+        Dictionaries dictionaries = new Dictionaries(dictionaryRequestDto, users.getUserName(), imageUrl);
 
         // DB 저장
         dictionaryRepository.save(dictionaries);
 
         // Dto 반환
-        return new DictionaryResponseDto(dictionaries.getTitle(), dictionaries.getContent(), dictionaries.getUserName());
+        return new DictionaryResponseDto(dictionaries.getTitle(), dictionaries.getContent(), dictionaries.getUserName(), dictionaries.getImageUrl());
     }
 
     // 식물사전 단건 조회
@@ -50,7 +57,7 @@ public class DictionaryService {
         Dictionaries dictionaries = findDictionary(dictionaryId);
 
         // Dto 반환
-        return new DictionaryResponseDto(dictionaries.getTitle(), dictionaries.getContent(), dictionaries.getUserName());
+        return new DictionaryResponseDto(dictionaries.getTitle(), dictionaries.getContent(), dictionaries.getUserName(), dictionaries.getImageUrl());
     }
 
     // 식물사전 리스트 조회
@@ -85,7 +92,7 @@ public class DictionaryService {
         dictionaryRepository.save(dictionaries);
 
         // DTO 반환
-        return new DictionaryResponseDto(dictionaries.getTitle(), dictionaries.getContent(), dictionaries.getUserName());
+        return new DictionaryResponseDto(dictionaries.getTitle(), dictionaries.getContent(), dictionaries.getUserName(), dictionaries.getImageUrl());
     }
 
     // 식물사전 삭제
@@ -106,7 +113,4 @@ public class DictionaryService {
     public Dictionaries findDictionary(long dictionaryId) {
         return dictionaryRepository.findById(dictionaryId).orElseThrow(NotFoundDictionaryException::new);
     }
-
-
-
 }
