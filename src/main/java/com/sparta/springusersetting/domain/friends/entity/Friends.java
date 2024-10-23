@@ -2,7 +2,7 @@ package com.sparta.springusersetting.domain.friends.entity;
 
 import com.sparta.springusersetting.domain.common.entity.Timestamped;
 
-import com.sparta.springusersetting.domain.users.entity.User;
+import com.sparta.springusersetting.domain.users.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,23 +18,23 @@ public class Friends extends Timestamped {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private Users userId;
 
     @ManyToOne
     @JoinColumn(name = "friend_id", nullable = false)
-    private User friendUserId;
+    private Users friendUserId;
 
     private FriendStatus friendStatus;
 
 
-    public Friends(Long id, User userId, User friendUserId, FriendStatus friendStatus) {
+    public Friends(Long id, Users userId, Users friendUserId, FriendStatus friendStatus) {
         this.id = id;
         this.userId = userId;
         this.friendUserId = friendUserId;
         this.friendStatus = friendStatus;
     }
 
-    public Friends(User userId, User friendUserId) {
+    public Friends(Users userId, Users friendUserId) {
         this.userId = userId;
         this.friendUserId = friendUserId;
         this.friendStatus = FriendStatus.PENDING;

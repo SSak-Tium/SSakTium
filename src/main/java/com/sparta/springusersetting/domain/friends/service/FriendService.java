@@ -6,7 +6,7 @@ import com.sparta.springusersetting.domain.friends.dto.responseDto.FriendRespons
 import com.sparta.springusersetting.domain.friends.entity.FriendStatus;
 import com.sparta.springusersetting.domain.friends.entity.Friends;
 import com.sparta.springusersetting.domain.friends.repository.FriendRepository;
-import com.sparta.springusersetting.domain.users.entity.User;
+import com.sparta.springusersetting.domain.users.entity.Users;
 import com.sparta.springusersetting.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -27,10 +27,10 @@ public class FriendService {
 
     public FriendResponseDto requestFriend(AuthUser authUser, Long id) {
 
-        User user = User.fromAuthUser(authUser);
+        Users user = Users.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
-        User friendUser = userService.findUser(id);
+        Users friendUser = userService.findUser(id);
 
         if (user.getId().equals(id)) {
             throw new IllegalArgumentException("You cannot invite yourself");
@@ -49,7 +49,7 @@ public class FriendService {
 
     public void cancelFriend(AuthUser authUser, Long id) {
 
-        User user = User.fromAuthUser(authUser);
+        Users user = Users.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(user.getId(), id);
@@ -73,7 +73,7 @@ public class FriendService {
 
     public FriendResponseDto acceptFriend(AuthUser authUser, Long id) {
 
-        User user = User.fromAuthUser(authUser);
+        Users user = Users.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
@@ -99,7 +99,7 @@ public class FriendService {
     }
 
     public FriendResponseDto rejectFriend(AuthUser authUser, Long id) {
-        User user = User.fromAuthUser(authUser);
+        Users user = Users.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         Optional<Friends> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
@@ -128,7 +128,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public Page<FriendPageResponseDto> getFriends(AuthUser authUser, int page, int size) {
 
-        User user = User.fromAuthUser(authUser);
+        Users user = Users.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         // ACCEPTED 상태의 친구만 조회
@@ -150,7 +150,7 @@ public class FriendService {
     }
 
     public void deleteFriend(AuthUser authUser, Long id) {
-        User user = User.fromAuthUser(authUser);
+        Users user = Users.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         // 친구 관계를 조회
