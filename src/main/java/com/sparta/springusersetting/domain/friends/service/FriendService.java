@@ -131,11 +131,16 @@ public class FriendService {
         User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
-        // 친구 목록을 가져오는 쿼리
+        // ACCEPTED 상태의 친구만 조회
         Page<Friends> friendsPage =
-                friendRepository.findByUserIdOrFriendId(user.getId(),user.getId(), PageRequest.of(page-1, size));
+                friendRepository.findByUserIdOrFriendIdAndStatus(
+                        user.getId(),
+                        user.getId(),
+                        FriendStatus.ACCEPTED,
+                        PageRequest.of(page - 1, size
+                        )
+        );
 
-        // DTO 변환
         return friendsPage.map(friends -> {
             Long friendId = friends.getFriendUserId().getId().equals(user.getId())
                     ? friends.getUserId().getId()

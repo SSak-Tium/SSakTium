@@ -71,6 +71,13 @@ public class FriendController {
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
+    /**
+     * 친구 목록조회 API
+     * @param authUser
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/v1/friends")
     public ResponseEntity<ApiResponse<Page<FriendPageResponseDto>>> getFriends(@AuthenticationPrincipal AuthUser authUser,
                                                                   @RequestParam(defaultValue = "1") int page,
@@ -78,4 +85,6 @@ public class FriendController {
         Page<FriendPageResponseDto> responseDtos = friendService.getFriends(authUser, page, size);
         return ResponseEntity.ok(ApiResponse.success(responseDtos));
     }
+
+
 }
