@@ -1,8 +1,8 @@
 package com.sparta.ssaktium.domain.boards.repository;
 
 import com.sparta.ssaktium.domain.boards.entity.Boards;
-import com.sparta.ssaktium.domain.boards.entity.PublicStatus;
-import com.sparta.ssaktium.domain.boards.entity.StatusEnum;
+import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
+import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.users.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -5,7 +5,7 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsDetailResponseDto
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsPageResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.entity.Boards;
-import com.sparta.ssaktium.domain.boards.entity.StatusEnum;
+import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardsRepository;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;

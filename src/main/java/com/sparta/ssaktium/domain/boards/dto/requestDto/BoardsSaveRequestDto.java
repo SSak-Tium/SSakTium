@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.boards.dto.requestDto;
 
-import com.sparta.ssaktium.domain.boards.entity.PublicStatus;
+import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

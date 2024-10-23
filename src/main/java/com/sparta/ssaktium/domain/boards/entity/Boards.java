@@ -1,6 +1,8 @@
 package com.sparta.ssaktium.domain.boards.entity;
 
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
+import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import com.sparta.ssaktium.domain.users.entity.Users;
 import jakarta.persistence.*;
