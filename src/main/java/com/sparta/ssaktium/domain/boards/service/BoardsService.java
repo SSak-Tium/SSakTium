@@ -6,7 +6,7 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsPageResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.entity.Boards;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
-import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
+import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardsException;
 import com.sparta.ssaktium.domain.boards.repository.BoardsRepository;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.entity.Users;
@@ -127,7 +127,7 @@ public class BoardsService {
 
     //Board 찾는 메서드
     public Boards findBoard(long id){
-       return boardsRepository.findById(id).orElseThrow(NotFoundBoardException::new);
+       return boardsRepository.findById(id).orElseThrow(NotFoundBoardsException::new);
     }
 
 

@@ -4,6 +4,7 @@ import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
+import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
 import com.sparta.ssaktium.domain.users.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,6 +23,8 @@ public class Boards extends Timestamped {
     private String content;
 
     private String image;
+
+    private int boardLikesCount =0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)
@@ -48,6 +51,19 @@ public class Boards extends Timestamped {
         this.image = boardsSaveRequestDto.getImages();
         this.publicStatus = boardsSaveRequestDto.getPublicStatus();
         this.statusEnum = StatusEnum.ACTIVATED;
+    }
+
+    // 좋아요 등록
+    public void incrementLikesCount(){
+        boardLikesCount++;
+    }
+
+    // 좋아요 취소
+    public void decrementLikesCount(){
+        if (boardLikesCount <= 0){
+            throw new LikeCountUnderflowException();
+        }
+        boardLikesCount--;
     }
 
     public void deleteBoards(){
