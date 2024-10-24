@@ -13,14 +13,22 @@ public class CommentResponseDto {
     private final LocalDateTime modifiedAt;
     private final Long boardId;
     private final Long userId;
+    private final int commentLikesCount;
 
-    public CommentResponseDto(Long id, String content, LocalDateTime createdAt, LocalDateTime modifiedAt, Long boardId, Long userId) {
+    public CommentResponseDto(Long id,
+                              String content,
+                              LocalDateTime createdAt,
+                              LocalDateTime modifiedAt,
+                              Long boardId,
+                              Long userId,
+                              int commentLikesCount) {
         this.id = id;
         this.content = content;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.boardId = boardId;
         this.userId = userId;
+        this.commentLikesCount = commentLikesCount;
     }
 
     // 객체 받아서 Dto 만들기
@@ -31,6 +39,7 @@ public class CommentResponseDto {
         this.modifiedAt = comments.getModifiedAt();
         this.boardId = comments.getBoard().getId();
         this.userId = comments.getUser().getId();
+        this.commentLikesCount = comments.getCommentLikesCount();
     }
 
 }
