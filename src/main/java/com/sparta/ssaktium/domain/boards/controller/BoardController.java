@@ -8,6 +8,7 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -64,8 +65,8 @@ public class BoardController {
      */
     @GetMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<BoardDetailResponseDto>> getBoard(@PathVariable Long id){
-        boardService.getBoard();
-        return ResponseEntity.ok(ApiResponse.success(boardService.getBoard()));
+        boardService.getBoard(id);
+        return ResponseEntity.ok(ApiResponse.success(boardService.getBoard(id)));
     }
 
     /**
@@ -88,11 +89,11 @@ public class BoardController {
      * @param page
      * @param size
      */
-//    @GetMapping("/newsfeed")
-//    public ResponseEntity<ApiResponse<Page<BoardsDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
-//                                                                                  @RequestParam(defaultValue = "1") int page,
-//                                                                                  @RequestParam(defaultValue = "5") int size){
-//        return ResponseEntity.ok(ApiResponse.success(boardsService.getNewsfeed(authUser,page,size)));
-//    }
+    @GetMapping("/newsfeed")
+    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
+                                                                                 @RequestParam(defaultValue = "1") int page,
+                                                                                 @RequestParam(defaultValue = "5") int size){
+        return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser,page,size)));
+    }
 
 }
