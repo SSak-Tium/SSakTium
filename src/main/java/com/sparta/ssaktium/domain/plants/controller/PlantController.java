@@ -3,7 +3,7 @@ package com.sparta.ssaktium.domain.plants.controller;
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantCreateRequestDto;
+import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.service.PlantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +30,8 @@ public class PlantController {
      */
     @PostMapping("/v1/plants")
     public ResponseEntity<ApiResponse<PlantResponseDto>> createPlant (@AuthenticationPrincipal AuthUser authUser,
-                                                                      @RequestPart PlantCreateRequestDto requestDto,
-                                                                      @RequestPart MultipartFile image) throws IOException {
+                                                                      @RequestPart PlantRequestDto requestDto,
+                                                                      @RequestPart(required = false) MultipartFile image) throws IOException {
         PlantResponseDto responseDto = plantService.createPlant(authUser, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
@@ -65,8 +65,8 @@ public class PlantController {
     @PutMapping("/v1/plants/{id}")
     public ResponseEntity<ApiResponse<PlantResponseDto>> updatePlant(@AuthenticationPrincipal AuthUser authUser,
                                                                      @PathVariable Long id,
-                                                                     @RequestPart PlantCreateRequestDto requestDto,
-                                                                     @RequestPart MultipartFile image) throws IOException {
+                                                                     @RequestPart PlantRequestDto requestDto,
+                                                                     @RequestPart(required = false) MultipartFile image) throws IOException {
         PlantResponseDto responseDto = plantService.updatePlant(authUser, id, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
