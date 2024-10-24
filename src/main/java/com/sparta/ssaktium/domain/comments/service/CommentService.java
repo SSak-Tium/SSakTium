@@ -1,6 +1,7 @@
 package com.sparta.ssaktium.domain.comments.service;
 
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.comments.dto.request.CommentRequestDto;
 import com.sparta.ssaktium.domain.comments.dto.response.CommentResponseDto;
@@ -67,16 +68,12 @@ public class CommentService {
         // 댓글 수정할 게시글이 있는지 확인
         Board board = boardCheckByBoardId(boardId);
 
-        // 댓글 수정할 유저
-        User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
-
         // 수정할 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new NotFoundCommentException());
 
         // 해당 댓글 작성자인지 확인
-        if (!comment.getUser().equals(user)){
+        if (!comment.getUser().getId().equals(authUser.getUserId())){
             throw new CommentOwnerMismatchException();
         }
 
@@ -93,16 +90,12 @@ public class CommentService {
         // 댓글 삭제할 게시글이 있는지 확인
         Board board = boardCheckByBoardId(boardId);
 
-        // 댓글 삭제할 유저
-        User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
-
         // 삭제할 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new NotFoundCommentException());
 
         // 해당 게시글 또는 해당 댓글 작성자인지 확인
-        if (!comment.getUser().equals(user.getId())){
+        if (!comment.getUser().getId().equals(authUser.getUserId())){
             throw new CommentOwnerMismatchException();
         }
 
@@ -113,7 +106,7 @@ public class CommentService {
     // 게시글이 있는지 확인
     public Board boardCheckByBoardId (Long boardId){
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new RuntimeException("익센션 설정 전"));
+                .orElseThrow(()->new NotFoundBoardException());
         return board;
     }
 }
