@@ -44,7 +44,7 @@ public class DictionaryService {
         dictionaryRepository.save(dictionary);
 
         // Dto 반환
-        return new DictionaryResponseDto(dictionary.getTitle(), dictionary.getContent(), dictionary.getUserName(), dictionary.getImageUrl());
+        return new DictionaryResponseDto(dictionary);
     }
 
     // 식물도감 단건 조회
@@ -57,7 +57,7 @@ public class DictionaryService {
         Dictionary dictionary = findDictionary(dictionaryId);
 
         // Dto 반환
-        return new DictionaryResponseDto(dictionary.getTitle(), dictionary.getContent(), dictionary.getUserName(), dictionary.getImageUrl());
+        return new DictionaryResponseDto(dictionary);
     }
 
     // 식물도감 리스트 조회
@@ -95,7 +95,7 @@ public class DictionaryService {
         dictionaryRepository.save(dictionary);
 
         // DTO 반환
-        return new DictionaryResponseDto(dictionary.getTitle(), dictionary.getContent(), dictionary.getUserName(), dictionary.getImageUrl());
+        return new DictionaryResponseDto(dictionary);
     }
 
     // 식물도감 삭제
@@ -107,10 +107,10 @@ public class DictionaryService {
         Dictionary dictionary = findDictionary(dictionaryId);
 
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        String menuImageName = s3Service.extractFileNameFromUrl(dictionary.getImageUrl());
+        String ImageName = s3Service.extractFileNameFromUrl(dictionary.getImageUrl());
 
         // 가져온 이미지 원본 이름으로 S3 이미지 삭제
-        s3Service.s3Client.deleteObject(s3Service.bucket, menuImageName);
+        s3Service.s3Client.deleteObject(s3Service.bucket, ImageName);
 
         // DB 삭제
         dictionaryRepository.delete(dictionary);

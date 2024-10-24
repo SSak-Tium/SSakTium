@@ -26,7 +26,7 @@ public class User extends Timestamped {
     private String password;
     private String userName;
 
-    private LocalDate birthDate;
+    private String birthYear;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
@@ -34,12 +34,14 @@ public class User extends Timestamped {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
+    private Long kakaoId;
 
-    public User(String email, String password, String userName, LocalDate birthDate, UserRole userRole) {
+
+    public User(String email, String password, String userName, String birthYear, UserRole userRole) {
         this.email = email;
         this.password = password;
         this.userName = userName;
-        this.birthDate = birthDate;
+        this.birthYear = birthYear;
         this.userRole = userRole;
         this.userStatus = UserStatus.ACTIVE;
     }
@@ -52,10 +54,22 @@ public class User extends Timestamped {
         this.userStatus = UserStatus.ACTIVE;
     }
 
+    // AuthUser -> User
     private User(Long id, String email, UserRole userRole) {
         this.id = id;
         this.email = email;
         this.userRole = userRole;
+    }
+
+    // 카카오 유저 생성
+    public User(String email, String nickname, String encodedPassword, String birthYear, UserRole userRole, Long kakaoId) {
+        this.email = email;
+        this.userName = nickname;
+        this.password = encodedPassword;
+        this.birthYear = birthYear;
+        this.userRole = userRole;
+        this.userStatus = UserStatus.ACTIVE;
+        this.kakaoId = kakaoId;
     }
 
     public static User fromAuthUser(AuthUser authUser) {
@@ -75,5 +89,10 @@ public class User extends Timestamped {
     // 유저 상태 삭제 처리
     public void delete() {
         this.userStatus = UserStatus.DELETED;
+    }
+
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
     }
 }

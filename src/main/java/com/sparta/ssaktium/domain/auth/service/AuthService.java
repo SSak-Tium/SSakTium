@@ -42,7 +42,7 @@ public class AuthService {
                 signupRequestDto.getEmail(),
                 encodedPassword,
                 signupRequestDto.getUserName(),
-                signupRequestDto.getBirthDate(),
+                signupRequestDto.getBirthYear(),
                 userRole
         );
         User savedUser = userRepository.save(newUser);
