@@ -21,6 +21,13 @@ public class Dictionary {
     private String userName;
     private String imageUrl;
 
+    public Dictionary(String title, String content, String userName, String imageUrl) {
+        this.title = title;
+        this.content = content;
+        this.userName = userName;
+        this.imageUrl = imageUrl;
+    }
+
     public Dictionary(DictionaryRequestDto dictionaryRequestDto, String userName, String imageUrl) {
         this.title = dictionaryRequestDto.getTitle();
         this.content = dictionaryRequestDto.getContent();
