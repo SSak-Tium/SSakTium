@@ -10,11 +10,13 @@ public class BoardDetailResponseDto {
     private final String title;
     private final String contents;
     private final String images;
+    private final int boardLikesCount;
 
     public BoardDetailResponseDto(Board board) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.contents = board.getContent();
         this.images = board.getImage();
+        this.boardLikesCount = board.getBoardLikesCount();
     }
 }
