@@ -23,8 +23,8 @@ public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
-    // 식물사전 등록
-    @PostMapping(value = "/v1/dictionaries", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    // 식물도감 등록
+    @PostMapping(value = "/v1/dictionaries")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> createDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestPart DictionaryRequestDto dictionaryRequestDto,
@@ -32,13 +32,13 @@ public class DictionaryController {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto, image)));
     }
 
-    // 식물사전 단건 조회
+    // 식물도감 단건 조회
     @GetMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> getDictionary(@AuthenticationPrincipal AuthUser authUser, @PathVariable long id) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionary(authUser.getUserId(), id)));
     }
 
-    // 식물사전 리스트 조회
+    // 식물도감 리스트 조회
     @GetMapping("/v1/dictionaries")
     public ResponseEntity<ApiResponse<Page<DictionaryListResponseDto>>> getDictionaryList(
             @RequestParam(defaultValue = "1") int page,
@@ -46,16 +46,17 @@ public class DictionaryController {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionaryList(page, size)));
     }
 
-    // 식물사전 수정
+    // 식물도감 수정
     @PutMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody DictionaryUpdateRequestDto dictionaryUpdateRequestDto,
-            @PathVariable long id) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, id)));
+            @RequestPart DictionaryUpdateRequestDto dictionaryUpdateRequestDto,
+            @RequestPart MultipartFile image,
+            @PathVariable long id) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, image, id)));
     }
 
-    // 식물사전 삭제
+    // 식물도감 삭제
     @DeleteMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<String>> deleteDictionary(@AuthenticationPrincipal AuthUser authUser, @PathVariable long id) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.deleteDictionary(authUser.getUserId(), id)));

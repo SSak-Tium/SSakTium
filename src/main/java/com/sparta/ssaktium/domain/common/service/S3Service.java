@@ -22,7 +22,7 @@ public class S3Service {
     public String bucket;
 
     // S3
-    private final AmazonS3Client s3Client;
+    public final AmazonS3Client s3Client;
 
     // 이미지 파일 이름 변경 메서드
     private String changeFileName(String originalFileName) {
@@ -50,7 +50,7 @@ public class S3Service {
     }
 
     // 등록된 사진 기존 URL 원본 파일이름으로 디코딩
-    private String extractFileNameFromUrl(String url) {
+    public String extractFileNameFromUrl(String url) {
         try {
             // URL 마지막 슬래시의 위치를 찾아서 인코딩된 파일 이름 가져오기
             String encodedFileName = url.substring(url.lastIndexOf("/") + 1);
