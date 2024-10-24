@@ -12,6 +12,5 @@ public class BoardSaveRequestDto {
 
     private String title;
     private String contents;
-    private String images;
     private PublicStatus publicStatus;
 }
