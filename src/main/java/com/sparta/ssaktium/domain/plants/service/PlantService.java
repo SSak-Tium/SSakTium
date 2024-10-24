@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.plants.service;
 
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantCreateRequestDto;
+import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
 import com.sparta.ssaktium.domain.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.exception.NotFoundPlantException;
@@ -28,7 +28,7 @@ public class PlantService {
     private final UserService userService;
 
     public PlantResponseDto createPlant(AuthUser authUser,
-                                        PlantCreateRequestDto requestDto,
+                                        PlantRequestDto requestDto,
                                         MultipartFile image) throws IOException {
 
         User user = User.fromAuthUser(authUser);
@@ -79,7 +79,7 @@ public class PlantService {
                 .collect(Collectors.toList());
     }
 
-    public PlantResponseDto updatePlant(AuthUser authUser, Long id, PlantCreateRequestDto requestDto, MultipartFile image) throws IOException {
+    public PlantResponseDto updatePlant(AuthUser authUser, Long id, PlantRequestDto requestDto, MultipartFile image) throws IOException {
 
         User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
