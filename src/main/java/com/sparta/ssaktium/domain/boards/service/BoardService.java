@@ -8,6 +8,7 @@ import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
+import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.comments.dto.response.CommentResponseDto;
 import com.sparta.ssaktium.domain.comments.dto.response.CommentSimpleResponseDto;
@@ -67,7 +68,7 @@ public class BoardService {
         Board updateBoard = findBoard(id);
         //게시글 본인 확인
        if(!updateBoard.getUser().equals(user)){
-           throw new RuntimeException();
+           throw new NotUserOfBoardException();
        }
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
@@ -87,7 +88,7 @@ public class BoardService {
 
         //게시글 본인 확인
         if(!deleteBoard.getUser().equals(user)){
-            throw new RuntimeException();
+            throw new NotUserOfBoardException();
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
         String imageUrl = s3Service.extractFileNameFromUrl(deleteBoard.getImageUrl());
