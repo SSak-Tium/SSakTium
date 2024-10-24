@@ -18,16 +18,16 @@ public class CommentLikesController {
 
     // 좋아요 등록
     @PostMapping
-    public ResponseEntity<ApiResponse<CommentLikesReponseDto>> postCommentLike (@PathVariable Long commentId,
+    public ResponseEntity<ApiResponse<CommentLikesReponseDto>> postCommentLike (@PathVariable Long id,
                                                                                  @AuthenticationPrincipal AuthUser authUser){
-        return ResponseEntity.ok(ApiResponse.success(commentLikesService.postCommentLike(commentId,authUser)));
+        return ResponseEntity.ok(ApiResponse.success(commentLikesService.postCommentLike(id,authUser)));
     }
 
     // 좋아요 취소
     @DeleteMapping("/{likeId}")
-    public void deleteCommentLike(@PathVariable Long commentId,
+    public void deleteCommentLike(@PathVariable Long id,
                                   @PathVariable Long likeId,
                                   @AuthenticationPrincipal AuthUser authUser){
-        commentLikesService.deleteCommentLike(commentId,likeId,authUser);
+        commentLikesService.deleteCommentLike(id,likeId,authUser);
     }
 }
