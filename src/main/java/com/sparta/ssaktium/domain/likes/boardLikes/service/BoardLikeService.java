@@ -1,6 +1,7 @@
 package com.sparta.ssaktium.domain.likes.boardLikes.service;
 
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
@@ -28,7 +29,7 @@ public class BoardLikeService {
     public BoardLikeResponseDto getBoardLikes(Long boardId, AuthUser authUser) {
         // 게시글이 있는지 확인
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new RuntimeException("익셉션 설정 전"));
+                .orElseThrow(()->new NotFoundBoardException());
 
         return new BoardLikeResponseDto(boardId,board.getBoardLikesCount());
     }
@@ -38,7 +39,7 @@ public class BoardLikeService {
     public BoardLikeResponseDto postBoardLikes(Long boardId, AuthUser authUser) {
         // 게시글이 있는지 확인
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new RuntimeException("익셉션 설정 전"));
+                .orElseThrow(()->new NotFoundBoardException());
 
         // 좋아요를 이미 누른 게시글인지 확인
         if (boardLikeRepository.existsByBoardIdAndUserId(boardId,authUser.getUserId())){
@@ -61,7 +62,7 @@ public class BoardLikeService {
     public void deleteBoardLikes(Long boardId, Long likeId, AuthUser authUser) {
         // 게시글이 있는지 확인
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new RuntimeException("익셉션 설정 전"));
+                .orElseThrow(()->new NotFoundBoardException());
 
         // 게시글에 해당 유저의 좋아요가 존재하는지 확인
         if (!boardLikeRepository.existsByBoardIdAndUserId(boardId,authUser.getUserId())){
