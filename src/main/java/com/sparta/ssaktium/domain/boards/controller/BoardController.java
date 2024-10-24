@@ -2,6 +2,7 @@ package com.sparta.ssaktium.domain.boards.controller;
 
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
@@ -55,12 +56,17 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    //게시글 단건 조회 (댓글 빠져있음)
-//    @GetMapping("/boards/{id}")
-//    public ResponseEntity<ApiResponse<BoardsDetailResponseDto>> getBoard(@PathVariable Long id){
-//        boardsService.getBoard();
-//        return ResponseEntity.ok(ApiResponse.success(boardsService.getBoard()));
-//    }
+
+    /**
+     * 게시글 단건 조회
+     * @param id
+     * @return
+     */
+    @GetMapping("/boards/{id}")
+    public ResponseEntity<ApiResponse<BoardDetailResponseDto>> getBoard(@PathVariable Long id){
+        boardService.getBoard();
+        return ResponseEntity.ok(ApiResponse.success(boardService.getBoard()));
+    }
 
     /**
      * 내 게시글 조회

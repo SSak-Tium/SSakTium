@@ -8,15 +8,21 @@ import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.comments.dto.response.CommentResponseDto;
+import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Comments;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserService userService;
+    private final CommentRepository commentRepository;
 
 
     @Transactional
@@ -70,20 +77,20 @@ public class BoardService {
         boardRepository.save(deleteBoard);
     }
 
-//    //게시글 단건 조회 (댓글필요)
-//    public BoardsDetailResponseDto getBoard(Long id) {
-//        //게시글 찾기
-//       Boards board = findBoard(id);
-//        //댓글 찾기
-//        List<Comments> commentList = commentRepository.findAllByBoardId(board.getId());
-//
-//        List<CommentResponseDto> dtoList = new ArrayList<>();
-//        for(Comments comments: commentList){
-//            dtoList.add(new CommentResponseDto(comments.getId,comments.getContents));
-//        }
-//
-//        return  new BoardsDetailResponseDto(board,dtoList);
-//    }
+    //게시글 단건 조회 (댓글필요)
+    public BoardDetailResponseDto getBoard(Long id) {
+        //게시글 찾기
+       Board board = findBoard(id);
+        //댓글 찾기
+        List<Comments> commentList = commentRepository.findAllByBoardId(board.getId());
+
+        List<CommentResponseDto> dtoList = new ArrayList<>();
+        for(Comments comments: commentList){
+            dtoList.add(new CommentResponseDto(comments.g,comments.getContents));
+        }
+
+        return  new BoardDetailResponseDto(board,dtoList);
+    }
 
     public BoardPageResponseDto getMyBoards(AuthUser authUser, int page, int size) {
         //사용자 찾기

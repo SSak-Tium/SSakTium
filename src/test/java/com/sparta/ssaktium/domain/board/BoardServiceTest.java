@@ -43,7 +43,6 @@ public class BoardServiceTest {
         AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
         BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa","aaaa", PublicStatus.ALL);
 
-
         //when
         BoardSaveResponseDto responseDto = boardService.saveBoards(authUser,requestDto);
         //then
