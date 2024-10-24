@@ -28,5 +28,5 @@ public class SignupRequestDto {
     private String userName;
 
     @NotNull
-    private LocalDate birthDate;
+    private String birthYear;
 }
