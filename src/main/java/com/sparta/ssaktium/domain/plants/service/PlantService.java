@@ -7,7 +7,7 @@ import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
 import com.sparta.ssaktium.domain.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.exception.NotFoundPlantException;
 import com.sparta.ssaktium.domain.plants.repository.PlantRepository;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class PlantService {
                                         PlantCreateRequestDto requestDto,
                                         MultipartFile image) throws IOException {
 
-        Users user = Users.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
@@ -46,7 +46,7 @@ public class PlantService {
     @Transactional(readOnly = true)
     public PlantResponseDto getPlant(AuthUser authUser, Long id) {
 
-        Users user = Users.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         Plant plant = plantRepository.findById(id).orElseThrow(() ->
@@ -63,7 +63,7 @@ public class PlantService {
     @Transactional(readOnly = true)
     public List<PlantResponseDto> getAllPlants(AuthUser authUser) {
 
-        Users user = Users.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         List<Plant> plantList = plantRepository.findByUserId(user);
@@ -81,7 +81,7 @@ public class PlantService {
 
     public PlantResponseDto updatePlant(AuthUser authUser, Long id, PlantCreateRequestDto requestDto, MultipartFile image) throws IOException {
 
-        Users user = Users.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         Plant plant = plantRepository.findById(id).orElseThrow(() ->
@@ -101,7 +101,7 @@ public class PlantService {
 
     public String deltePlant(AuthUser authUser, Long id) {
 
-        Users user = Users.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
 
         Plant plant = plantRepository.findById(id).orElseThrow(() ->

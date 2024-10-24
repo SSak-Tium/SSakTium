@@ -8,7 +8,7 @@ import com.sparta.ssaktium.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.ssaktium.domain.auth.exception.DeletedUserException;
 import com.sparta.ssaktium.domain.auth.exception.DuplicateEmailException;
 import com.sparta.ssaktium.domain.auth.exception.UnauthorizedPasswordException;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.enums.UserStatus;
 import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
@@ -38,36 +38,36 @@ public class AuthService {
 
         UserRole userRole = UserRole.of(UserRole.ROLE_USER.getUserRole());
 
-        Users newUsers = new Users(
+        User newUser = new User(
                 signupRequestDto.getEmail(),
                 encodedPassword,
                 signupRequestDto.getUserName(),
                 signupRequestDto.getBirthDate(),
                 userRole
         );
-        Users savedUsers = userRepository.save(newUsers);
+        User savedUser = userRepository.save(newUser);
 
-        String bearerToken = jwtUtil.createToken(savedUsers.getId(), savedUsers.getEmail(), userRole);
+        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
 
         return new SignupResponseDto(bearerToken);
     }
 
     // 로그인
     public SigninResponseDto signin(SigninRequestDto signinRequestDto) {
-        Users users = userRepository.findByEmail(signinRequestDto.getEmail()).orElseThrow(
+        User user = userRepository.findByEmail(signinRequestDto.getEmail()).orElseThrow(
                 NotFoundUserException::new);
 
         // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환
-        if (!passwordEncoder.matches(signinRequestDto.getPassword(), users.getPassword())) {
+        if (!passwordEncoder.matches(signinRequestDto.getPassword(), user.getPassword())) {
             throw new UnauthorizedPasswordException();
         }
 
         // UserStatus 가 DELETED 면 로그인 불가능
-        if (users.getUserStatus().equals(UserStatus.DELETED)) {
+        if (user.getUserStatus().equals(UserStatus.DELETED)) {
             throw new DeletedUserException();
         }
 
-        String bearerToken = jwtUtil.createToken(users.getId(), users.getEmail(), users.getUserRole());
+        String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
 
         return new SigninResponseDto(bearerToken);
     }

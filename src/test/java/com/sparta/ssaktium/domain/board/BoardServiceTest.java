@@ -1,13 +1,13 @@
 package com.sparta.ssaktium.domain.board;
 
-import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsSaveResponseDto;
-import com.sparta.ssaktium.domain.boards.entity.Boards;
+import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-import com.sparta.ssaktium.domain.boards.repository.BoardsRepository;
-import com.sparta.ssaktium.domain.boards.service.BoardsService;
+import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -26,26 +26,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BoardsServiceTest {
+public class BoardServiceTest {
 
     @Mock
-    private BoardsRepository boardsRepository;
+    private BoardRepository boardRepository;
 
     @Mock
     private UserService userService;
 
     @InjectMocks
-    private BoardsService boardsService;
+    private BoardService boardService;
 
     @Test
     public void 보드_생성_성공(){
         //given
         AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
-        BoardsSaveRequestDto requestDto = new BoardsSaveRequestDto("aa","aaa","aaaa", PublicStatus.ALL);
+        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa","aaaa", PublicStatus.ALL);
 
 
         //when
-        BoardsSaveResponseDto responseDto = boardsService.saveBoards(authUser,requestDto);
+        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser,requestDto);
         //then
         assertNotNull(requestDto);
         assertEquals(responseDto.getTitle(), requestDto.getTitle());
@@ -58,20 +58,20 @@ public class BoardsServiceTest {
         //given
         AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
         long boardId = 1L;
-        BoardsSaveRequestDto requestDto = new BoardsSaveRequestDto("aa","aaa","aaaa", PublicStatus.ALL);
+        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa","aaaa", PublicStatus.ALL);
         // 게시글 소유자 생성
-        Users ownerUser = new Users("aa@aa.com", "password", "name", UserRole.ROLE_USER);
+        User ownerUser = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
 
         // reflection을 사용하여 user 필드 설정
-        Boards updateBoards = new Boards(); // 기본 생성자 호출
-        Field userField = Boards.class.getDeclaredField("user");
+        Board updateBoard = new Board(); // 기본 생성자 호출
+        Field userField = Board.class.getDeclaredField("user");
         userField.setAccessible(true);
-        userField.set(updateBoards, ownerUser);
+        userField.set(updateBoard, ownerUser);
 
         when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
-        when(boardsRepository.findById(boardId)).thenReturn(Optional.of(updateBoards));
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(updateBoard));
         // when
-        BoardsSaveResponseDto responseDto = boardsService.updateBoards(authUser, boardId, requestDto);
+        BoardSaveResponseDto responseDto = boardService.updateBoards(authUser, boardId, requestDto);
         //then
         assertNotNull(requestDto);
         assertEquals(responseDto.getTitle(), requestDto.getTitle());

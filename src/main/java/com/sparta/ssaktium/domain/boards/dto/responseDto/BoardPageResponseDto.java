@@ -5,15 +5,15 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class BoardsPageResponseDto {
+public class BoardPageResponseDto {
 
-    private final List<BoardsDetailResponseDto> content;
+    private final List<BoardDetailResponseDto> content;
     private final int totalPages;
     private final long totalElements;
     private final int size;
     private final int number;
 
-    public BoardsPageResponseDto(List<BoardsDetailResponseDto> content, int totalPages, long totalElements, int size, int number) {
+    public BoardPageResponseDto(List<BoardDetailResponseDto> content, int totalPages, long totalElements, int size, int number) {
         this.content = content;
         this.totalPages = totalPages;
         this.totalElements = totalElements;

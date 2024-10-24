@@ -1,10 +1,10 @@
 package com.sparta.ssaktium.domain.boards.controller;
 
 import com.sparta.ssaktium.config.ApiResponse;
-import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsPageResponseDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsSaveResponseDto;
-import com.sparta.ssaktium.domain.boards.service.BoardsService;
+import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
-public class BoardsController {
+public class BoardController {
 
-    private final BoardsService boardsService;
+    private final BoardService boardService;
 
     /**
      * 게시글 작성
@@ -25,9 +25,9 @@ public class BoardsController {
      * @return
      */
     @PostMapping("/boards")
-    public ResponseEntity<ApiResponse<BoardsSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                        @RequestBody BoardsSaveRequestDto requestDto){
-        return  ResponseEntity.ok(ApiResponse.success(boardsService.saveBoards(authUser,requestDto)));
+    public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                       @RequestBody BoardSaveRequestDto requestDto){
+        return  ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser,requestDto)));
     }
 
     /**
@@ -37,10 +37,10 @@ public class BoardsController {
      * @param requestDto
      */
     @PutMapping("/boards/{id}")
-    public ResponseEntity<ApiResponse<BoardsSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                           @PathVariable Long id,
-                                                                           @RequestBody BoardsSaveRequestDto requestDto){
-        return ResponseEntity.ok(ApiResponse.success(boardsService.updateBoards(authUser,id,requestDto)));
+    public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                         @PathVariable Long id,
+                                                                         @RequestBody BoardSaveRequestDto requestDto){
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser,id,requestDto)));
     }
 
     /**
@@ -51,7 +51,7 @@ public class BoardsController {
     @DeleteMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
                                                        @PathVariable Long id){
-        boardsService.deleteBoards(authUser,id);
+        boardService.deleteBoards(authUser,id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -70,10 +70,10 @@ public class BoardsController {
      * 댓글 페이지네이션 빠져있음
      */
     @GetMapping("/boards/me")
-    public ResponseEntity<ApiResponse<BoardsPageResponseDto>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
-                                                                          @RequestParam(defaultValue = "1") int page,
-                                                                          @RequestParam(defaultValue = "5") int size){
-        return ResponseEntity.ok(ApiResponse.success(boardsService.getMyBoards(authUser,page,size)));
+    public ResponseEntity<ApiResponse<BoardPageResponseDto>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
+                                                                         @RequestParam(defaultValue = "1") int page,
+                                                                         @RequestParam(defaultValue = "5") int size){
+        return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser,page,size)));
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.sparta.ssaktium.domain.friends.dto.responseDto;
 
 import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
-import com.sparta.ssaktium.domain.friends.entity.Friends;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.friends.entity.Friend;
+import com.sparta.ssaktium.domain.users.entity.User;
 import lombok.Getter;
 
 @Getter
@@ -14,10 +14,10 @@ public class FriendResponseDto {
     private FriendStatus status;
 
     // Friends 엔티티에서 상태를 가져오는 생성자
-    public FriendResponseDto(Friends friends, Users myUser, Users friendUser) {
-        this.id = friends.getId();
+    public FriendResponseDto(Friend friend, User myUser, User friendUser) {
+        this.id = friend.getId();
         this.myUserId = myUser.getId();
         this.friendUserId = friendUser.getId();
-        this.status = friends.getFriendStatus();
+        this.status = friend.getFriendStatus();
     }
 }
