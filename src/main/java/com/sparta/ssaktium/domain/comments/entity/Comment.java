@@ -1,19 +1,17 @@
 package com.sparta.ssaktium.domain.comments.entity;
 
-import com.sparta.ssaktium.domain.boards.entity.Boards;
+import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @NoArgsConstructor
 @Getter
-public class Comments extends Timestamped {
+public class Comment extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +20,13 @@ public class Comments extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boards_id")
-    private Boards board;
+    private Board board;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
 
-    public Comments(String content, Boards board, Users user){
+    public Comment(String content, Board board, User user){
         this.content = content;
         this.board = board;
         this.user = user;

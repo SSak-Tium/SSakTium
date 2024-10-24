@@ -4,7 +4,7 @@ import com.sparta.ssaktium.config.JwtUtil;
 import com.sparta.ssaktium.domain.auth.dto.request.AdminSignupRequestDto;
 import com.sparta.ssaktium.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.ssaktium.domain.auth.exception.DuplicateEmailException;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +35,13 @@ public class AdminAuthService {
         UserRole userRole = UserRole.of(UserRole.ROLE_ADMIN.getUserRole());
 
         // User Entity 관리자 추가
-        Users newUsers = Users.addAdminUser(adminSignupRequestDto, encodedPassword, userRole);
+        User newUser = User.addAdminUser(adminSignupRequestDto, encodedPassword, userRole);
 
         // DB 저장
-        Users savedUsers = userRepository.save(newUsers);
+        User savedUser = userRepository.save(newUser);
 
         // 토큰 생성
-        String bearerToken = jwtUtil.createToken(savedUsers.getId(), savedUsers.getEmail(), userRole);
+        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
 
         return new SignupResponseDto(bearerToken);
     }

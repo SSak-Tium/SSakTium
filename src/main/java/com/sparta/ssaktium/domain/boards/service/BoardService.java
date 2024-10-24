@@ -1,15 +1,15 @@
 package com.sparta.ssaktium.domain.boards.service;
 
-import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsDetailResponseDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsPageResponseDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardsSaveResponseDto;
-import com.sparta.ssaktium.domain.boards.entity.Boards;
+import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
-import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardsException;
-import com.sparta.ssaktium.domain.boards.repository.BoardsRepository;
+import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
+import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,54 +20,54 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BoardsService {
+public class BoardService {
 
-    private final BoardsRepository boardsRepository;
+    private final BoardRepository boardRepository;
     private final UserService userService;
 
 
     @Transactional
-    public BoardsSaveResponseDto saveBoards(AuthUser authUser, BoardsSaveRequestDto requestDto) {
+    public BoardSaveResponseDto saveBoards(AuthUser authUser, BoardSaveRequestDto requestDto) {
         //유저 확인
-        Users user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(authUser.getUserId());
         //제공받은 정보로 새 보드 만들기
-        Boards newBoard = new Boards(requestDto,user);
+        Board newBoard = new Board(requestDto,user);
         //저장
-        boardsRepository.save(newBoard);
+        boardRepository.save(newBoard);
         //responseDto 반환
-        return new BoardsSaveResponseDto(newBoard);
+        return new BoardSaveResponseDto(newBoard);
     }
 
     @Transactional
-    public BoardsSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardsSaveRequestDto requestDto) {
+    public BoardSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardSaveRequestDto requestDto) {
         //유저 확인
-        Users user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(authUser.getUserId());
         //게시글 찾기
-        Boards updateBoards = findBoard(id);
+        Board updateBoard = findBoard(id);
         //게시글 본인 확인
-       if(!updateBoards.getUser().equals(user)){
+       if(!updateBoard.getUser().equals(user)){
            throw new RuntimeException();
        }
        //게시글 수정
-       updateBoards.updateBoards(requestDto);
-       boardsRepository.save(updateBoards);
+       updateBoard.updateBoards(requestDto);
+       boardRepository.save(updateBoard);
        //responseDto 반환
-       return new BoardsSaveResponseDto(updateBoards);
+       return new BoardSaveResponseDto(updateBoard);
     }
 
     @Transactional
     public void deleteBoards(AuthUser authUser,Long id){
         //유저 확인
-        Users user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(authUser.getUserId());
         //게시글 찾기
-        Boards deleteBoards = findBoard(id);
+        Board deleteBoard = findBoard(id);
         //게시글 본인 확인
-        if(!deleteBoards.getUser().equals(user)){
+        if(!deleteBoard.getUser().equals(user)){
             throw new RuntimeException();
         }
         //해당 보드 삭제 상태 변경
-        deleteBoards.deleteBoards();
-        boardsRepository.save(deleteBoards);
+        deleteBoard.deleteBoards();
+        boardRepository.save(deleteBoard);
     }
 
 //    //게시글 단건 조회 (댓글필요)
@@ -85,21 +85,21 @@ public class BoardsService {
 //        return  new BoardsDetailResponseDto(board,dtoList);
 //    }
 
-    public BoardsPageResponseDto getMyBoards(AuthUser authUser, int page, int size) {
+    public BoardPageResponseDto getMyBoards(AuthUser authUser, int page, int size) {
         //사용자 찾기
-        Users user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(authUser.getUserId());
         //페이지 요청 객체 생성 (페이지 숫자가 실제로는 0부터 시작하므로 원하는 숫자 -1을 입력해야 해당 페이지가 나온다)
         Pageable pageable = PageRequest.of(page -1, size);
         //해당 유저가 쓴 게시글 페이지네이션해서 가져오기
-        Page<Boards> boards = boardsRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED,pageable);
+        Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED,pageable);
 
         // BoardsPageResponseDto 생성
-        return new BoardsPageResponseDto(
-                boards.map(BoardsDetailResponseDto::new).getContent(),
+        return new BoardPageResponseDto(
+                boards.map(BoardDetailResponseDto::new).getContent(),
                 boards.getTotalPages(),
                 boards.getTotalElements(),
                 boards.getSize(),
-                boards.getNumber()
+                boards.getNumber()+1
         );
     }
 
@@ -126,8 +126,8 @@ public class BoardsService {
 //    }
 
     //Board 찾는 메서드
-    public Boards findBoard(long id){
-       return boardsRepository.findById(id).orElseThrow(NotFoundBoardsException::new);
+    public Board findBoard(long id){
+       return boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
     }
 
 

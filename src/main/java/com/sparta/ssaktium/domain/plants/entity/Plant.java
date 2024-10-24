@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.plants.entity;
 
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantCreateRequestDto;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ public class Plant extends Timestamped {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private Users userId;
+    private User userId;
 
     private String plantName;
 
@@ -26,7 +26,7 @@ public class Plant extends Timestamped {
 
     private String imageUrl;
 
-    public Plant(PlantCreateRequestDto requestDto, Users userId, String imageUrl) {
+    public Plant(PlantCreateRequestDto requestDto, User userId, String imageUrl) {
         this.userId = userId;
         this.plantName = requestDto.getPlantName();
         this.plantNickname = requestDto.getPlantNickname();

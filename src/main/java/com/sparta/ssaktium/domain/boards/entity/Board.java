@@ -1,11 +1,11 @@
 package com.sparta.ssaktium.domain.boards.entity;
 
-import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardsSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
-import com.sparta.ssaktium.domain.users.entity.Users;
+import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Boards extends Timestamped {
+public class Board extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +28,7 @@ public class Boards extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)
-    private Users user;
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
@@ -36,20 +36,20 @@ public class Boards extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Boards (BoardsSaveRequestDto boardsSaveRequestDto,Users user){
-        this.title = boardsSaveRequestDto.getTitle();
-        this.content = boardsSaveRequestDto.getContents();
-        this.image = boardsSaveRequestDto.getImages();
-        this.publicStatus = boardsSaveRequestDto.getPublicStatus();
+    public Board(BoardSaveRequestDto boardSaveRequestDto, User user){
+        this.title = boardSaveRequestDto.getTitle();
+        this.content = boardSaveRequestDto.getContents();
+        this.image = boardSaveRequestDto.getImages();
+        this.publicStatus = boardSaveRequestDto.getPublicStatus();
         this.user = user;
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(BoardsSaveRequestDto boardsSaveRequestDto){
-        this.title = boardsSaveRequestDto.getTitle();
-        this.content = boardsSaveRequestDto.getContents();
-        this.image = boardsSaveRequestDto.getImages();
-        this.publicStatus = boardsSaveRequestDto.getPublicStatus();
+    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto){
+        this.title = boardSaveRequestDto.getTitle();
+        this.content = boardSaveRequestDto.getContents();
+        this.image = boardSaveRequestDto.getImages();
+        this.publicStatus = boardSaveRequestDto.getPublicStatus();
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
