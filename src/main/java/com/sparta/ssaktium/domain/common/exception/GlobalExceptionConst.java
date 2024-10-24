@@ -38,6 +38,7 @@ public enum GlobalExceptionConst {
     DELETED_USER(HttpStatus.NOT_FOUND, " 탈퇴된 회원입니다."),
     NOT_FOUND_FREIND_REQUEST(HttpStatus.NOT_FOUND, "해당 친구 요청이 없습니다."),
     NOT_FOUND_FREIND(HttpStatus.NOT_FOUND, "해당 유저는 친구등록이 되어있지 않습니다"),
+    NOT_FOUND_PLANT(HttpStatus.NOT_FOUND, "해당 식물은 없습니다."),
     NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."),
 
     // 상태코드 409
