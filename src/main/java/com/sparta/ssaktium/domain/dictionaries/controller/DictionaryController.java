@@ -23,7 +23,14 @@ public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
-    // 식물도감 등록
+    /**
+     * 식물도감 등록
+     * @param authUser
+     * @param dictionaryRequestDto
+     * @param image
+     * @return
+     * @throws IOException
+     */
     @PostMapping(value = "/v1/dictionaries")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> createDictionary(
             @AuthenticationPrincipal AuthUser authUser,
@@ -32,13 +39,23 @@ public class DictionaryController {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto, image)));
     }
 
-    // 식물도감 단건 조회
+    /**
+     * 식물도감 단건 조회
+     * @param authUser
+     * @param id
+     * @return
+     */
     @GetMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> getDictionary(@AuthenticationPrincipal AuthUser authUser, @PathVariable long id) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionary(authUser.getUserId(), id)));
     }
 
-    // 식물도감 리스트 조회
+    /**
+     * 식물도감 리스트 조회
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/v1/dictionaries")
     public ResponseEntity<ApiResponse<Page<DictionaryListResponseDto>>> getDictionaryList(
             @RequestParam(defaultValue = "1") int page,
@@ -46,7 +63,15 @@ public class DictionaryController {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionaryList(page, size)));
     }
 
-    // 식물도감 수정
+    /**
+     * 식물도감 수정
+     * @param authUser
+     * @param dictionaryUpdateRequestDto
+     * @param image
+     * @param id
+     * @return
+     * @throws IOException
+     */
     @PutMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
@@ -56,7 +81,12 @@ public class DictionaryController {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, image, id)));
     }
 
-    // 식물도감 삭제
+    /**
+     * 식물도감 삭제
+     * @param authUser
+     * @param id
+     * @return
+     */
     @DeleteMapping("/v1/dictionaries/{id}")
     public ResponseEntity<ApiResponse<String>> deleteDictionary(@AuthenticationPrincipal AuthUser authUser, @PathVariable long id) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.deleteDictionary(authUser.getUserId(), id)));
