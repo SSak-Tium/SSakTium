@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.common.dto;
 
-import com.sparta.ssaktium.domain.user.enums.UserRole;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.likes.commentLikes.entity;
 
-import com.sparta.ssaktium.domain.comments.entity.Comment;
+import com.sparta.ssaktium.domain.comments.entity.Comments;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +16,13 @@ public class CommentLikes {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", nullable =false)
-    private Comment comment;
+    private Comments comments;
 
     @Column(name = "user_id",nullable = false)
     private Long userId;
 
-    public CommentLikes(Comment comment, Long userId){
-        this.comment = comment;
+    public CommentLikes(Comments comments, Long userId){
+        this.comments = comments;
         this.userId = userId;
     }
 }

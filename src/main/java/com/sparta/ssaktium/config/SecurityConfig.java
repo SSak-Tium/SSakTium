@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.config;
 
-import com.sparta.ssaktium.domain.user.enums.UserRole;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화
                 .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signin", "/auth/signup").permitAll()
+                        .requestMatchers("/v1/auth/*","/v1/auth/admin/signup").permitAll()
                         .requestMatchers("/test").hasAuthority(UserRole.Authority.ADMIN)
                         .anyRequest().authenticated()
                 )

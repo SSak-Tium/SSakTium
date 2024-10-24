@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.likes.boardLikes.entity;
 
-import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.entity.Boards;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,12 +16,12 @@ public class BoardLikes {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable =false)
-    private Board board;
+    private Boards board;
 
     @Column(name = "user_id",nullable = false)
     private Long userId;
 
-    public BoardLikes(Board board, Long userId){
+    public BoardLikes(Boards board, Long userId){
         this.board = board;
         this.userId = userId;
     }

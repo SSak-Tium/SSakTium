@@ -8,5 +8,5 @@ public interface BoardLikesRepository extends JpaRepository<BoardLikes, Long> {
     int countByBoardId(Long boardId);
 
     // 해당 유저가 해당 게시글에 좋아요 눌렀는지 확인
-    boolean existsByBoardIdandUserId(Long boardId, long userId);
+    boolean existsByBoardIdAndUserId(Long boardId, long userId);
 }

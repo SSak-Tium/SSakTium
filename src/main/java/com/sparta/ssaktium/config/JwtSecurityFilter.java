@@ -1,7 +1,7 @@
 package com.sparta.ssaktium.config;
 
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
-import com.sparta.ssaktium.domain.user.enums.UserRole;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

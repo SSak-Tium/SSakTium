@@ -1,13 +1,13 @@
 package com.sparta.ssaktium.domain.likes.boardLikes.service;
 
-import com.sparta.ssaktium.domain.boards.entity.Board;
-import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.boards.entity.Boards;
+import com.sparta.ssaktium.domain.boards.repository.BoardsRepository;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikesResponseDto;
 import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLikes;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
 import com.sparta.ssaktium.domain.likes.exception.LikeOwnerMismatchException;
-import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardLikesException;
+import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardsLikesException;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikesRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class BoardLikesService {
 
-    private final BoardRepository boardRepository;
+    private final BoardsRepository boardsRepository;
     private final BoardLikesRepository boardLikesRepository;
 
 
     // 게시글 좋아요 조회 = 필요없는 기능일수도!!
     public BoardLikesResponseDto getBoardLikes(Long boardId, AuthUser authUser) {
         // 게시글이 있는지 확인
-        Board board = boardRepository.findById(boardId)
+        Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(()->new RuntimeException("익셉션 설정 전"));
 
         return new BoardLikesResponseDto(boardId,board.getBoardLikesCount());
@@ -37,11 +37,11 @@ public class BoardLikesService {
     @Transactional
     public BoardLikesResponseDto postBoardLikes(Long boardId,AuthUser authUser) {
         // 게시글이 있는지 확인
-        Board board = boardRepository.findById(boardId)
+        Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(()->new RuntimeException("익셉션 설정 전"));
 
         // 좋아요를 이미 누른 게시글인지 확인
-        if (boardLikesRepository.existsByBoardIdandUserId(boardId,authUser.getUserId())){
+        if (boardLikesRepository.existsByBoardIdAndUserId(boardId,authUser.getUserId())){
             throw new AlreadyLikedException();
         }
 
@@ -51,7 +51,7 @@ public class BoardLikesService {
 
         // 게시글에 등록된 좋아요 수 증가
         board.incrementLikesCount();
-        boardRepository.save(board);
+        boardsRepository.save(board);
 
         return new BoardLikesResponseDto(boardId,board.getBoardLikesCount());
     }
@@ -60,17 +60,17 @@ public class BoardLikesService {
     @Transactional
     public void deleteBoardLikes(Long boardId, Long likeId, AuthUser authUser) {
         // 게시글이 있는지 확인
-        Board board = boardRepository.findById(boardId)
+        Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(()->new RuntimeException("익셉션 설정 전"));
 
         // 게시글에 해당 유저의 좋아요가 존재하는지 확인
-        if (!boardLikesRepository.existsByBoardIdandUserId(boardId,authUser.getUserId())){
-            throw new NotFoundBoardLikesException();
+        if (!boardLikesRepository.existsByBoardIdAndUserId(boardId,authUser.getUserId())){
+            throw new NotFoundBoardsLikesException();
         }
 
         // 좋아요가 존재하는지 확인
         BoardLikes boardLikes = boardLikesRepository.findById(likeId)
-                .orElseThrow(()-> new NotFoundBoardLikesException());
+                .orElseThrow(()-> new NotFoundBoardsLikesException());
 
         // 좋아요 한 유저가 맞는지 확인
         if(!boardLikes.getUserId().equals(authUser.getUserId())){
