@@ -1,7 +1,7 @@
 package com.sparta.ssaktium.domain.plants.entity;
 
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantCreateRequestDto;
+import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,16 +26,15 @@ public class Plant extends Timestamped {
 
     private String imageUrl;
 
-    public Plant(PlantCreateRequestDto requestDto, User userId, String imageUrl) {
+    public Plant(PlantRequestDto requestDto, User userId, String imageUrl) {
         this.userId = userId;
         this.plantName = requestDto.getPlantName();
         this.plantNickname = requestDto.getPlantNickname();
         this.imageUrl = imageUrl;
     }
 
-    public void update(PlantCreateRequestDto requestDto) {
+    public void update(PlantRequestDto requestDto) {
         this.plantName = requestDto.getPlantName();
         this.plantNickname = requestDto.getPlantNickname();
-        this.imageUrl = requestDto.getImageUrl();
     }
 }
