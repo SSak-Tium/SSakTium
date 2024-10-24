@@ -5,8 +5,8 @@ import com.sparta.ssaktium.domain.common.exception.GlobalException;
 import static com.sparta.ssaktium.domain.common.exception.GlobalExceptionConst.NOT_FOUND_COMMENT_LIKE;
 
 
-public class NotFoundCommentsLikesException extends GlobalException {
-    public NotFoundCommentsLikesException() {
+public class NotFoundCommentLikeException extends GlobalException {
+    public NotFoundCommentLikeException() {
         super(NOT_FOUND_COMMENT_LIKE);
     }
 }

@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
-public class Users extends Timestamped {
+public class User extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class Users extends Timestamped {
     private UserStatus userStatus;
 
 
-    public Users(String email, String password, String userName, LocalDate birthDate, UserRole userRole) {
+    public User(String email, String password, String userName, LocalDate birthDate, UserRole userRole) {
         this.email = email;
         this.password = password;
         this.userName = userName;
@@ -44,7 +44,7 @@ public class Users extends Timestamped {
         this.userStatus = UserStatus.ACTIVE;
     }
 
-    public Users(String email, String password, String userName, UserRole userRole) {
+    public User(String email, String password, String userName, UserRole userRole) {
         this.email = email;
         this.password = password;
         this.userName = userName;
@@ -52,19 +52,19 @@ public class Users extends Timestamped {
         this.userStatus = UserStatus.ACTIVE;
     }
 
-    private Users(Long id, String email, UserRole userRole) {
+    private User(Long id, String email, UserRole userRole) {
         this.id = id;
         this.email = email;
         this.userRole = userRole;
     }
 
-    public static Users fromAuthUser(AuthUser authUser) {
+    public static User fromAuthUser(AuthUser authUser) {
         String roleName = authUser.getAuthorities().iterator().next().getAuthority();
-        return new Users(authUser.getUserId(), authUser.getEmail(), UserRole.of(roleName));
+        return new User(authUser.getUserId(), authUser.getEmail(), UserRole.of(roleName));
     }
 
-    public static Users addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
-        return new Users(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), userRole);
+    public static User addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
+        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), userRole);
     }
 
     // 유저 비밀번호 변경

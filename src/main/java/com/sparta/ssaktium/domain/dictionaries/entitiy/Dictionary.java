@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Table(name = "dictionaries")
-public class Dictionaries {
+public class Dictionary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class Dictionaries {
     private String userName;
     private String imageUrl;
 
-    public Dictionaries(DictionaryRequestDto dictionaryRequestDto, String userName, String imageUrl) {
+    public Dictionary(DictionaryRequestDto dictionaryRequestDto, String userName, String imageUrl) {
         this.title = dictionaryRequestDto.getTitle();
         this.content = dictionaryRequestDto.getContent();
         this.userName = userName;

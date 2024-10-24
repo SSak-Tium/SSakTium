@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.plants.dto.responseDto;
 
-import com.sparta.ssaktium.domain.users.entity.Users;
 import lombok.Getter;
 
 @Getter

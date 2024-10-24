@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardsSaveRequestDto {
+public class BoardSaveRequestDto {
 
     private String title;
     private String contents;
