@@ -107,6 +107,12 @@ public class PlantService {
         Plant plant = plantRepository.findById(id).orElseThrow(() ->
                 new NotFoundPlantException());
 
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
+
+        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
+        s3Service.s3Client.deleteObject(s3Service.bucket, imageName);
+
         plantRepository.delete(plant);
 
         return "정상적으로 삭제되었습니다.";
