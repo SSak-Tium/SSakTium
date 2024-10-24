@@ -99,7 +99,7 @@ public class BoardService {
                 boards.getTotalPages(),
                 boards.getTotalElements(),
                 boards.getSize(),
-                boards.getNumber()
+                boards.getNumber()+1
         );
     }
 
