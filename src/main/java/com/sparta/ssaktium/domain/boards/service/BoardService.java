@@ -15,6 +15,7 @@ import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
 import com.sparta.ssaktium.domain.comments.service.CommentService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
@@ -27,7 +28,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +42,17 @@ public class BoardService {
     private final UserService userService;
     private final CommentService commentService;
     private final FriendService friendService;
+    private final S3Service s3Service;
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(AuthUser authUser, BoardSaveRequestDto requestDto) {
+    public BoardSaveResponseDto saveBoards(AuthUser authUser, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
         //유저 확인
         User user = userService.findUser(authUser.getUserId());
+        // 업로드한 파일의 S3 URL 주소
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board newBoard = new Board(requestDto,user);
+        Board newBoard = new Board(requestDto,user,imageUrl);
         //저장
         boardRepository.save(newBoard);
         //responseDto 반환
@@ -54,7 +60,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardSaveRequestDto requestDto) {
+    public BoardSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardSaveRequestDto requestDto,MultipartFile image) throws IOException {
         //유저 확인
         User user = userService.findUser(authUser.getUserId());
         //게시글 찾기
@@ -63,8 +69,10 @@ public class BoardService {
        if(!updateBoard.getUser().equals(user)){
            throw new RuntimeException();
        }
+        // 업로드한 파일의 S3 URL 주소
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
        //게시글 수정
-       updateBoard.updateBoards(requestDto);
+       updateBoard.updateBoards(requestDto,imageUrl);
        boardRepository.save(updateBoard);
        //responseDto 반환
        return new BoardSaveResponseDto(updateBoard);
@@ -76,10 +84,16 @@ public class BoardService {
         User user = userService.findUser(authUser.getUserId());
         //게시글 찾기
         Board deleteBoard = findBoard(id);
+
         //게시글 본인 확인
         if(!deleteBoard.getUser().equals(user)){
             throw new RuntimeException();
         }
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        String imageUrl = s3Service.extractFileNameFromUrl(deleteBoard.getImageUrl());
+
+        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
+        s3Service.s3Client.deleteObject(s3Service.bucket, imageUrl);
         //해당 보드 삭제 상태 변경
         deleteBoard.deleteBoards();
         boardRepository.save(deleteBoard);

@@ -22,7 +22,7 @@ public class Board extends Timestamped {
 
     private String content;
 
-    private String image;
+    private String imageUrl;
 
     private int boardLikesCount =0;
 
@@ -36,19 +36,19 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(BoardSaveRequestDto boardSaveRequestDto, User user){
+    public Board(BoardSaveRequestDto boardSaveRequestDto, User user,String imageUrl){
         this.title = boardSaveRequestDto.getTitle();
         this.content = boardSaveRequestDto.getContents();
-        this.image = boardSaveRequestDto.getImages();
         this.publicStatus = boardSaveRequestDto.getPublicStatus();
         this.user = user;
+        this.imageUrl = imageUrl;
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto){
+    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto,String imageUrl){
         this.title = boardSaveRequestDto.getTitle();
         this.content = boardSaveRequestDto.getContents();
-        this.image = boardSaveRequestDto.getImages();
+        this.imageUrl = imageUrl;
         this.publicStatus = boardSaveRequestDto.getPublicStatus();
         this.statusEnum = StatusEnum.ACTIVATED;
     }

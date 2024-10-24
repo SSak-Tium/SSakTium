@@ -12,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,8 +31,9 @@ public class BoardController {
      */
     @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                       @RequestBody BoardSaveRequestDto requestDto){
-        return  ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser,requestDto)));
+                                                                       @RequestPart BoardSaveRequestDto requestDto,
+                                                                       @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+        return  ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser,requestDto,image)));
     }
 
     /**
@@ -41,8 +45,9 @@ public class BoardController {
     @PutMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                          @PathVariable Long id,
-                                                                         @RequestBody BoardSaveRequestDto requestDto){
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser,id,requestDto)));
+                                                                         @RequestPart BoardSaveRequestDto requestDto,
+                                                                         @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser,id,requestDto,image)));
     }
 
     /**
@@ -84,7 +89,7 @@ public class BoardController {
     }
 
     /**
-     * 친구항목 필요
+     * 뉴스피드
      * @param authUser
      * @param page
      * @param size
