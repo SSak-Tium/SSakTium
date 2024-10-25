@@ -1,4 +1,4 @@
-package com.sparta.ssaktium.domain.users.controller;
+package com.sparta.ssaktium.domain.users.kakao.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.ssaktium.config.ApiResponse;
