@@ -48,7 +48,7 @@ public class CommentLikeService {
 
     // 댓글에 좋아요 취소
     @Transactional
-    public void deleteCommentLike(Long commentId, Long likeId, Long userId) {
+    public void deleteCommentLike(Long commentId, Long userId) {
         // 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundCommentException());

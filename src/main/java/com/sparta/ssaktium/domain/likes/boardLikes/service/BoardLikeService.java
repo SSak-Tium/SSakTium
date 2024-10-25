@@ -25,7 +25,7 @@ public class BoardLikeService {
 
 
     // 게시글 좋아요 조회 = 필요없는 기능일수도!!
-    public BoardLikeResponseDto getBoardLikes(Long boardId, Long userId) {
+    public BoardLikeResponseDto getBoardLikes(Long boardId) {
         // 게시글이 있는지 확인
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundBoardException());
@@ -58,7 +58,7 @@ public class BoardLikeService {
 
     // 게시글에 좋아요 취소
     @Transactional
-    public void deleteBoardLikes(Long boardId, Long likeId, Long userId) {
+    public void deleteBoardLikes(Long boardId, Long userId) {
         // 게시글이 있는지 확인
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundBoardException());

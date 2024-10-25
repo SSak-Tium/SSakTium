@@ -13,42 +13,40 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/boards/{id}")
+@RequestMapping("/v1/boards")
 public class CommentController {
 
     private final CommentService commentService;
 
     // 댓글 조회
-    @GetMapping("/comments")
-    public ResponseEntity<ApiResponse<Page<CommentResponseDto>>> getComments(@PathVariable Long id,
-                                                                             @AuthenticationPrincipal AuthUser authUser,
-                                                                             @RequestParam(defaultValue = "0") int page,
-                                                                             @RequestParam(defaultValue = "10") int size){
-        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(id,authUser.getUserId(), page, size)));
+    @GetMapping("/{boardId}/comments")
+    public ResponseEntity<ApiResponse<Page<CommentResponseDto>>> getComments(@PathVariable Long boardId,
+                                                                             @RequestParam(defaultValue = "1") int page,
+                                                                             @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(boardId, page, size)));
     }
 
     // 댓글 등록
-    @PostMapping("/comments")
-    public ResponseEntity<ApiResponse<CommentResponseDto>> postComment(@PathVariable Long id,
-                                                                       @AuthenticationPrincipal AuthUser authUser,
-                                                                       @RequestBody CommentRequestDto commentRequestDto){
-        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(id,authUser.getUserId(),commentRequestDto)));
+    @PostMapping("/{boardId}/comments")
+    public ResponseEntity<ApiResponse<CommentResponseDto>> postComment(@AuthenticationPrincipal AuthUser authUser,
+                                                                       @PathVariable Long boardId,
+                                                                       @RequestBody CommentRequestDto commentRequestDto) {
+        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(authUser.getUserId(), boardId, commentRequestDto)));
     }
 
     // 댓글 수정
-    @PutMapping("/comments/{commentId}")
-    public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(@PathVariable Long id,
+    @PutMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(@AuthenticationPrincipal AuthUser authUser,
+                                                                         @PathVariable Long boardId,
                                                                          @PathVariable Long commentId,
-                                                                         @AuthenticationPrincipal AuthUser authUser,
-                                                                         @RequestBody CommentRequestDto commentRequestDto){
-        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(id,commentId,authUser.getUserId(),commentRequestDto)));
+                                                                         @RequestBody CommentRequestDto commentRequestDto) {
+        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(authUser.getUserId(), boardId, commentId, commentRequestDto)));
     }
 
     // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
-    public void deleteComment(@PathVariable Long id,
-                              @PathVariable Long commentId,
-                              @AuthenticationPrincipal AuthUser authUser){
-        commentService.deleteComment(id,commentId,authUser.getUserId());
+    public void deleteComment(@AuthenticationPrincipal AuthUser authUser,
+                              @PathVariable Long commentId) {
+        commentService.deleteComment(authUser.getUserId(), commentId);
     }
 }

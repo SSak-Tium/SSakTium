@@ -30,13 +30,12 @@ public class CommentService {
     private final BoardService boardService;
 
     // 댓글 조회
-    public Page<CommentResponseDto> getComments(Long boardId, Long userId, int page, int size) {
-
+    public Page<CommentResponseDto> getComments(Long boardId, int page, int size) {
         // 게시글이 있는지 확인
         boardService.findBoard(boardId);
 
         // 페이지네이션 생성
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         Page<Comment> comments = commentRepository.findByBoardId(boardId, pageable);
 
         // 댓글 리스트를 Dto 로 반환
@@ -82,10 +81,7 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long boardId, Long commentId, Long userId) {
-        // 댓글 삭제할 게시글이 있는지 확인
-        boardService.findBoard(boardId);
-
+    public void deleteComment(Long commentId, Long userId) {
         // 삭제할 댓글이 있는지 확인
         Comment comment = findComment(commentId);
 
