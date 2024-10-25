@@ -34,30 +34,30 @@ public class CommentService {
     private final UserRepository userRepository;
 
     // 댓글 조회
-    public Page<CommentResponseDto> getComments(Long boardId, AuthUser authUser, int page, int size){
+    public Page<CommentResponseDto> getComments(Long boardId, AuthUser authUser, int page, int size) {
 
         // 게시글이 있는지 확인
         Board board = boardCheckByBoardId(boardId);
 
         // 페이징
         Pageable pageable = PageRequest.of(page, size);
-        Page<Comment> comments = commentRepository.findByBoardId(boardId,pageable);
+        Page<Comment> comments = commentRepository.findByBoardId(boardId, pageable);
 
         return comments.map(comment -> new CommentResponseDto(comment));
     }
 
     // 댓글 등록
     @Transactional
-    public CommentResponseDto postComment(Long boardId,AuthUser authUser, CommentRequestDto commentRequestDto) {
+    public CommentResponseDto postComment(Long boardId, AuthUser authUser, CommentRequestDto commentRequestDto) {
         // 댓글 작성할 게시글이 있는지 확인
         Board board = boardCheckByBoardId(boardId);
 
         // 댓글 작성할 유저
         User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
+                .orElseThrow(() -> new NotFoundUserException());
 
         // 댓글 생성 후 저장
-        Comment newcomment = new Comment(commentRequestDto.getContent(),board,user);
+        Comment newcomment = new Comment(commentRequestDto.getContent(), board, user);
         commentRepository.save(newcomment);
 
         return new CommentResponseDto(newcomment);
@@ -71,14 +71,14 @@ public class CommentService {
 
         // 댓글 수정할 유저
         User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
+                .orElseThrow(() -> new NotFoundUserException());
 
         // 수정할 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()-> new NotFoundCommentException());
+                .orElseThrow(() -> new NotFoundCommentException());
 
         // 해당 댓글 작성자인지 확인
-        if (!comment.getUser().equals(user)){
+        if (!comment.getUser().equals(user)) {
             throw new CommentOwnerMismatchException();
         }
 
@@ -97,14 +97,14 @@ public class CommentService {
 
         // 댓글 삭제할 유저
         User user = userRepository.findByEmail(authUser.getEmail())
-                .orElseThrow(()->new NotFoundUserException());
+                .orElseThrow(() -> new NotFoundUserException());
 
         // 삭제할 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()-> new NotFoundCommentException());
+                .orElseThrow(() -> new NotFoundCommentException());
 
         // 해당 게시글 또는 해당 댓글 작성자인지 확인
-        if (!comment.getUser().equals(user.getId())){
+        if (!comment.getUser().equals(user.getId())) {
             throw new CommentOwnerMismatchException();
         }
 
@@ -113,13 +113,14 @@ public class CommentService {
     }
 
     // 게시글이 있는지 확인
-    public Board boardCheckByBoardId (Long boardId){
+    public Board boardCheckByBoardId(Long boardId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new RuntimeException("익센션 설정 전"));
+                .orElseThrow(() -> new RuntimeException("익센션 설정 전"));
         return board;
     }
 
-    public List<Comment> findAllByBoardId(long boardId){
-        return  commentRepository.findAllByBoardId(boardId);
+    public List<Comment> findAllByBoardId(long boardId) {
+        return commentRepository.findAllByBoardId(boardId);
     }
+
 }

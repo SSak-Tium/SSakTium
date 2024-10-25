@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Board extends Timestamped {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
@@ -24,10 +25,10 @@ public class Board extends Timestamped {
 
     private String imageUrl;
 
-    private int boardLikesCount =0;
+    private int boardLikesCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -36,7 +37,7 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(BoardSaveRequestDto boardSaveRequestDto, User user,String imageUrl){
+    public Board(BoardSaveRequestDto boardSaveRequestDto, User user, String imageUrl) {
         this.title = boardSaveRequestDto.getTitle();
         this.content = boardSaveRequestDto.getContents();
         this.publicStatus = boardSaveRequestDto.getPublicStatus();
@@ -45,7 +46,7 @@ public class Board extends Timestamped {
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto,String imageUrl){
+    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto, String imageUrl) {
         this.title = boardSaveRequestDto.getTitle();
         this.content = boardSaveRequestDto.getContents();
         this.imageUrl = imageUrl;
@@ -54,19 +55,19 @@ public class Board extends Timestamped {
     }
 
     // 좋아요 등록
-    public void incrementLikesCount(){
+    public void incrementLikesCount() {
         boardLikesCount++;
     }
 
     // 좋아요 취소
-    public void decrementLikesCount(){
-        if (boardLikesCount <= 0){
+    public void decrementLikesCount() {
+        if (boardLikesCount <= 0) {
             throw new LikeCountUnderflowException();
         }
         boardLikesCount--;
     }
 
-    public void deleteBoards(){
+    public void deleteBoards() {
         this.statusEnum = StatusEnum.DELETED;
     }
 }

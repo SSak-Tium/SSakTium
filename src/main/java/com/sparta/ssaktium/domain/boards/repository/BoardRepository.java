@@ -12,14 +12,15 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface BoardRepository extends JpaRepository<Board,Long> {
+public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByUserIdAndStatusEnum(Long id, StatusEnum statusEnum, Pageable pageable);
 
     @Query("SELECT b FROM Board b WHERE (b.user = :user) OR " +
             "(b.publicStatus = :friendsStatus AND b.user IN :friends) OR " +
             "(b.publicStatus = :allStatus) " +
-            "ORDER BY b.modifiedAt DESC") // modifiedAtDate를 기준으로 내림차순 정렬
+            "ORDER BY b.modifiedAt DESC")
+        // modifiedAtDate를 기준으로 내림차순 정렬
     Page<Board> findAllForNewsFeed(
             @Param("user") User user,
             @Param("friends") List<User> friends,

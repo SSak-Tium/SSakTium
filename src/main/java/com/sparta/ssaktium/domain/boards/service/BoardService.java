@@ -49,7 +49,7 @@ public class BoardService {
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board newBoard = new Board(requestDto,user,imageUrl);
+        Board newBoard = new Board(requestDto, user, imageUrl);
         //저장
         boardRepository.save(newBoard);
         //responseDto 반환
@@ -57,33 +57,33 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto,MultipartFile image) throws IOException {
+    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
         Board updateBoard = findBoard(id);
         //게시글 본인 확인
-       if(!updateBoard.getUser().equals(user)){
-           throw new NotUserOfBoardException();
-       }
+        if (!updateBoard.getUser().equals(user)) {
+            throw new NotUserOfBoardException();
+        }
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-       //게시글 수정
-       updateBoard.updateBoards(requestDto,imageUrl);
-       boardRepository.save(updateBoard);
-       //responseDto 반환
-       return new BoardSaveResponseDto(updateBoard);
+        //게시글 수정
+        updateBoard.updateBoards(requestDto, imageUrl);
+        boardRepository.save(updateBoard);
+        //responseDto 반환
+        return new BoardSaveResponseDto(updateBoard);
     }
 
     @Transactional
-    public void deleteBoards(Long userId,Long id){
+    public void deleteBoards(Long userId, Long id) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
         Board deleteBoard = findBoard(id);
 
         //게시글 본인 확인
-        if(!deleteBoard.getUser().equals(user)){
+        if (!deleteBoard.getUser().equals(user)) {
             throw new NotUserOfBoardException();
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
@@ -99,28 +99,28 @@ public class BoardService {
     //게시글 단건 조회
     public BoardDetailResponseDto getBoard(Long id) {
         //게시글 찾기
-       Board board = findBoard(id);
+        Board board = findBoard(id);
         //댓글 찾기
         List<Comment> commentList = commentService.findAllByBoardId(board.getId());
 
         List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
-        for(Comment comments: commentList){
+        for (Comment comments : commentList) {
             dtoList.add(new CommentSimpleResponseDto(comments.getId(),
                     comments.getContent(),
                     comments.getModifiedAt(),
                     comments.getCommentLikesCount()));
         }
 
-        return  new BoardDetailResponseDto(board,dtoList);
+        return new BoardDetailResponseDto(board, dtoList);
     }
 
     public BoardPageResponseDto getMyBoards(Long userId, int page, int size) {
         //사용자 찾기
         User user = userService.findUser(userId);
         //페이지 요청 객체 생성 (페이지 숫자가 실제로는 0부터 시작하므로 원하는 숫자 -1을 입력해야 해당 페이지가 나온다)
-        Pageable pageable = PageRequest.of(page -1, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         //해당 유저가 쓴 게시글 페이지네이션해서 가져오기
-        Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED,pageable);
+        Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, pageable);
 
         // BoardsPageResponseDto 생성
         List<BoardDetailResponseDto> boardDetails = new ArrayList<>();
@@ -146,7 +146,7 @@ public class BoardService {
                 boards.getTotalPages(),
                 boards.getTotalElements(),
                 boards.getSize(),
-                boards.getNumber()+1
+                boards.getNumber() + 1
         );
     }
 
@@ -154,7 +154,7 @@ public class BoardService {
     public Page<BoardDetailResponseDto> getNewsfeed(Long userId, int page, int size) {
         //사용자 찾기
         User user = userService.findUser(userId);
-        Pageable pageable = PageRequest.of(page - 1 ,size);
+        Pageable pageable = PageRequest.of(page - 1, size);
 
         //친구목록 가져오기
         List<User> friends = friendService.findFriends(user.getId());
@@ -188,8 +188,8 @@ public class BoardService {
     }
 
     //Board 찾는 메서드
-    public Board findBoard(long id){
-       return boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
+    public Board findBoard(long id) {
+        return boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
     }
 
 }

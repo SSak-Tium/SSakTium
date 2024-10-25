@@ -23,16 +23,16 @@ public class CommentController {
     public ResponseEntity<ApiResponse<Page<CommentResponseDto>>> getComments(@PathVariable Long id,
                                                                              @AuthenticationPrincipal AuthUser authUser,
                                                                              @RequestParam(defaultValue = "0") int page,
-                                                                             @RequestParam(defaultValue = "10") int size){
-        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(id,authUser, page, size)));
+                                                                             @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(id, authUser, page, size)));
     }
 
     // 댓글 등록
     @PostMapping("/comments")
     public ResponseEntity<ApiResponse<CommentResponseDto>> postComment(@PathVariable Long id,
                                                                        @AuthenticationPrincipal AuthUser authUser,
-                                                                       @RequestBody CommentRequestDto commentRequestDto){
-        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(id,authUser,commentRequestDto)));
+                                                                       @RequestBody CommentRequestDto commentRequestDto) {
+        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(id, authUser, commentRequestDto)));
     }
 
     // 댓글 수정
@@ -40,15 +40,15 @@ public class CommentController {
     public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(@PathVariable Long id,
                                                                          @PathVariable Long commentId,
                                                                          @AuthenticationPrincipal AuthUser authUser,
-                                                                         @RequestBody CommentRequestDto commentRequestDto){
-        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(id,commentId,authUser,commentRequestDto)));
+                                                                         @RequestBody CommentRequestDto commentRequestDto) {
+        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(id, commentId, authUser, commentRequestDto)));
     }
 
     // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     public void deleteComment(@PathVariable Long id,
                               @PathVariable Long commentId,
-                              @AuthenticationPrincipal AuthUser authUser){
-        commentService.deleteComment(id,commentId,authUser);
+                              @AuthenticationPrincipal AuthUser authUser) {
+        commentService.deleteComment(id, commentId, authUser);
     }
 }
