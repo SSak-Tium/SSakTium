@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.plants.dto.responseDto;
 
+import com.sparta.ssaktium.domain.plants.entity.Plant;
 import lombok.Getter;
 
 @Getter
@@ -11,11 +12,11 @@ public class PlantResponseDto {
     private String plantNickname;
     private String imageUrl;
 
-    public PlantResponseDto(Long id, Long userId, String plantName, String plantNickname, String imageUrl) {
-        this.id = id;
-        this.userId = userId;
-        this.plantName = plantName;
-        this.plantNickname = plantNickname;
-        this.imageUrl = imageUrl;
+    public PlantResponseDto(Plant plant) {
+        this.id = plant.getId();
+        this.userId = plant.getUserId().getId();
+        this.plantName = plant.getPlantName();
+        this.plantNickname = plant.getPlantNickname();
+        this.imageUrl = plant.getImageUrl();
     }
 }

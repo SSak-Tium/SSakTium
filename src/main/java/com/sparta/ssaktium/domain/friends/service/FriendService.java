@@ -1,16 +1,14 @@
 package com.sparta.ssaktium.domain.friends.service;
 
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.friends.dto.responseDto.FriendPageResponseDto;
 import com.sparta.ssaktium.domain.friends.dto.responseDto.FriendResponseDto;
-import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.entity.Friend;
+import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.exception.*;
 import com.sparta.ssaktium.domain.friends.repository.FriendRepository;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,10 +25,9 @@ public class FriendService {
     private final UserService userService;
     private final FriendRepository friendRepository;
 
-    public FriendResponseDto requestFriend(AuthUser authUser, Long id) {
+    public FriendResponseDto requestFriend(Long userId, Long id) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
         User friendUser = userService.findUser(id);
 
@@ -49,10 +46,9 @@ public class FriendService {
         return new FriendResponseDto(friend, user, friendUser);
     }
 
-    public void cancelFriend(AuthUser authUser, Long id) {
+    public String cancelFriend(Long userId, Long id) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
         Optional<Friend> friendRequest = friendRepository.findByUserIdAndFriendUserId(user.getId(), id);
 
@@ -71,12 +67,13 @@ public class FriendService {
         }
 
         friendRepository.delete(friend);
+
+        return "친구 요청 취소 완료";
     }
 
-    public FriendResponseDto acceptFriend(AuthUser authUser, Long id) {
+    public FriendResponseDto acceptFriend(Long userId, Long id) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
         Optional<Friend> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
 
@@ -100,9 +97,9 @@ public class FriendService {
         return new FriendResponseDto(friend, friend.getFriendUserId(), friend.getUserId());
     }
 
-    public FriendResponseDto rejectFriend(AuthUser authUser, Long id) {
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+    public FriendResponseDto rejectFriend(Long userId, Long id) {
+
+        User user = userService.findUser(userId);
 
         Optional<Friend> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
 
@@ -128,10 +125,9 @@ public class FriendService {
 
 
     @Transactional(readOnly = true)
-    public Page<FriendPageResponseDto> getFriends(AuthUser authUser, int page, int size) {
+    public Page<FriendPageResponseDto> getFriends(Long userId, int page, int size) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
         // ACCEPTED 상태의 친구만 조회
         Page<Friend> friendsPage =
@@ -141,7 +137,7 @@ public class FriendService {
                         FriendStatus.ACCEPTED,
                         PageRequest.of(page - 1, size
                         )
-        );
+                );
 
         return friendsPage.map(friend -> {
             Long friendId = friend.getFriendUserId().getId().equals(user.getId())
@@ -151,9 +147,9 @@ public class FriendService {
         });
     }
 
-    public void deleteFriend(AuthUser authUser, Long id) {
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+    public String deleteFriend(Long userId, Long id) {
+
+        User user = userService.findUser(userId);
 
         // 친구 관계를 조회
         Optional<Friend> friendRelationship = friendRepository.findByUserIdAndFriendId(user.getId(), id);
@@ -170,9 +166,11 @@ public class FriendService {
 
         // 친구 관계 삭제
         friendRepository.delete(friendRelationship.get());
+
+        return "친구 삭제 요청 완료";
     }
 
-    public List<User> findFriends (long userId){
+    public List<User> findFriends(long userId) {
         return friendRepository.findFriendsByUserId(userId, FriendStatus.ACCEPTED);
     }
 }

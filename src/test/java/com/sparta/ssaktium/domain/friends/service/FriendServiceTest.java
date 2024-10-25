@@ -66,7 +66,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser.getId())).thenReturn(Optional.empty());
 
         // when
-        FriendResponseDto responseDto = friendService.requestFriend(authUser, friendAuthUser.getUserId());
+        FriendResponseDto responseDto = friendService.requestFriend(authUser.getUserId(), friendAuthUser.getUserId());
 
         // then
         assertNotNull(responseDto);
@@ -88,7 +88,7 @@ class FriendServiceTest {
 
         // when & then
         assertThrows(FriendRequestAlreadySentException.class, () -> {
-            friendService.requestFriend(authUser, friendAuthUser.getUserId());
+            friendService.requestFriend(authUser.getUserId(), friendAuthUser.getUserId());
         });
 
         verify(friendRepository, never()).save(any(Friend.class));
@@ -101,7 +101,7 @@ class FriendServiceTest {
 
         // when & then
         assertThrows(SelfRequestException.class, () -> {
-            friendService.requestFriend(authUser, authUser.getUserId());
+            friendService.requestFriend(authUser.getUserId(), authUser.getUserId());
         });
 
         verify(friendRepository, never()).save(any(Friend.class));
@@ -118,7 +118,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUserId)).thenReturn(Optional.of(friend));
 
         // when
-        friendService.cancelFriend(authUser, friendUserId);
+        friendService.cancelFriend(authUser.getUserId(), friendUserId);
 
         // then
         verify(friendRepository).delete(friend);
@@ -133,7 +133,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUserId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotFoundRequestFriendException.class, () -> friendService.cancelFriend(authUser, friendUserId));
+        assertThrows(NotFoundRequestFriendException.class, () -> friendService.cancelFriend(authUser.getUserId(), friendUserId));
         verify(friendRepository, never()).delete(any(Friend.class));
     }
 
@@ -148,7 +148,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(friendUserId, user.getId())).thenReturn(Optional.of(friend));
 
         // when
-        FriendResponseDto responseDto = friendService.acceptFriend(authUser, friendUserId);
+        FriendResponseDto responseDto = friendService.acceptFriend(authUser.getUserId(), friendUserId);
 
         // then
         assertNotNull(responseDto);
@@ -165,7 +165,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(friendUserId, user.getId())).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotFoundRequestFriendException.class, () -> friendService.acceptFriend(authUser, friendUserId));
+        assertThrows(NotFoundRequestFriendException.class, () -> friendService.acceptFriend(authUser.getUserId(), friendUserId));
         verify(friendRepository, never()).save(any(Friend.class));
     }
 
@@ -180,7 +180,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(friendUserId, user.getId())).thenReturn(Optional.of(friend));
 
         // when
-        FriendResponseDto responseDto = friendService.rejectFriend(authUser, friendUserId);
+        FriendResponseDto responseDto = friendService.rejectFriend(authUser.getUserId(), friendUserId);
 
         // then
         assertNotNull(responseDto);
@@ -197,7 +197,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendUserId(friendUserId, user.getId())).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotFoundRequestFriendException.class, () -> friendService.rejectFriend(authUser, friendUserId));
+        assertThrows(NotFoundRequestFriendException.class, () -> friendService.rejectFriend(authUser.getUserId(), friendUserId));
         verify(friendRepository, never()).save(any(Friend.class));
     }
 
@@ -213,7 +213,7 @@ class FriendServiceTest {
                 .thenReturn(friendsPage);
 
         // when
-        Page<FriendPageResponseDto> result = friendService.getFriends(authUser, 1, 10);
+        Page<FriendPageResponseDto> result = friendService.getFriends(authUser.getUserId(), 1, 10);
 
         // then
         assertNotNull(result);
@@ -231,7 +231,7 @@ class FriendServiceTest {
                 .thenReturn(friendsPage);
 
         // when
-        Page<FriendPageResponseDto> result = friendService.getFriends(authUser, 1, 10);
+        Page<FriendPageResponseDto> result = friendService.getFriends(authUser.getUserId(), 1, 10);
 
         // then
         assertNotNull(result);
@@ -249,7 +249,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendId(user.getId(), friendUserId)).thenReturn(Optional.of(friend));
 
         // when
-        friendService.deleteFriend(authUser, friendUserId);
+        friendService.deleteFriend(authUser.getUserId(), friendUserId);
 
         // then
         verify(friendRepository).delete(friend);
@@ -265,7 +265,7 @@ class FriendServiceTest {
         when(friendRepository.findByUserIdAndFriendId(friendUserId, user.getId())).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotFoundFriendException.class, () -> friendService.deleteFriend(authUser, friendUserId));
+        assertThrows(NotFoundFriendException.class, () -> friendService.deleteFriend(authUser.getUserId(), friendUserId));
         verify(friendRepository, never()).delete(any(Friend.class));
     }
 
