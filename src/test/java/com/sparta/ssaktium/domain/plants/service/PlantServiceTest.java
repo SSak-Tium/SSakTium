@@ -66,7 +66,7 @@ class PlantServiceTest {
         when(plantRepository.findById(anyLong())).thenReturn(Optional.of(plant));
 
         // when
-        PlantResponseDto response = plantService.getPlant(authUser, 1L);
+        PlantResponseDto response = plantService.getPlant(authUser.getUserId(), 1L);
 
         // then
         assertEquals(plant.getPlantName(), response.getPlantName());
@@ -80,7 +80,7 @@ class PlantServiceTest {
         when(plantRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when, then
-        assertThrows(NotFoundPlantException.class, () -> plantService.getPlant(authUser, 1L));
+        assertThrows(NotFoundPlantException.class, () -> plantService.getPlant(authUser.getUserId(), 1L));
     }
 
     @Test
@@ -90,7 +90,7 @@ class PlantServiceTest {
         when(plantRepository.findByUserId(any(User.class))).thenReturn(List.of(plant));
 
         // when
-        List<PlantResponseDto> response = plantService.getAllPlants(authUser);
+        List<PlantResponseDto> response = plantService.getAllPlants(authUser.getUserId());
 
         // then
         assertEquals(1, response.size());
@@ -105,7 +105,7 @@ class PlantServiceTest {
         when(plantRepository.findById(anyLong())).thenReturn(Optional.of(plant));
 
         // when
-        PlantResponseDto response = plantService.updatePlant(authUser, 1L, plantRequestDto, multipartFile);
+        PlantResponseDto response = plantService.updatePlant(authUser.getUserId(), 1L, plantRequestDto, multipartFile);
 
         // then
         assertEquals(plantRequestDto.getPlantName(), response.getPlantName());
