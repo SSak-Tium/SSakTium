@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.plants.service;
 
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantCreateRequestDto;
+import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
 import com.sparta.ssaktium.domain.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.exception.NotFoundPlantException;
@@ -28,7 +28,7 @@ public class PlantService {
     private final UserService userService;
 
     public PlantResponseDto createPlant(AuthUser authUser,
-                                        PlantCreateRequestDto requestDto,
+                                        PlantRequestDto requestDto,
                                         MultipartFile image) throws IOException {
 
         User user = User.fromAuthUser(authUser);
@@ -79,7 +79,7 @@ public class PlantService {
                 .collect(Collectors.toList());
     }
 
-    public PlantResponseDto updatePlant(AuthUser authUser, Long id, PlantCreateRequestDto requestDto, MultipartFile image) throws IOException {
+    public PlantResponseDto updatePlant(AuthUser authUser, Long id, PlantRequestDto requestDto, MultipartFile image) throws IOException {
 
         User user = User.fromAuthUser(authUser);
         userService.findUser(user.getId());
@@ -106,6 +106,12 @@ public class PlantService {
 
         Plant plant = plantRepository.findById(id).orElseThrow(() ->
                 new NotFoundPlantException());
+
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
+
+        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
+        s3Service.s3Client.deleteObject(s3Service.bucket, imageName);
 
         plantRepository.delete(plant);
 

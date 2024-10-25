@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -169,5 +170,9 @@ public class FriendService {
 
         // 친구 관계 삭제
         friendRepository.delete(friendRelationship.get());
+    }
+
+    public List<User> findFriends (long userId){
+        return friendRepository.findFriendsByUserId(userId, FriendStatus.ACCEPTED);
     }
 }

@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 @Getter
@@ -108,5 +110,9 @@ public class CommentService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(()->new NotFoundBoardException());
         return board;
+    }
+
+    public List<Comment> findAllByBoardId(long boardId){
+        return  commentRepository.findAllByBoardId(boardId);
     }
 }

@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화
                 .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/auth/*","/v1/auth/admin/signup").permitAll()
+                        .requestMatchers("/v1/auth/*", "/v1/auth/admin/signup", "/v1/ssaktium/home", "/v1/*").permitAll()
                         .requestMatchers("/test").hasAuthority(UserRole.Authority.ADMIN)
                         .anyRequest().authenticated()
                 )

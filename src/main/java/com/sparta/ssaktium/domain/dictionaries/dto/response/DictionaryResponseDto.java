@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.dictionaries.dto.response;
 
+import com.sparta.ssaktium.domain.dictionaries.entitiy.Dictionary;
 import lombok.Getter;
 
 @Getter
@@ -10,10 +11,10 @@ public class DictionaryResponseDto {
     private String userName;
     private String imageUrl;
 
-    public DictionaryResponseDto(String title, String content, String userName, String imageUrl) {
-        this.title = title;
-        this.content = content;
-        this.userName = userName;
-        this.imageUrl = imageUrl;
+    public DictionaryResponseDto(Dictionary dictionary) {
+        this.title = dictionary.getTitle();
+        this.content = dictionary.getContent();
+        this.userName = dictionary.getUserName();
+        this.imageUrl = dictionary.getImageUrl();
     }
 }

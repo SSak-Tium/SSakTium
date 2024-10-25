@@ -5,18 +5,35 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
+import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.comments.dto.response.CommentResponseDto;
+import com.sparta.ssaktium.domain.comments.dto.response.CommentSimpleResponseDto;
+import com.sparta.ssaktium.domain.comments.entity.Comment;
+import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
+import com.sparta.ssaktium.domain.comments.service.CommentService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.common.service.S3Service;
+import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
+import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Comments;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,14 +41,19 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserService userService;
+    private final CommentService commentService;
+    private final FriendService friendService;
+    private final S3Service s3Service;
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(AuthUser authUser, BoardSaveRequestDto requestDto) {
+    public BoardSaveResponseDto saveBoards(AuthUser authUser, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
         //유저 확인
         User user = userService.findUser(authUser.getUserId());
+        // 업로드한 파일의 S3 URL 주소
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board newBoard = new Board(requestDto,user);
+        Board newBoard = new Board(requestDto,user,imageUrl);
         //저장
         boardRepository.save(newBoard);
         //responseDto 반환
@@ -39,17 +61,19 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardSaveRequestDto requestDto) {
+    public BoardSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardSaveRequestDto requestDto,MultipartFile image) throws IOException {
         //유저 확인
         User user = userService.findUser(authUser.getUserId());
         //게시글 찾기
         Board updateBoard = findBoard(id);
         //게시글 본인 확인
        if(!updateBoard.getUser().equals(user)){
-           throw new RuntimeException();
+           throw new NotUserOfBoardException();
        }
+        // 업로드한 파일의 S3 URL 주소
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
        //게시글 수정
-       updateBoard.updateBoards(requestDto);
+       updateBoard.updateBoards(requestDto,imageUrl);
        boardRepository.save(updateBoard);
        //responseDto 반환
        return new BoardSaveResponseDto(updateBoard);
@@ -61,29 +85,38 @@ public class BoardService {
         User user = userService.findUser(authUser.getUserId());
         //게시글 찾기
         Board deleteBoard = findBoard(id);
+
         //게시글 본인 확인
         if(!deleteBoard.getUser().equals(user)){
-            throw new RuntimeException();
+            throw new NotUserOfBoardException();
         }
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        String imageUrl = s3Service.extractFileNameFromUrl(deleteBoard.getImageUrl());
+
+        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
+        s3Service.s3Client.deleteObject(s3Service.bucket, imageUrl);
         //해당 보드 삭제 상태 변경
         deleteBoard.deleteBoards();
         boardRepository.save(deleteBoard);
     }
 
-//    //게시글 단건 조회 (댓글필요)
-//    public BoardsDetailResponseDto getBoard(Long id) {
-//        //게시글 찾기
-//       Boards board = findBoard(id);
-//        //댓글 찾기
-//        List<Comments> commentList = commentRepository.findAllByBoardId(board.getId());
-//
-//        List<CommentResponseDto> dtoList = new ArrayList<>();
-//        for(Comments comments: commentList){
-//            dtoList.add(new CommentResponseDto(comments.getId,comments.getContents));
-//        }
-//
-//        return  new BoardsDetailResponseDto(board,dtoList);
-//    }
+    //게시글 단건 조회
+    public BoardDetailResponseDto getBoard(Long id) {
+        //게시글 찾기
+       Board board = findBoard(id);
+        //댓글 찾기
+        List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+
+        List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
+        for(Comment comments: commentList){
+            dtoList.add(new CommentSimpleResponseDto(comments.getId(),
+                    comments.getContent(),
+                    comments.getModifiedAt(),
+                    comments.getCommentLikesCount()));
+        }
+
+        return  new BoardDetailResponseDto(board,dtoList);
+    }
 
     public BoardPageResponseDto getMyBoards(AuthUser authUser, int page, int size) {
         //사용자 찾기
@@ -94,42 +127,73 @@ public class BoardService {
         Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED,pageable);
 
         // BoardsPageResponseDto 생성
+        List<BoardDetailResponseDto> boardDetails = new ArrayList<>();
+        for (Board board : boards) {
+            // 댓글 리스트 가져오기
+            List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+            List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
+            for (Comment comment : commentList) {
+                dtoList.add(new CommentSimpleResponseDto(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getModifiedAt(),
+                        comment.getCommentLikesCount()
+                ));
+            }
+            // BoardDetailResponseDto 생성
+            boardDetails.add(new BoardDetailResponseDto(board, dtoList));
+        }
+
+        // BoardsPageResponseDto 생성
         return new BoardPageResponseDto(
-                boards.map(BoardDetailResponseDto::new).getContent(),
+                boardDetails,
                 boards.getTotalPages(),
                 boards.getTotalElements(),
                 boards.getSize(),
-                boards.getNumber()
+                boards.getNumber()+1
         );
     }
 
-    //뉴스피드 (친구필요)
-//    public Page<BoardsDetailResponseDto> getNewsfeed(AuthUser authUser, int page, int size) {
-//        //사용자 찾기
-//        User user = userService.findUser(authUser.getUserId());
-//        Pageable pageable = PageRequest.of(page - 1 ,size);
-//
-//        //친구목록 가져오기
-//        List<User> friends = userService.getFriends(user.getId());
-//
-//        // 게시글 리스트 가져오기
-//        Page<Boards> boardsPage = boardsRepository.findAllForNewsFeed(
-//                user,
-//                friends,
-//                PublicStatus.FRIENDS, // 친구의 게시글 상태
-//                PublicStatus.ALL,      // 전체 공개 게시글 상태
-//                pageable               // Pageable 객체 전달
-//        );
-//
-//        // DTO로 변환하여 반환
-//        return boardsPage.map(BoardsDetailResponseDto::new);
-//    }
+    //뉴스피드
+    public Page<BoardDetailResponseDto> getNewsfeed(AuthUser authUser, int page, int size) {
+        //사용자 찾기
+        User user = userService.findUser(authUser.getUserId());
+        Pageable pageable = PageRequest.of(page - 1 ,size);
+
+        //친구목록 가져오기
+        List<User> friends = friendService.findFriends(user.getId());
+
+        // 게시글 리스트 가져오기
+        Page<Board> boardsPage = boardRepository.findAllForNewsFeed(
+                user,
+                friends,
+                PublicStatus.FRIENDS, // 친구의 게시글 상태
+                PublicStatus.ALL,      // 전체 공개 게시글 상태
+                pageable               // Pageable 객체 전달
+        );
+
+        List<BoardDetailResponseDto> dtoList = new ArrayList<>();
+        for (Board board : boardsPage) {
+            // 댓글 리스트 가져오기
+            List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+            List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
+            for (Comment comment : commentList) {
+                commentDtos.add(new CommentSimpleResponseDto(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getModifiedAt(),
+                        comment.getCommentLikesCount()
+                ));
+            }
+            // BoardDetailResponseDto 생성
+            dtoList.add(new BoardDetailResponseDto(board, commentDtos));
+        }
+        return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
+    }
 
     //Board 찾는 메서드
     public Board findBoard(long id){
        return boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
     }
-
-
 
 }
