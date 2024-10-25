@@ -24,7 +24,7 @@ public class CommentController {
                                                                              @AuthenticationPrincipal AuthUser authUser,
                                                                              @RequestParam(defaultValue = "0") int page,
                                                                              @RequestParam(defaultValue = "10") int size){
-        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(id,authUser, page, size)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(id,authUser.getUserId(), page, size)));
     }
 
     // 댓글 등록
@@ -32,7 +32,7 @@ public class CommentController {
     public ResponseEntity<ApiResponse<CommentResponseDto>> postComment(@PathVariable Long id,
                                                                        @AuthenticationPrincipal AuthUser authUser,
                                                                        @RequestBody CommentRequestDto commentRequestDto){
-        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(id,authUser,commentRequestDto)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(id,authUser.getUserId(),commentRequestDto)));
     }
 
     // 댓글 수정
@@ -41,7 +41,7 @@ public class CommentController {
                                                                          @PathVariable Long commentId,
                                                                          @AuthenticationPrincipal AuthUser authUser,
                                                                          @RequestBody CommentRequestDto commentRequestDto){
-        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(id,commentId,authUser,commentRequestDto)));
+        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(id,commentId,authUser.getUserId(),commentRequestDto)));
     }
 
     // 댓글 삭제
@@ -49,6 +49,6 @@ public class CommentController {
     public void deleteComment(@PathVariable Long id,
                               @PathVariable Long commentId,
                               @AuthenticationPrincipal AuthUser authUser){
-        commentService.deleteComment(id,commentId,authUser);
+        commentService.deleteComment(id,commentId,authUser.getUserId());
     }
 }

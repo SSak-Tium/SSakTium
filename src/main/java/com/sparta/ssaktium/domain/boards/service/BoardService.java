@@ -100,23 +100,23 @@ public class BoardService {
         boardRepository.save(deleteBoard);
     }
 
-    //게시글 단건 조회
-    public BoardDetailResponseDto getBoard(Long id) {
-        //게시글 찾기
-       Board board = findBoard(id);
-        //댓글 찾기
-        List<Comment> commentList = commentService.findAllByBoardId(board.getId());
-
-        List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
-        for(Comment comments: commentList){
-            dtoList.add(new CommentSimpleResponseDto(comments.getId(),
-                    comments.getContent(),
-                    comments.getModifiedAt(),
-                    comments.getCommentLikesCount()));
-        }
-
-        return  new BoardDetailResponseDto(board,dtoList);
-    }
+//    //게시글 단건 조회
+//    public BoardDetailResponseDto getBoard(Long id) {
+//        //게시글 찾기
+//       Board board = findBoard(id);
+//        //댓글 찾기
+//        List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+//
+//        List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
+//        for(Comment comments: commentList){
+//            dtoList.add(new CommentSimpleResponseDto(comments.getId(),
+//                    comments.getContent(),
+//                    comments.getModifiedAt(),
+//                    comments.getCommentLikesCount()));
+//        }
+//
+//        return  new BoardDetailResponseDto(board,dtoList);
+//    }
 
     public BoardPageResponseDto getMyBoards(AuthUser authUser, int page, int size) {
         //사용자 찾기

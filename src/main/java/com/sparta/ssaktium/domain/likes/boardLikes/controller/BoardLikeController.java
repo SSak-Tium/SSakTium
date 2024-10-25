@@ -21,14 +21,14 @@ public class BoardLikeController {
     @GetMapping
     public ResponseEntity<ApiResponse<BoardLikeResponseDto>> getBoardLikes(@PathVariable Long id,
                                                                            @AuthenticationPrincipal AuthUser authUser){
-        return ResponseEntity.ok(ApiResponse.success(boardLikeService.getBoardLikes(id,authUser)));
+        return ResponseEntity.ok(ApiResponse.success(boardLikeService.getBoardLikes(id,authUser.getUserId())));
     }
 
     // 좋아요 등록
     @PostMapping
     public ResponseEntity<ApiResponse<BoardLikeResponseDto>> postBoardLikes(@PathVariable Long id,
                                                                             @AuthenticationPrincipal AuthUser authUser){
-        return ResponseEntity.ok(ApiResponse.success(boardLikeService.postBoardLikes(id,authUser)));
+        return ResponseEntity.ok(ApiResponse.success(boardLikeService.postBoardLikes(id,authUser.getUserId())));
     }
 
     // 좋아요 취소
@@ -36,7 +36,7 @@ public class BoardLikeController {
     public void deleteBoardLikes(@PathVariable Long id,
                                  @PathVariable Long likeId,
                                  @AuthenticationPrincipal AuthUser authUser){
-        boardLikeService.deleteBoardLikes(id,likeId,authUser);
+        boardLikeService.deleteBoardLikes(id,likeId,authUser.getUserId());
     }
 
 }
