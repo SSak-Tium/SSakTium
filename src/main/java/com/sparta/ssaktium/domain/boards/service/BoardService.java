@@ -37,7 +37,6 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserService userService;
-    private final CommentService commentService;
     private final FriendService friendService;
     private final S3Service s3Service;
 
@@ -49,11 +48,11 @@ public class BoardService {
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board newBoard = new Board(requestDto, user, imageUrl);
+        Board board = new Board(requestDto.getTitle(), requestDto.getContents(),requestDto.getPublicStatus() ,user, imageUrl);
         //저장
-        boardRepository.save(newBoard);
+        Board savedBoard = boardRepository.save(board);
         //responseDto 반환
-        return new BoardSaveResponseDto(newBoard);
+        return new BoardSaveResponseDto(savedBoard);
     }
 
     @Transactional
@@ -61,7 +60,7 @@ public class BoardService {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
-        Board updateBoard = findBoard(id);
+        Board updateBoard = getBoardById(id);
         //게시글 본인 확인
         if (!updateBoard.getUser().equals(user)) {
             throw new NotUserOfBoardException();
@@ -80,7 +79,7 @@ public class BoardService {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
-        Board deleteBoard = findBoard(id);
+        Board deleteBoard = getBoardById(id);
 
         //게시글 본인 확인
         if (!deleteBoard.getUser().equals(user)) {
@@ -99,9 +98,9 @@ public class BoardService {
     //게시글 단건 조회
     public BoardDetailResponseDto getBoard(Long id) {
         //게시글 찾기
-        Board board = findBoard(id);
+        Board board = getBoardById(id);
         //댓글 찾기
-        List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+        List<Comment> commentList = getCommentsByBoardId(board.getId());
 
         List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
         for (Comment comments : commentList) {
@@ -126,7 +125,7 @@ public class BoardService {
         List<BoardDetailResponseDto> boardDetails = new ArrayList<>();
         for (Board board : boards) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+            List<Comment> commentList = getCommentsByBoardId(board.getId());
             List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
             for (Comment comment : commentList) {
                 dtoList.add(new CommentSimpleResponseDto(
@@ -171,7 +170,7 @@ public class BoardService {
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = commentService.findAllByBoardId(board.getId());
+            List<Comment> commentList = getCommentsByBoardId(board.getId());
             List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
             for (Comment comment : commentList) {
                 commentDtos.add(new CommentSimpleResponseDto(
@@ -188,8 +187,13 @@ public class BoardService {
     }
 
     //Board 찾는 메서드
-    public Board findBoard(long id) {
-        return boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
+    public Board getBoardById(Long id) {
+        return boardRepository.findActiveBoardById(id,StatusEnum.DELETED)
+                .orElseThrow(NotFoundBoardException::new);
     }
 
+    //Board에 연관된 댓글리스트 불러오기
+    public List<Comment> getCommentsByBoardId(Long boardId) {
+        return boardRepository.findCommentsByBoardId(boardId, StatusEnum.DELETED);
+    }
 }

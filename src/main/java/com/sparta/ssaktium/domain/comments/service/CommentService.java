@@ -119,8 +119,4 @@ public class CommentService {
         return board;
     }
 
-    public List<Comment> findAllByBoardId(long boardId) {
-        return commentRepository.findAllByBoardId(boardId);
-    }
-
 }

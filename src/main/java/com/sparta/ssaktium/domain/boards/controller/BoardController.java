@@ -106,4 +106,6 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
 
+//    @GetMapping("/search")
+//    public ResponseEntity<ApiResponse<Page<>>>
 }

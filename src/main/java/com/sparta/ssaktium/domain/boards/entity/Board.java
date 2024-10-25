@@ -3,12 +3,15 @@ package com.sparta.ssaktium.domain.boards.entity;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
+import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,16 +34,19 @@ public class Board extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
     @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
 
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(BoardSaveRequestDto boardSaveRequestDto, User user, String imageUrl) {
-        this.title = boardSaveRequestDto.getTitle();
-        this.content = boardSaveRequestDto.getContents();
-        this.publicStatus = boardSaveRequestDto.getPublicStatus();
+    public Board(String title,String content,PublicStatus publicStatus, User user, String imageUrl) {
+        this.title = title;
+        this.content = content;
+        this.publicStatus = publicStatus;
         this.user = user;
         this.imageUrl = imageUrl;
         this.statusEnum = StatusEnum.ACTIVATED;
