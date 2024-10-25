@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-
+// 댓글 서비스 테스트
 @ExtendWith(MockitoExtension.class) // Mockito 사용 설정
 class CommentServiceTest {
 
