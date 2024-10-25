@@ -43,9 +43,9 @@ public class BoardService {
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(AuthUser authUser, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
+    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
         //유저 확인
-        User user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(userId);
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
@@ -57,9 +57,9 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(AuthUser authUser, Long id, BoardSaveRequestDto requestDto,MultipartFile image) throws IOException {
+    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto,MultipartFile image) throws IOException {
         //유저 확인
-        User user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(userId);
         //게시글 찾기
         Board updateBoard = findBoard(id);
         //게시글 본인 확인
@@ -76,9 +76,9 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoards(AuthUser authUser,Long id){
+    public void deleteBoards(Long userId,Long id){
         //유저 확인
-        User user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(userId);
         //게시글 찾기
         Board deleteBoard = findBoard(id);
 
@@ -114,9 +114,9 @@ public class BoardService {
         return  new BoardDetailResponseDto(board,dtoList);
     }
 
-    public BoardPageResponseDto getMyBoards(AuthUser authUser, int page, int size) {
+    public BoardPageResponseDto getMyBoards(Long userId, int page, int size) {
         //사용자 찾기
-        User user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(userId);
         //페이지 요청 객체 생성 (페이지 숫자가 실제로는 0부터 시작하므로 원하는 숫자 -1을 입력해야 해당 페이지가 나온다)
         Pageable pageable = PageRequest.of(page -1, size);
         //해당 유저가 쓴 게시글 페이지네이션해서 가져오기
@@ -151,9 +151,9 @@ public class BoardService {
     }
 
     //뉴스피드
-    public Page<BoardDetailResponseDto> getNewsfeed(AuthUser authUser, int page, int size) {
+    public Page<BoardDetailResponseDto> getNewsfeed(Long userId, int page, int size) {
         //사용자 찾기
-        User user = userService.findUser(authUser.getUserId());
+        User user = userService.findUser(userId);
         Pageable pageable = PageRequest.of(page - 1 ,size);
 
         //친구목록 가져오기

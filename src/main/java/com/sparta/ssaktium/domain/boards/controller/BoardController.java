@@ -33,7 +33,7 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                        @RequestPart BoardSaveRequestDto requestDto,
                                                                        @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        return  ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser,requestDto,image)));
+        return  ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(),requestDto,image)));
     }
 
     /**
@@ -47,7 +47,7 @@ public class BoardController {
                                                                          @PathVariable Long id,
                                                                          @RequestPart BoardSaveRequestDto requestDto,
                                                                          @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser,id,requestDto,image)));
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser.getUserId(),id,requestDto,image)));
     }
 
     /**
@@ -58,7 +58,7 @@ public class BoardController {
     @DeleteMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
                                                        @PathVariable Long id){
-        boardService.deleteBoards(authUser,id);
+        boardService.deleteBoards(authUser.getUserId(),id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -85,7 +85,7 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardPageResponseDto>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
                                                                          @RequestParam(defaultValue = "1") int page,
                                                                          @RequestParam(defaultValue = "5") int size){
-        return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser,page,size)));
+        return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser.getUserId(),page,size)));
     }
 
     /**
@@ -98,7 +98,7 @@ public class BoardController {
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
                                                                                  @RequestParam(defaultValue = "1") int page,
                                                                                  @RequestParam(defaultValue = "5") int size){
-        return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser,page,size)));
+        return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(),page,size)));
     }
 
 }
