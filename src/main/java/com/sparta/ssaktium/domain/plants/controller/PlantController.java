@@ -32,7 +32,7 @@ public class PlantController {
     public ResponseEntity<ApiResponse<PlantResponseDto>> createPlant (@AuthenticationPrincipal AuthUser authUser,
                                                                       @RequestPart PlantRequestDto requestDto,
                                                                       @RequestPart(required = false) MultipartFile image) throws IOException {
-        PlantResponseDto responseDto = plantService.createPlant(authUser, requestDto, image);
+        PlantResponseDto responseDto = plantService.createPlant(authUser.getUserId(), requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -46,7 +46,7 @@ public class PlantController {
     public ResponseEntity<ApiResponse<PlantResponseDto>> getPlant(@AuthenticationPrincipal AuthUser authUser,
                                                                   @PathVariable Long id) {
 
-        PlantResponseDto responseDto = plantService.getPlant(authUser, id);
+        PlantResponseDto responseDto = plantService.getPlant(authUser.getUserId(), id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
 
     }
@@ -58,7 +58,7 @@ public class PlantController {
      */
     @GetMapping("/v1/plants")
     public ResponseEntity<ApiResponse<List<PlantResponseDto>>> getAllPlants(@AuthenticationPrincipal AuthUser authUser) {
-        List<PlantResponseDto> responseDto = plantService.getAllPlants(authUser);
+        List<PlantResponseDto> responseDto = plantService.getAllPlants(authUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -67,7 +67,7 @@ public class PlantController {
                                                                      @PathVariable Long id,
                                                                      @RequestPart PlantRequestDto requestDto,
                                                                      @RequestPart(required = false) MultipartFile image) throws IOException {
-        PlantResponseDto responseDto = plantService.updatePlant(authUser, id, requestDto, image);
+        PlantResponseDto responseDto = plantService.updatePlant(authUser.getUserId(), id, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -80,6 +80,6 @@ public class PlantController {
     @DeleteMapping("/v1/plants/{id}")
     public ResponseEntity<ApiResponse<String>> deletePlant(@AuthenticationPrincipal AuthUser authUser,
                                                          @PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(plantService.deltePlant(authUser,id)));
+        return ResponseEntity.ok(ApiResponse.success(plantService.deltePlant(authUser.getUserId(),id)));
     }
 }
