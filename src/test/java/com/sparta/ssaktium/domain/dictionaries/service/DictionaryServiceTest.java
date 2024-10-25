@@ -42,16 +42,12 @@ class DictionaryServiceTest {
 
     @Mock
     private DictionaryRepository dictionaryRepository;
-
     @Mock
     private UserService userService;
-
     @Mock
     private S3Service s3Service;
-
     @Mock
     private AmazonS3Client s3Client;
-
     @Mock
     private MultipartFile image;
 
