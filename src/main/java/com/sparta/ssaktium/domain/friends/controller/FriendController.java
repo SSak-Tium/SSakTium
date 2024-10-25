@@ -27,7 +27,7 @@ public class FriendController {
     @PostMapping("/v1/users/{id}/friends")
     public ResponseEntity<ApiResponse<FriendResponseDto>> requestFriend(@AuthenticationPrincipal AuthUser authUser,
                                                                         @PathVariable Long id) {
-        FriendResponseDto responseDto = friendService.requestFriend(authUser, id);
+        FriendResponseDto responseDto = friendService.requestFriend(authUser.getUserId(), id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -40,8 +40,7 @@ public class FriendController {
      */
     @DeleteMapping("/v1/users/{id}/friends")
     public ResponseEntity<ApiResponse<String>> cancelFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
-        friendService.cancelFriend(authUser, id);
-        return ResponseEntity.ok(ApiResponse.success("친구 요청이 취소되었습니다."));
+        return ResponseEntity.ok(ApiResponse.success(friendService.cancelFriend(authUser.getUserId(), id)));
     }
 
     /**
@@ -54,12 +53,13 @@ public class FriendController {
     @PutMapping("v1/friends/{id}/accept")
     public ResponseEntity<ApiResponse<FriendResponseDto>> acceptFriend(@AuthenticationPrincipal AuthUser authUser,
                                                                        @PathVariable Long id) {
-        FriendResponseDto responseDto = friendService.acceptFriend(authUser, id);
+        FriendResponseDto responseDto = friendService.acceptFriend(authUser.getUserId(), id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
     /**
      * 친구 요청 거절 API
+     *
      * @param authUser
      * @param id
      * @return
@@ -67,12 +67,13 @@ public class FriendController {
     @PutMapping("/v1/friends/{id}/reject")
     public ResponseEntity<ApiResponse<FriendResponseDto>> rejectFriend(@AuthenticationPrincipal AuthUser authUser,
                                                                        @PathVariable Long id) {
-        FriendResponseDto responseDto = friendService.rejectFriend(authUser, id);
+        FriendResponseDto responseDto = friendService.rejectFriend(authUser.getUserId(), id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
     /**
      * 친구 목록조회 API
+     *
      * @param authUser
      * @param page
      * @param size
@@ -80,22 +81,23 @@ public class FriendController {
      */
     @GetMapping("/v1/friends")
     public ResponseEntity<ApiResponse<Page<FriendPageResponseDto>>> getFriends(@AuthenticationPrincipal AuthUser authUser,
-                                                                  @RequestParam(defaultValue = "1") int page,
-                                                                  @RequestParam(defaultValue = "10") int size) {
-        Page<FriendPageResponseDto> responseDtos = friendService.getFriends(authUser, page, size);
+                                                                               @RequestParam(defaultValue = "1") int page,
+                                                                               @RequestParam(defaultValue = "10") int size) {
+        Page<FriendPageResponseDto> responseDtos = friendService.getFriends(authUser.getUserId(), page, size);
         return ResponseEntity.ok(ApiResponse.success(responseDtos));
     }
 
     /**
      * 친구 삭제 API
+     *
      * @param authUser
      * @param id
      * @return
      */
     @DeleteMapping("/v1/friends/{id}")
     public ResponseEntity<ApiResponse<String>> deleteFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
-        friendService.deleteFriend(authUser, id);
-        return ResponseEntity.ok(ApiResponse.success("친구 삭제 성공"));
+
+        return ResponseEntity.ok(ApiResponse.success(friendService.deleteFriend(authUser.getUserId(), id)));
     }
 
 }
