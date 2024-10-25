@@ -15,7 +15,7 @@ public enum GlobalExceptionConst {
     INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST,"파일 형식이 잘못되었습니다."),
     FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "파일 크기가 잘못되었습니다."),
     DO_NOT_REQUEST_YOURSELF(HttpStatus.BAD_REQUEST, "본인을 친구로 요청할 수 없습니다."),
-    ERR_FRIEND_REQUEST_ALREADY_HANDLED(HttpStatus.BAD_REQUEST, "이미 수락했거나 거절된 친구 요청입니다."),
+    ERR_ALREADY_FRIEND(HttpStatus.BAD_REQUEST, "이미 수락했거나 거절된 친구 요청입니다."),
     LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, "좋아요 수는 0보다 작을 수 없습니다."),
 
     // 상태코드 401

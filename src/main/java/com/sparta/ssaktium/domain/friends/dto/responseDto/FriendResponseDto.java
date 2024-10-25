@@ -13,7 +13,7 @@ public class FriendResponseDto {
     private Long friendUserId;
     private FriendStatus status;
 
-    // Friends 엔티티에서 상태를 가져오는 생성자
+
     public FriendResponseDto(Friend friend, User myUser, User friendUser) {
         this.id = friend.getId();
         this.myUserId = myUser.getId();
