@@ -49,15 +49,15 @@ class PlantServiceTest {
     private PlantRequestDto plantRequestDto;
     private String imageUrl;
 
-    @BeforeEach
-    void setUp() {
-        // 초기 설정
-        user = new User("test@example.com", "password", "testUser", LocalDate.of(1990, 1, 1), UserRole.ROLE_ADMIN);
-        authUser = new AuthUser(1L, "test@example.com", UserRole.ROLE_ADMIN);
-        plantRequestDto = new PlantRequestDto("testPlant", "testNickname");
-        plant = new Plant(plantRequestDto, user, "testUrl");
-        imageUrl = "testImageUrl";
-    }
+//    @BeforeEach
+//    void setUp() {
+//        // 초기 설정
+//        user = new User("test@example.com", "password", "testUser", LocalDate.of(1990, 1, 1), UserRole.ROLE_ADMIN);
+//        authUser = new AuthUser(1L, "test@example.com", UserRole.ROLE_ADMIN);
+//        plantRequestDto = new PlantRequestDto("testPlant", "testNickname");
+//        plant = new Plant(plantRequestDto, user, "testUrl");
+//        imageUrl = "testImageUrl";
+//    }
 
     @Test
     void 식물_조회_성공() {
