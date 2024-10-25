@@ -79,7 +79,7 @@ public class BoardServiceTest {
         when(s3Service.uploadImageToS3(any(MultipartFile.class), any())).thenReturn(mockImageUrl);
 
         //when
-        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser,requestDto,image);
+        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser.getUserId(),requestDto,image);
         //then
         assertNotNull(requestDto);
         assertEquals(responseDto.getTitle(), requestDto.getTitle());
@@ -112,7 +112,7 @@ public class BoardServiceTest {
         when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(updateBoard));
         // when
-        BoardSaveResponseDto responseDto = boardService.updateBoards(authUser, boardId, requestDto,image);
+        BoardSaveResponseDto responseDto = boardService.updateBoards(authUser.getUserId(), boardId, requestDto,image);
         //then
         assertNotNull(requestDto);
         assertEquals(responseDto.getTitle(), requestDto.getTitle());
@@ -191,7 +191,7 @@ public class BoardServiceTest {
         when(commentService.findAllByBoardId(board1.getId())).thenReturn(Arrays.asList(comment1, comment2));
 
         // when
-        BoardPageResponseDto responseDto = boardService.getMyBoards(authUser, 1, 5);
+        BoardPageResponseDto responseDto = boardService.getMyBoards(authUser.getUserId(), 1, 5);
 
         // then
         assertNotNull(responseDto);
