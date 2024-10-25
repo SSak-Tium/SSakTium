@@ -13,61 +13,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/v1")
 public class FriendController {
 
     private final FriendService friendService;
 
     /**
-     * 친구요청 API
+     * 친구 요청 또는 수락API
      *
      * @param authUser
      * @param id
      * @return
      */
-    @PostMapping("/v1/users/{id}/friends")
-    public ResponseEntity<ApiResponse<FriendResponseDto>> requestFriend(@AuthenticationPrincipal AuthUser authUser,
-                                                                        @PathVariable Long id) {
-        FriendResponseDto responseDto = friendService.requestFriend(authUser.getUserId(), id);
-        return ResponseEntity.ok(ApiResponse.success(responseDto));
-    }
-
-    /**
-     * 친구 요청 취소 API
-     *
-     * @param authUser
-     * @param id
-     * @return
-     */
-    @DeleteMapping("/v1/users/{id}/friends")
-    public ResponseEntity<ApiResponse<String>> cancelFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(friendService.cancelFriend(authUser.getUserId(), id)));
-    }
-
-    /**
-     * 친구 요청 수락 API
-     *
-     * @param authUser
-     * @param id
-     * @return
-     */
-    @PutMapping("v1/friends/{id}/accept")
-    public ResponseEntity<ApiResponse<FriendResponseDto>> acceptFriend(@AuthenticationPrincipal AuthUser authUser,
-                                                                       @PathVariable Long id) {
-        FriendResponseDto responseDto = friendService.acceptFriend(authUser.getUserId(), id);
-        return ResponseEntity.ok(ApiResponse.success(responseDto));
-    }
-
-    /**
-     * 친구 요청 거절 API
-     *
-     * @param authUser
-     * @param id
-     * @return
-     */
-    @PutMapping("/v1/friends/{id}/reject")
-    public ResponseEntity<ApiResponse<FriendResponseDto>> rejectFriend(@AuthenticationPrincipal AuthUser authUser,
-                                                                       @PathVariable Long id) {
-        FriendResponseDto responseDto = friendService.rejectFriend(authUser.getUserId(), id);
+    @PostMapping("/friends/{id}")
+    public ResponseEntity<ApiResponse<FriendResponseDto>> requestOrAcceptFriend(@AuthenticationPrincipal AuthUser authUser,
+                                                                                @PathVariable Long id) {
+        FriendResponseDto responseDto = friendService.requestOrAcceptFriend(authUser.getUserId(), id);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -79,7 +40,7 @@ public class FriendController {
      * @param size
      * @return
      */
-    @GetMapping("/v1/friends")
+    @GetMapping("/friends")
     public ResponseEntity<ApiResponse<Page<FriendPageResponseDto>>> getFriends(@AuthenticationPrincipal AuthUser authUser,
                                                                                @RequestParam(defaultValue = "1") int page,
                                                                                @RequestParam(defaultValue = "10") int size) {
@@ -88,16 +49,15 @@ public class FriendController {
     }
 
     /**
-     * 친구 삭제 API
+     * 친구 요청 취소, 거절, 삭제 API
      *
      * @param authUser
      * @param id
      * @return
      */
-    @DeleteMapping("/v1/friends/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
-
-        return ResponseEntity.ok(ApiResponse.success(friendService.deleteFriend(authUser.getUserId(), id)));
+    @DeleteMapping("/friends/{id}")
+    public ResponseEntity<ApiResponse<String>> cancelOrDeleteFriend(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(friendService.cancelOrDeleteFriend(authUser.getUserId(), id)));
     }
 
 }
