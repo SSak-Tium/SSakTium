@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.plants.service;
 
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
@@ -27,12 +26,11 @@ public class PlantService {
     private final S3Service s3Service;
     private final UserService userService;
 
-    public PlantResponseDto createPlant(AuthUser authUser,
+    public PlantResponseDto createPlant(Long userId,
                                         PlantRequestDto requestDto,
                                         MultipartFile image) throws IOException {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
@@ -40,72 +38,49 @@ public class PlantService {
 
         plantRepository.save(plant);
 
-        return new PlantResponseDto(plant.getId(), plant.getUserId().getId(), plant.getPlantName(), plant.getPlantNickname(), plant.getImageUrl());
+        return new PlantResponseDto(plant);
     }
 
     @Transactional(readOnly = true)
-    public PlantResponseDto getPlant(AuthUser authUser, Long id) {
+    public PlantResponseDto getPlant(Long userId, Long id) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
-        Plant plant = plantRepository.findById(id).orElseThrow(() ->
-                new NotFoundPlantException());
+        Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
-        return new PlantResponseDto(
-                plant.getId(),
-                plant.getUserId().getId(),
-                plant.getPlantName(),
-                plant.getPlantNickname(),
-                plant.getImageUrl());
+        return new PlantResponseDto(plant);
     }
 
     @Transactional(readOnly = true)
-    public List<PlantResponseDto> getAllPlants(AuthUser authUser) {
+    public List<PlantResponseDto> getAllPlants(Long userId) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
         List<Plant> plantList = plantRepository.findByUserId(user);
 
         return plantList.stream()
-                .map(plant -> new PlantResponseDto(
-                        plant.getId(),
-                        plant.getUserId().getId(),
-                        plant.getPlantName(),
-                        plant.getPlantNickname(),
-                        plant.getImageUrl()
-                ))
+                .map(PlantResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    public PlantResponseDto updatePlant(AuthUser authUser, Long id, PlantRequestDto requestDto, MultipartFile image) throws IOException {
+    public PlantResponseDto updatePlant(Long userId, Long id, PlantRequestDto requestDto, MultipartFile image) throws IOException {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
-        Plant plant = plantRepository.findById(id).orElseThrow(() ->
-                new NotFoundPlantException());
+        Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
         plant.update(requestDto);
 
         plantRepository.save(plant);
 
-        return new PlantResponseDto(
-                plant.getId(),
-                plant.getUserId().getId(),
-                plant.getPlantName(),
-                plant.getPlantNickname(),
-                plant.getImageUrl());
+        return new PlantResponseDto(plant);
     }
 
-    public String deltePlant(AuthUser authUser, Long id) {
+    public String deltePlant(Long userId, Long id) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
-        Plant plant = plantRepository.findById(id).orElseThrow(() ->
-                new NotFoundPlantException());
+        Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());

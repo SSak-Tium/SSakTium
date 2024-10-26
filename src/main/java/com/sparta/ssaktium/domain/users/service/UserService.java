@@ -82,9 +82,8 @@ public class UserService {
         }
     }
 
-    // 유저 조회 메서드
+    // 유저 조회 메서드 ( id )
     public User findUser(long userId) {
         return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
     }
-
 }

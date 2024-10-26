@@ -32,7 +32,7 @@ public class CommentService {
     // 댓글 조회
     public Page<CommentResponseDto> getComments(Long boardId, int page, int size) {
         // 게시글이 있는지 확인
-        boardService.findBoard(boardId);
+        boardService.getBoardById(boardId);
 
         // 페이지네이션 생성
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -46,7 +46,7 @@ public class CommentService {
     @Transactional
     public CommentResponseDto postComment(Long boardId, Long userId, CommentRequestDto commentRequestDto) {
         // 댓글을 작성할 게시글이 있는지 확인
-        Board board = boardService.findBoard(boardId);
+        Board board = boardService.getBoardById(boardId);
 
         // 댓글을 작성할 유저
         User user = userService.findUser(userId);
@@ -62,7 +62,7 @@ public class CommentService {
     @Transactional
     public CommentResponseDto updateComment(Long boardId, Long commentId, Long userId, CommentRequestDto commentRequestDto) {
         // 댓글을 수정할 게시글이 있는지 확인
-        boardService.findBoard(boardId);
+        boardService.getBoardById(boardId);
 
         // 수정할 댓글이 있는지 확인
         Comment comment = findComment(commentId);

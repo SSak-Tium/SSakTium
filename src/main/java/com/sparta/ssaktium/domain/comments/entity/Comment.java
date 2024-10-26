@@ -33,7 +33,7 @@ public class Comment extends Timestamped {
         this.user = user;
     }
 
-    public void incrementLikesCount() {
+    public void incrementLikesCount(){
         commentLikesCount++;
     }
 

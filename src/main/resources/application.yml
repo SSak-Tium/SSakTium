@@ -10,8 +10,6 @@ server:
 spring:
   config:
     import: optional:file:.env[.properties]
-  application:
-    name: spring-usersetting
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}

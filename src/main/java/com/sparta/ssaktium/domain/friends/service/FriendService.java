@@ -1,178 +1,119 @@
 package com.sparta.ssaktium.domain.friends.service;
 
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.friends.dto.responseDto.FriendPageResponseDto;
 import com.sparta.ssaktium.domain.friends.dto.responseDto.FriendResponseDto;
-import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.entity.Friend;
+import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.exception.*;
 import com.sparta.ssaktium.domain.friends.repository.FriendRepository;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class FriendService {
 
     private final UserService userService;
     private final FriendRepository friendRepository;
 
-    public FriendResponseDto requestFriend(AuthUser authUser, Long id) {
-
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
-
-        User friendUser = userService.findUser(id);
-
-        if (user.getId().equals(id)) {
+    @Transactional
+    public FriendResponseDto requestOrAcceptFriend(Long userId, Long friendId) {
+        if (Objects.equals(userId, friendId)) {
             throw new SelfRequestException();
         }
 
-        Optional<Friend> checkAlreadyRequest = friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser.getId());
-        if (checkAlreadyRequest.isPresent()) {
-            throw new FriendRequestAlreadySentException();
+        User user = userService.findUser(userId);
+        User friendUser = userService.findUser(friendId);
+
+        Optional<Friend> friendRelationship = findFriendRelationship(user.getId(), friendUser.getId());
+
+        if (friendRelationship.isEmpty()) {
+            Friend newFriendRequest = new Friend(user, friendUser);
+            friendRepository.save(newFriendRequest);
+            return new FriendResponseDto(newFriendRequest, user, friendUser);
         }
 
-        Friend friend = new Friend(user, friendUser);
-        friendRepository.save(friend);
+        Friend existingFriendRequest = friendRelationship.get();
 
-        return new FriendResponseDto(friend, user, friendUser);
+        if (existingFriendRequest.getFriendStatus() == FriendStatus.ACCEPTED) {
+            throw new AlreadyFriendsException();
+        }
+        else if (existingFriendRequest.getFriendStatus() == FriendStatus.PENDING) {
+            if (existingFriendRequest.getUser().getId().equals(userId)) {
+                throw new FriendRequestAlreadySentException();
+            } else {
+                existingFriendRequest.acceptFriend();
+                friendRepository.save(existingFriendRequest);
+                return new FriendResponseDto(existingFriendRequest, existingFriendRequest.getFriendUser(), existingFriendRequest.getUser());
+            }
+        }
+
+        existingFriendRequest.acceptFriend();
+        friendRepository.save(existingFriendRequest);
+        return new FriendResponseDto(existingFriendRequest, existingFriendRequest.getFriendUser(), existingFriendRequest.getUser());
     }
 
-    public void cancelFriend(AuthUser authUser, Long id) {
+    public Page<FriendPageResponseDto> getFriends(Long userId, int page, int size) {
 
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+        User user = userService.findUser(userId);
 
-        Optional<Friend> friendRequest = friendRepository.findByUserIdAndFriendUserId(user.getId(), id);
-
-        if (friendRequest.isEmpty()) {
-            throw new NotFoundRequestFriendException();
-        }
-
-        Friend friend = friendRequest.get();
-
-        if (!friend.getUserId().getId().equals(user.getId())) {
-            throw new UnauthorizedFriendRequestCancellationException();
-        }
-
-        if (friend.getFriendStatus() != FriendStatus.PENDING) {
-            throw new InvalidFriendRequestStatusException();
-        }
-
-        friendRepository.delete(friend);
-    }
-
-    public FriendResponseDto acceptFriend(AuthUser authUser, Long id) {
-
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
-
-        Optional<Friend> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
-
-        if (friendRequest.isEmpty()) {
-            throw new NotFoundRequestFriendException();
-        }
-
-        Friend friend = friendRequest.get();
-
-        if (!friend.getFriendUserId().getId().equals(user.getId())) {
-            throw new UnauthorizedFriendRequestAcceptanceException();
-        }
-
-        if (friend.getFriendStatus() == FriendStatus.ACCEPTED) {
-            throw new AlreadyAcceptedFriendException();
-        }
-
-        friend.acceptFriend();
-        friendRepository.save(friend);
-
-        return new FriendResponseDto(friend, friend.getFriendUserId(), friend.getUserId());
-    }
-
-    public FriendResponseDto rejectFriend(AuthUser authUser, Long id) {
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
-
-        Optional<Friend> friendRequest = friendRepository.findByUserIdAndFriendUserId(id, user.getId());
-
-        if (friendRequest.isEmpty()) {
-            throw new NotFoundRequestFriendException();
-        }
-
-        Friend friend = friendRequest.get();
-
-        if (!friend.getFriendUserId().getId().equals(user.getId())) {
-            throw new UnauthorizedFriendRequestAcceptanceException();
-        }
-
-        if (friend.getFriendStatus() != FriendStatus.PENDING) {
-            throw new AlreadyAcceptedFriendException();
-        }
-
-        friend.rejectFriend();
-        friendRepository.save(friend);
-
-        return new FriendResponseDto(friend, friend.getFriendUserId(), friend.getUserId());
-    }
-
-
-    @Transactional(readOnly = true)
-    public Page<FriendPageResponseDto> getFriends(AuthUser authUser, int page, int size) {
-
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
-
-        // ACCEPTED 상태의 친구만 조회
         Page<Friend> friendsPage =
-                friendRepository.findByUserIdOrFriendIdAndStatus(
+                friendRepository.findByUserOrFriend(
                         user.getId(),
                         user.getId(),
-                        FriendStatus.ACCEPTED,
                         PageRequest.of(page - 1, size
                         )
-        );
+                );
 
         return friendsPage.map(friend -> {
-            Long friendId = friend.getFriendUserId().getId().equals(user.getId())
-                    ? friend.getUserId().getId()
-                    : friend.getFriendUserId().getId();
+            Long friendId = friend.getFriendUser().getId().equals(user.getId())
+                    ? friend.getUser().getId()
+                    : friend.getFriendUser().getId();
             return new FriendPageResponseDto(friend, friendId);
         });
     }
 
-    public void deleteFriend(AuthUser authUser, Long id) {
-        User user = User.fromAuthUser(authUser);
-        userService.findUser(user.getId());
+    @Transactional
+    public String cancelOrDeleteFriend(Long userId, Long id) {
 
-        // 친구 관계를 조회
-        Optional<Friend> friendRelationship = friendRepository.findByUserIdAndFriendId(user.getId(), id);
+        User user = userService.findUser(userId);
 
-        // 친구 관계가 없으면, 반대의 경우도 확인
+        Optional<Friend> friendRelationship = friendRepository.findByUserAndFriend(user.getId(), id);
+
         if (friendRelationship.isEmpty()) {
-            friendRelationship = friendRepository.findByUserIdAndFriendId(id, user.getId());
+            friendRelationship = friendRepository.findByUserAndFriend(id, user.getId());
         }
 
-        // 친구 관계가 존재하지 않는 경우 예외 처리
         if (friendRelationship.isEmpty()) {
             throw new NotFoundFriendException();
         }
 
-        // 친구 관계 삭제
         friendRepository.delete(friendRelationship.get());
+
+        return "친구 거절/삭제 요청 완료";
     }
 
-    public List<User> findFriends (long userId){
-        return friendRepository.findFriendsByUserId(userId, FriendStatus.ACCEPTED);
+    private Optional<Friend> findFriendRelationship(Long userId, Long friendId) {
+        Optional<Friend> friendRelationship = friendRepository.findByUserAndFriend(userId, friendId);
+        if (friendRelationship.isEmpty()) {
+            friendRelationship = friendRepository.findByUserAndFriend(friendId, userId);
+        }
+        return friendRelationship;
     }
+
+
+    public List<User> findFriends(long userId) {
+        return friendRepository.findFriendsByUser(userId, FriendStatus.ACCEPTED);
+    }
+
 }
