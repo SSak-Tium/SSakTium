@@ -1,7 +1,6 @@
-package com.sparta.ssaktium.domain.plants.entity;
+package com.sparta.ssaktium.domain.plants.plants.entity;
 
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
