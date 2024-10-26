@@ -1,6 +1,6 @@
-package com.sparta.ssaktium.domain.plants.repository;
+package com.sparta.ssaktium.domain.plants.plants.repository;
 
-import com.sparta.ssaktium.domain.plants.entity.Plant;
+import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
 import com.sparta.ssaktium.domain.users.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

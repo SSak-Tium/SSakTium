@@ -1,11 +1,11 @@
-package com.sparta.ssaktium.domain.plants.service;
+package com.sparta.ssaktium.domain.plants.plants.service;
 
 import com.sparta.ssaktium.domain.common.service.S3Service;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
-import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
-import com.sparta.ssaktium.domain.plants.entity.Plant;
-import com.sparta.ssaktium.domain.plants.exception.NotFoundPlantException;
-import com.sparta.ssaktium.domain.plants.repository.PlantRepository;
+import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantRequestDto;
+import com.sparta.ssaktium.domain.plants.plants.dto.responseDto.PlantResponseDto;
+import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
+import com.sparta.ssaktium.domain.plants.plants.exception.NotFoundPlantException;
+import com.sparta.ssaktium.domain.plants.plants.repository.PlantRepository;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -96,5 +96,9 @@ public class PlantService {
         plantRepository.delete(plant);
 
         return "정상적으로 삭제되었습니다.";
+    }
+
+    public Plant findPlant (Long id) {
+        return plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
     }
 }

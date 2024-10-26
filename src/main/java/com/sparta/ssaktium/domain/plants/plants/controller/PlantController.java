@@ -1,10 +1,10 @@
-package com.sparta.ssaktium.domain.plants.controller;
+package com.sparta.ssaktium.domain.plants.plants.controller;
 
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
-import com.sparta.ssaktium.domain.plants.dto.responseDto.PlantResponseDto;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
-import com.sparta.ssaktium.domain.plants.service.PlantService;
+import com.sparta.ssaktium.domain.plants.plants.dto.responseDto.PlantResponseDto;
+import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantRequestDto;
+import com.sparta.ssaktium.domain.plants.plants.service.PlantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

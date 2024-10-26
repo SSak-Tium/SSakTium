@@ -1,6 +1,6 @@
-package com.sparta.ssaktium.domain.plants.dto.responseDto;
+package com.sparta.ssaktium.domain.plants.plants.dto.responseDto;
 
-import com.sparta.ssaktium.domain.plants.entity.Plant;
+import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
 import lombok.Getter;
 
 @Getter
