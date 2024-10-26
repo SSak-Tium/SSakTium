@@ -14,7 +14,7 @@ public class PlantResponseDto {
 
     public PlantResponseDto(Plant plant) {
         this.id = plant.getId();
-        this.userId = plant.getUserId().getId();
+        this.userId = plant.getUser().getId();
         this.plantName = plant.getPlantName();
         this.plantNickname = plant.getPlantNickname();
         this.imageUrl = plant.getImageUrl();
