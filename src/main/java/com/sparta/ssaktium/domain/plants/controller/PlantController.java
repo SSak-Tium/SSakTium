@@ -16,33 +16,36 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/v1")
 public class PlantController {
 
     private final PlantService plantService;
 
     /**
      * 내 식물 등록
+     *
      * @param authUser
      * @param requestDto
      * @param image
      * @return
      * @throws IOException
      */
-    @PostMapping("/v1/plants")
-    public ResponseEntity<ApiResponse<PlantResponseDto>> createPlant (@AuthenticationPrincipal AuthUser authUser,
-                                                                      @RequestPart PlantRequestDto requestDto,
-                                                                      @RequestPart(required = false) MultipartFile image) throws IOException {
+    @PostMapping("/plants")
+    public ResponseEntity<ApiResponse<PlantResponseDto>> createPlant(@AuthenticationPrincipal AuthUser authUser,
+                                                                     @RequestPart PlantRequestDto requestDto,
+                                                                     @RequestPart(required = false) MultipartFile image) throws IOException {
         PlantResponseDto responseDto = plantService.createPlant(authUser.getUserId(), requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
     /**
      * 내 식물 단건조회
+     *
      * @param authUser
      * @param id
      * @return
      */
-    @GetMapping("/v1/plants/{id}")
+    @GetMapping("/plants/{id}")
     public ResponseEntity<ApiResponse<PlantResponseDto>> getPlant(@AuthenticationPrincipal AuthUser authUser,
                                                                   @PathVariable Long id) {
 
@@ -53,16 +56,17 @@ public class PlantController {
 
     /**
      * 내 식물 다건 조회
+     *
      * @param authUser
      * @return
      */
-    @GetMapping("/v1/plants")
+    @GetMapping("/plants")
     public ResponseEntity<ApiResponse<List<PlantResponseDto>>> getAllPlants(@AuthenticationPrincipal AuthUser authUser) {
         List<PlantResponseDto> responseDto = plantService.getAllPlants(authUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
-    @PutMapping("/v1/plants/{id}")
+    @PutMapping("/plants/{id}")
     public ResponseEntity<ApiResponse<PlantResponseDto>> updatePlant(@AuthenticationPrincipal AuthUser authUser,
                                                                      @PathVariable Long id,
                                                                      @RequestPart PlantRequestDto requestDto,
@@ -73,13 +77,14 @@ public class PlantController {
 
     /**
      * 내 식물 삭제
+     *
      * @param authUser
      * @param id
      * @return
      */
-    @DeleteMapping("/v1/plants/{id}")
+    @DeleteMapping("/plants/{id}")
     public ResponseEntity<ApiResponse<String>> deletePlant(@AuthenticationPrincipal AuthUser authUser,
-                                                         @PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(plantService.deltePlant(authUser.getUserId(),id)));
+                                                           @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(plantService.deltePlant(authUser.getUserId(), id)));
     }
 }
