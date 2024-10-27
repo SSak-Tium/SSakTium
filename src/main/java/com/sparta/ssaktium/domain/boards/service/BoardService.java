@@ -17,6 +17,7 @@ import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -80,10 +81,12 @@ public class BoardService {
         User user = userService.findUser(userId);
         //게시글 찾기
         Board deleteBoard = getBoardById(id);
-
-        //게시글 본인 확인
-        if (!deleteBoard.getUser().equals(user)) {
-            throw new NotUserOfBoardException();
+        //어드민 일시 본인 확인 넘어가기
+        if(!user.getUserRole().equals(UserRole.ROLE_ADMIN)) {
+            //게시글 본인 확인
+            if (!deleteBoard.getUser().equals(user)) {
+                throw new NotUserOfBoardException();
+            }
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
         String imageUrl = s3Service.extractFileNameFromUrl(deleteBoard.getImageUrl());
