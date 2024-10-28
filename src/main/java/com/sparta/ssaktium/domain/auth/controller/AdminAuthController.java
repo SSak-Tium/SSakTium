@@ -19,7 +19,7 @@ public class AdminAuthController {
 
     /**
      * 관리자 회원가입
-     * @param adminSignupRequestDto
+     * @param adminSignupRequestDto 관리자 등록 회원 정보 : Email, Password, 이름
      * @return
      */
     @PostMapping("/v1/auth/admin/signup")

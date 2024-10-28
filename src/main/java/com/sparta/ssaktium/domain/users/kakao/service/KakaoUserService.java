@@ -52,7 +52,6 @@ public class KakaoUserService {
         log.info(createToken);
 
         return createToken;
-//        return accessToken;
     }
 
     private String getToken(String code) throws JsonProcessingException {

@@ -2,6 +2,7 @@ package com.sparta.ssaktium.domain.dictionaries.entitiy;
 
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryRequestDto;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryUpdateRequestDto;
+import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,20 +19,23 @@ public class Dictionary {
 
     private String title;
     private String content;
-    private String userName;
     private String imageUrl;
 
-    public Dictionary(String title, String content, String userName, String imageUrl) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id",nullable = false)
+    private User user;
+
+    public Dictionary(String title, String content, User user, String imageUrl) {
         this.title = title;
         this.content = content;
-        this.userName = userName;
+        this.user = user;
         this.imageUrl = imageUrl;
     }
 
-    public Dictionary(DictionaryRequestDto dictionaryRequestDto, String userName, String imageUrl) {
+    public Dictionary(DictionaryRequestDto dictionaryRequestDto, User user, String imageUrl) {
         this.title = dictionaryRequestDto.getTitle();
         this.content = dictionaryRequestDto.getContent();
-        this.userName = userName;
+        this.user = user;
         this.imageUrl = imageUrl;
     }
 

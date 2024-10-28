@@ -33,7 +33,7 @@ public class PlantController {
     @PostMapping("/plants")
     public ResponseEntity<ApiResponse<PlantResponseDto>> createPlant(@AuthenticationPrincipal AuthUser authUser,
                                                                      @RequestPart PlantRequestDto requestDto,
-                                                                     @RequestPart(required = false) MultipartFile image) throws IOException {
+                                                                     @RequestPart(required = false) MultipartFile image) {
         PlantResponseDto responseDto = plantService.createPlant(authUser.getUserId(), requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
@@ -70,7 +70,7 @@ public class PlantController {
     public ResponseEntity<ApiResponse<PlantResponseDto>> updatePlant(@AuthenticationPrincipal AuthUser authUser,
                                                                      @PathVariable Long id,
                                                                      @RequestPart PlantRequestDto requestDto,
-                                                                     @RequestPart(required = false) MultipartFile image) throws IOException {
+                                                                     @RequestPart(required = false) MultipartFile image) {
         PlantResponseDto responseDto = plantService.updatePlant(authUser.getUserId(), id, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
@@ -85,6 +85,6 @@ public class PlantController {
     @DeleteMapping("/plants/{id}")
     public ResponseEntity<ApiResponse<String>> deletePlant(@AuthenticationPrincipal AuthUser authUser,
                                                            @PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(plantService.deltePlant(authUser.getUserId(), id)));
+        return ResponseEntity.ok(ApiResponse.success(plantService.deletePlant(authUser.getUserId(), id)));
     }
 }

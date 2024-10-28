@@ -67,7 +67,7 @@ class DictionaryServiceTest {
         ReflectionTestUtils.setField(authUser, "userId", 1L);
         user = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_USER);
         ReflectionTestUtils.setField(user, "id", 1L);
-        dictionary = new Dictionary("title", "content", "name", "https://image.url");
+        dictionary = new Dictionary("title", "content", user, "https://image.url");
         ReflectionTestUtils.setField(dictionary, "id", 1L);
         imageUrl = "https://image.url";
     }
@@ -109,8 +109,8 @@ class DictionaryServiceTest {
         int size = 5;
 
         List<Dictionary> dictionaries = List.of(
-                new Dictionary("title1", "content1", "name1", "https://image1.url"),
-                new Dictionary("title2", "content2", "name2", "https://image2.url")
+                new Dictionary("title1", "content1", user, "https://image1.url"),
+                new Dictionary("title2", "content2", user, "https://image2.url")
         );
 
         Page<Dictionary> dictionaryPage = new PageImpl<>(dictionaries);
