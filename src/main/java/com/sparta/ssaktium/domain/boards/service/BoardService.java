@@ -116,6 +116,7 @@ public class BoardService {
         return new BoardDetailResponseDto(board, dtoList);
     }
 
+    //내게시글 조회
     public Page<BoardDetailResponseDto> getMyBoards(Long userId, int page, int size) {
         //사용자 찾기
         User user = userService.findUser(userId);
@@ -142,6 +143,31 @@ public class BoardService {
             boardDetails.add(new BoardDetailResponseDto(board, dtoList));
         }
         return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
+    }
+
+    //전체게시글 조회
+    public Page<BoardDetailResponseDto> getAllBoards(int page, int size){
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL,pageable);
+
+        List<BoardDetailResponseDto> dtoList = new ArrayList<>();
+        for (Board board : boardsPage.getContent()) {
+            // 댓글 리스트 가져오기
+            List<Comment> commentList = getCommentsByBoardId(board.getId());
+            List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
+            for (Comment comment : commentList) {
+                commentDtos.add(new CommentSimpleResponseDto(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getModifiedAt(),
+                        comment.getCommentLikesCount()
+                ));
+            }
+            dtoList.add(new BoardDetailResponseDto(board,commentDtos));
+        }
+        return new PageImpl<>(dtoList, pageable,boardsPage.getTotalElements());
     }
 
     //뉴스피드

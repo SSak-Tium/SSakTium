@@ -106,6 +106,11 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
 
+    @GetMapping("/boards/allstatus")
+    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
+                                                                                  @RequestParam(defaultValue = "5") int size){
+        return ResponseEntity.ok(ApiResponse.success(boardService.getAllBoards(page,size)));
+    }
 
 //    @GetMapping("/search")
 //    public ResponseEntity<ApiResponse<Page<>>>
