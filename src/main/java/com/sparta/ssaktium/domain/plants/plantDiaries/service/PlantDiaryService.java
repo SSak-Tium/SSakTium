@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.plants.plantDiaries.service;
 
+import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
@@ -8,6 +9,7 @@ import com.sparta.ssaktium.domain.plants.plantDiaries.exception.NotFoundPlantDia
 import com.sparta.ssaktium.domain.plants.plantDiaries.repository.PlantDiaryRepository;
 import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.plants.service.PlantService;
+import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,13 +31,16 @@ public class PlantDiaryService {
 
     @Transactional
     public PlantDiaryResponseDto createDiary(Long userId, Long id, PlantDiaryRequestDto requestDto, MultipartFile image) {
-        userService.findUser(userId);
+
+        User user = userService.findUser(userId);
 
         Plant plant = plantService.findPlant(id);
 
+        plantService.validateOwner(userId, plant);
+
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
-        PlantDiary plantDiary = new PlantDiary(plant, requestDto.getContent(), imageUrl, requestDto.getItemDate());
+        PlantDiary plantDiary = new PlantDiary(plant, requestDto.getContent(), imageUrl, requestDto.getItemDate(), user);
 
         PlantDiary savedPlantDiary = plantDiaryRepository.save(plantDiary);
 
@@ -50,8 +55,11 @@ public class PlantDiaryService {
 
         Page<PlantDiary> plantDiaryPage = plantDiaryRepository.findAllByPlantId(id, pageable);
 
-        return plantDiaryPage.map(PlantDiaryResponseDto::new);
+        if (plantDiaryPage.isEmpty()) {
+            throw new UauthorizedAccessException();
+        }
 
+        return plantDiaryPage.map(PlantDiaryResponseDto::new);
     }
 
     public PlantDiaryResponseDto getDiary(Long userId, Long id, Long diaryId) {
@@ -61,6 +69,8 @@ public class PlantDiaryService {
         plantService.findPlant(id);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+
+        validateOwner(userId, plantDiary);
 
         return new PlantDiaryResponseDto(plantDiary);
     }
@@ -73,6 +83,8 @@ public class PlantDiaryService {
         plantService.findPlant(id);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+
+        validateOwner(userId, plantDiary);
 
         String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
 
@@ -96,6 +108,8 @@ public class PlantDiaryService {
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
 
+        validateOwner(userId, plantDiary);
+
         String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
 
         s3Service.deleteObject(s3Service.bucket, imageName);
@@ -103,5 +117,11 @@ public class PlantDiaryService {
         plantDiaryRepository.delete(plantDiary);
 
         return "정상적으로 삭제되었습니다.";
+    }
+
+    private void validateOwner(Long userId, PlantDiary plantDiary) {
+        if (!plantDiary.getUser().getId().equals(userId)) {
+            throw new UauthorizedAccessException();
+        }
     }
 }

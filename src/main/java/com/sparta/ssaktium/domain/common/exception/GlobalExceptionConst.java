@@ -28,6 +28,7 @@ public enum GlobalExceptionConst {
     ERR_UNAUTHORIZED_FRIEND_REQUEST_ACCEPTANCE(HttpStatus.FORBIDDEN, "본인이 받은 친구 요청만 수락할 수 있습니다."),
     NOT_USER_OF_LIKE(HttpStatus.FORBIDDEN, "댓글 작성자가 아닙니다."),
     NOT_USER_OF_BOARD(HttpStatus.FORBIDDEN, "게시글 작성자가 아닙니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, "본인이 작성한 글만 수정, 조회, 삭제할 수 있습니다."),
 
     // 상태코드 404
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
