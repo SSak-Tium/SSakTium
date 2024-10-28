@@ -64,7 +64,6 @@ public class BoardController {
 
     /**
      * 게시글 삭제변환
-     *
      * @param authUser
      * @param id
      */
@@ -78,7 +77,6 @@ public class BoardController {
 
     /**
      * 게시글 단건 조회
-     *
      * @param id
      * @return
      */
@@ -90,7 +88,6 @@ public class BoardController {
 
     /**
      * 내 게시글 조회
-     *
      * @param authUser
      * @param page
      * @param size     댓글 페이지네이션 빠져있음
