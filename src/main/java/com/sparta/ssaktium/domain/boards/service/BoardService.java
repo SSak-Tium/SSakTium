@@ -212,9 +212,4 @@ public class BoardService {
         return boardRepository.findActiveBoardById(id, StatusEnum.ACTIVATED)
                 .orElseThrow(NotFoundBoardException::new);
     }
-
-    //Board에 연관된 댓글리스트 불러오기
-    public List<Comment> getCommentsByBoardId(Long boardId) {
-        return boardRepository.findCommentsByBoardId(boardId, StatusEnum.ACTIVATED);
-    }
 }

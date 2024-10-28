@@ -34,9 +34,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b FROM Board b WHERE b.id = :id AND b.statusEnum = :activatedStatus")
     Optional<Board> findActiveBoardById(@Param("id") Long id, @Param("activatedStatus") StatusEnum activatedStatus);
 
-    @Query("SELECT b FROM Board b LEFT JOIN FETCH b.comments WHERE b.id = :id AND b.statusEnum = :activatedStatus")
-    List<Comment> findCommentsByBoardId(@Param("id") Long id, @Param("activatedStatus") StatusEnum activatedStatus);
-
     @Query("SELECT b FROM Board b WHERE b.publicStatus = :publicStatus")
     Page<Board> findAllByPublicStatus(@Param("publicStatus") PublicStatus publicStatus,Pageable pageable);
 }
