@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.plants.plants.service;
 
+import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.plants.dto.responseDto.PlantResponseDto;
@@ -47,6 +48,8 @@ public class PlantService {
 
         Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
+        validateOwner(userId, plant);
+
         return new PlantResponseDto(plant);
     }
 
@@ -55,6 +58,10 @@ public class PlantService {
         User user = userService.findUser(userId);
 
         List<Plant> plantList = plantRepository.findByUser(user);
+
+        if (plantList.isEmpty()) {
+            throw new UauthorizedAccessException();
+        }
 
         return plantList.stream()
                 .map(PlantResponseDto::new)
@@ -67,6 +74,8 @@ public class PlantService {
         userService.findUser(userId);
 
         Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
+
+        validateOwner(userId, plant);
 
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
@@ -88,6 +97,8 @@ public class PlantService {
 
         Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
+        validateOwner(userId, plant);
+
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
         s3Service.deleteObject(s3Service.bucket, imageName);
@@ -100,4 +111,11 @@ public class PlantService {
     public Plant findPlant (Long id) {
         return plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
     }
+
+    public void validateOwner(Long userId, Plant plant) {
+        if (!plant.getUser().getId().equals(userId)) {
+            throw new UauthorizedAccessException();
+        }
+    }
+
 }
