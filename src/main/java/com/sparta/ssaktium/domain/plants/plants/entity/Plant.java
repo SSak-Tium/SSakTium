@@ -1,7 +1,6 @@
-package com.sparta.ssaktium.domain.plants.entity;
+package com.sparta.ssaktium.domain.plants.plants.entity;
 
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
-import com.sparta.ssaktium.domain.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class Plant extends Timestamped {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private User user;
 
     private String plantName;
 
@@ -26,15 +25,16 @@ public class Plant extends Timestamped {
 
     private String imageUrl;
 
-    public Plant(PlantRequestDto requestDto, User userId, String imageUrl) {
-        this.userId = userId;
-        this.plantName = requestDto.getPlantName();
-        this.plantNickname = requestDto.getPlantNickname();
+    public Plant(User user, String plantName, String plantNickname, String imageUrl) {
+        this.user = user;
+        this.plantName = plantName;
+        this.plantNickname = plantNickname;
         this.imageUrl = imageUrl;
     }
 
-    public void update(PlantRequestDto requestDto) {
-        this.plantName = requestDto.getPlantName();
-        this.plantNickname = requestDto.getPlantNickname();
+    public void update(String plantName, String plantNickname, String imageUrl) {
+        this.plantName = plantName;
+        this.plantNickname = plantNickname;
+        this.imageUrl = imageUrl;
     }
 }

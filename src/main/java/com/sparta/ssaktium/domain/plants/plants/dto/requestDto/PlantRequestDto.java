@@ -1,4 +1,4 @@
-package com.sparta.ssaktium.domain.plants.dto.requestDto;
+package com.sparta.ssaktium.domain.plants.plants.dto.requestDto;
 
 import lombok.Getter;
 
