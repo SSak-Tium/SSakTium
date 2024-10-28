@@ -22,6 +22,8 @@ public class PlantDiary extends Timestamped {
     @JoinColumn(name = "plant_id", nullable = false)
     private Plant plant;
 
+    private String title;
+
     private String content;
 
     private String imageUrl;
@@ -32,8 +34,9 @@ public class PlantDiary extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public PlantDiary(Plant plant, String content, String imageUrl, LocalDate itemDate, User user) {
+    public PlantDiary(Plant plant, String title, String content, String imageUrl, LocalDate itemDate, User user) {
         this.plant = plant;
+        this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
         this.itemDate = itemDate;
