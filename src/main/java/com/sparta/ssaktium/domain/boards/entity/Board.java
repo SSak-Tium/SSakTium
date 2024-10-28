@@ -10,6 +10,7 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class Board extends Timestamped {
 
     private String content;
 
-    private String imageUrl;
+    private List<String> imageList;
 
     private int boardLikesCount = 0;
 
@@ -43,19 +44,19 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(String title,String content,PublicStatus publicStatus, User user, String imageUrl) {
+    public Board(String title,String content,PublicStatus publicStatus, User user, List<String> imageList) {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
         this.user = user;
-        this.imageUrl = imageUrl;
+        this.imageList = imageList;
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto, String imageUrl) {
+    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto, List<String> imageList) {
         this.title = boardSaveRequestDto.getTitle();
         this.content = boardSaveRequestDto.getContents();
-        this.imageUrl = imageUrl;
+        this.imageList = imageList;
         this.publicStatus = boardSaveRequestDto.getPublicStatus();
     }
 

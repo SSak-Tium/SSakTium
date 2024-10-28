@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,8 +34,8 @@ public class BoardController {
     @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                        @RequestPart BoardSaveRequestDto requestDto,
-                                                                       @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, image)));
+                                                                       @RequestPart(value = "image", required = false) List<MultipartFile> images) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, images)));
     }
 
     /**
@@ -48,8 +49,8 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                          @PathVariable Long id,
                                                                          @RequestPart BoardSaveRequestDto requestDto,
-                                                                         @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser.getUserId(), id, requestDto, image)));
+                                                                         @RequestPart(value = "image", required = false) List<MultipartFile> images) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser.getUserId(), id, requestDto, images)));
     }
 
     /**
@@ -111,7 +112,4 @@ public class BoardController {
                                                                                   @RequestParam(defaultValue = "5") int size){
         return ResponseEntity.ok(ApiResponse.success(boardService.getAllBoards(page,size)));
     }
-
-//    @GetMapping("/search")
-//    public ResponseEntity<ApiResponse<Page<>>>
 }
