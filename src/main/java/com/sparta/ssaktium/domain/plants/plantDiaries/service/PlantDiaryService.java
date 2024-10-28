@@ -31,7 +31,7 @@ public class PlantDiaryService {
     private final PlantService plantService;
 
     @Transactional
-    public PlantDiaryResponseDto createDiary(Long userId, Long id, PlantDiaryRequestDto requestDto, MultipartFile image) throws IOException {
+    public PlantDiaryResponseDto createDiary(Long userId, Long id, PlantDiaryRequestDto requestDto, MultipartFile image) {
         userService.findUser(userId);
 
         Plant plant = plantService.findPlant(id);
@@ -66,5 +66,23 @@ public class PlantDiaryService {
         return new PlantDiaryResponseDto(plantDiary);
     }
 
+    @Transactional
+    public PlantDiaryResponseDto updateDiary(long userId, Long id, Long diaryId, PlantDiaryRequestDto requestDto, MultipartFile image) {
 
+        userService.findUser(userId);
+
+        PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+
+        String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
+
+        s3Service.deleteObject(s3Service.bucket, imageName);
+
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+
+        plantDiary.update(requestDto.getContent(), requestDto.getItemDate(), imageUrl);
+
+        plantDiaryRepository.save(plantDiary);
+
+        return new PlantDiaryResponseDto(plantDiary);
+    }
 }

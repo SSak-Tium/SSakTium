@@ -33,4 +33,10 @@ public class PlantDiary extends Timestamped {
         this.imageUrl = imageUrl;
         this.itemDate = itemDate;
     }
+
+    public void update(String content, LocalDate itemDate, String imageUrl) {
+        this.content = content;
+        this.itemDate = itemDate;
+        this.imageUrl = imageUrl;
+    }
 }

@@ -5,7 +5,6 @@ import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.service.PlantDiaryService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ public class PlantDiaryController {
     public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> createDiary(@AuthenticationPrincipal AuthUser authUser,
                                                                           @PathVariable Long id,
                                                                           @RequestPart PlantDiaryRequestDto requestDto,
-                                                                          @RequestPart(required = false) MultipartFile image) throws IOException {
+                                                                          @RequestPart(required = false) MultipartFile image) {
         PlantDiaryResponseDto responseDto = plantDiaryService.createDiary(authUser.getUserId(), id, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
@@ -69,6 +68,25 @@ public class PlantDiaryController {
                                                                        @PathVariable Long id,
                                                                        @PathVariable Long diaryId) {
         PlantDiaryResponseDto responseDto = plantDiaryService.getDiary(authUser.getUserId(), id, diaryId);
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
+    }
+
+    /**
+     * plantDiary 수정 API
+     * @param authUser
+     * @param id
+     * @param diaryId
+     * @param requestDto
+     * @param image
+     * @return
+     */
+    @PutMapping("/plants/{id}/diaries/{diaryId}")
+    public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> updateDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                                          @PathVariable Long id,
+                                                                          @PathVariable Long diaryId,
+                                                                          @RequestPart PlantDiaryRequestDto requestDto,
+                                                                          @RequestPart(required = false) MultipartFile image) {
+        PlantDiaryResponseDto responseDto = plantDiaryService.updateDiary(authUser.getUserId(), id, diaryId, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 }
