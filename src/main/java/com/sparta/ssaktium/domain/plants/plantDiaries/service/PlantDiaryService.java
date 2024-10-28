@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.plants.plantDiaries.service;
 
+import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
@@ -9,13 +10,18 @@ import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.plants.service.PlantService;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PlantDiaryService {
 
     private final PlantDiaryRepository plantDiaryRepository;
@@ -23,6 +29,7 @@ public class PlantDiaryService {
     private final S3Service s3Service;
     private final PlantService plantService;
 
+    @Transactional
     public PlantDiaryResponseDto createDiary(Long userId, Long id, PlantDiaryRequestDto requestDto, MultipartFile image) throws IOException {
         userService.findUser(userId);
 
@@ -36,4 +43,17 @@ public class PlantDiaryService {
 
         return new PlantDiaryResponseDto(savedPlantDiary);
     }
+
+    public Page<PlantDiaryResponseDto> getAllDiaries(Long userId, Long id, int page, int size) {
+
+        userService.findUser(userId);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<PlantDiary> plantDiaryPage = plantDiaryRepository.findAllByPlantId(id, pageable);
+
+        return plantDiaryPage.map(PlantDiaryResponseDto::new);
+
+    }
+
 }
