@@ -57,27 +57,44 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) {
+    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, List<MultipartFile> imageList,List<String> remainingImages) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
-        Board updateBoard = getBoardById(id);
+        Board board = getBoardById(id);
         //게시글 본인 확인
-        if (!updateBoard.getUser().equals(user)) {
+        if (!board.getUser().equals(user)) {
             throw new NotUserOfBoardException();
         }
+
+        //각 요소가 빈칸일때 기존 데이터를 그대로 쓰는 법
+        String title = requestDto.getTitle() != null ? requestDto.getTitle() : board.getTitle();
+        String content = requestDto.getContents() != null ? requestDto.getContents() : board.getContent();
+        PublicStatus publicStatus = requestDto.getPublicStatus() != null ? requestDto.getPublicStatus() : board.getPublicStatus();
+
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        List<String> imageUrls = s3Service.extractFileNamesFromUrls(updateBoard.getImageList());
+        List<String> imageUrls = s3Service.extractFileNamesFromUrls(board.getImageList());
 
         //가져온 이미지 리스트 삭제
-        for (String imageurl : imageUrls) {
-            s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
+        for (String imageUrl : imageUrls) {
+            if(!remainingImages.contains(imageUrl)){
+            s3Service.deleteObject(s3Service.bucket, imageUrl);
+            } // 반복적으로 삭제
         }
-        // 업로드한 파일의 S3 URL 주소
-        List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
+        // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
+        List<String> updatedImageList = new ArrayList<>(remainingImages);
+        for (MultipartFile image : imageList) {
+            String originalFileName = image.getOriginalFilename();
+            // 이미 존재하는 파일 이름을 유지
+            if (!updatedImageList.contains(originalFileName)) {
+                String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+                updatedImageList.add(newImageUrl);
+            }
+        }
+
         //게시글 수정
-        updateBoard.updateBoards(requestDto.getTitle(),requestDto.getContents(),requestDto.getPublicStatus(), imageUrl);
-        boardRepository.save(updateBoard);
+        board.updateBoards(title,content,publicStatus, updatedImageList);
+        Board updateBoard = boardRepository.save(board);
         //responseDto 반환
         return new BoardSaveResponseDto(updateBoard);
     }

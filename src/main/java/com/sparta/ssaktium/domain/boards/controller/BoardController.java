@@ -34,7 +34,7 @@ public class BoardController {
     @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                        @RequestPart BoardSaveRequestDto requestDto,
-                                                                       @RequestPart(value = "image", required = false) List<MultipartFile> images) throws IOException {
+                                                                       @RequestPart(value = "image", required = false) List<MultipartFile> images)  {
         return ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, images)));
     }
 
@@ -49,8 +49,9 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                          @PathVariable Long id,
                                                                          @RequestPart BoardSaveRequestDto requestDto,
-                                                                         @RequestPart(value = "image", required = false) List<MultipartFile> images) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser.getUserId(), id, requestDto, images)));
+                                                                         @RequestPart(value = "newimages", required = false) List<MultipartFile> images,
+                                                                         @RequestPart(value = "images", required = false) List<String> remainingImages) {
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser.getUserId(), id, requestDto, images,remainingImages)));
     }
 
     /**
