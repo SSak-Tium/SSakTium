@@ -27,6 +27,7 @@ public class Board extends Timestamped {
 
     private String content;
 
+    @ElementCollection
     private List<String> imageList;
 
     private int boardLikesCount = 0;

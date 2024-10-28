@@ -89,10 +89,12 @@ public class BoardService {
             }
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        List<String> imageUrl = s3Service.extractFileNamesFromUrls(deleteBoard.getImageList());
+        List<String> imageUrls = s3Service.extractFileNamesFromUrls(deleteBoard.getImageList());
 
-        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
-//        s3Service.s3Client.deleteObject(s3Service.bucket, imageUrl);
+        //가져온 이미지 리스트 삭제
+        for (String imageurl : imageUrls) {
+            s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
+        }
         //해당 보드 삭제 상태 변경
         deleteBoard.deleteBoards();
         boardRepository.save(deleteBoard);

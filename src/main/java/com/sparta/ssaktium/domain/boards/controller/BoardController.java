@@ -95,7 +95,6 @@ public class BoardController {
 
     /**
      * 뉴스피드
-     *
      * @param authUser
      * @param page
      * @param size
@@ -107,6 +106,12 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
 
+    /**
+     * 게시글 전체 조회
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/boards/status-all")
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
                                                                                   @RequestParam(defaultValue = "5") int size){
