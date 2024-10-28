@@ -43,11 +43,11 @@ public class BoardService {
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
+    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) throws IOException {
         //유저 확인
         User user = userService.findUser(userId);
         // 업로드한 파일의 S3 URL 주소
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+        List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
         Board board = new Board(requestDto.getTitle(), requestDto.getContents(), requestDto.getPublicStatus(), user, imageUrl);
         //저장
@@ -57,7 +57,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, MultipartFile image) throws IOException {
+    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) throws IOException {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
@@ -67,7 +67,7 @@ public class BoardService {
             throw new NotUserOfBoardException();
         }
         // 업로드한 파일의 S3 URL 주소
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+        List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
         //게시글 수정
         updateBoard.updateBoards(requestDto, imageUrl);
         boardRepository.save(updateBoard);
@@ -89,10 +89,12 @@ public class BoardService {
             }
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        String imageUrl = s3Service.extractFileNameFromUrl(deleteBoard.getImageUrl());
+        List<String> imageUrls = s3Service.extractFileNamesFromUrls(deleteBoard.getImageList());
 
-        // 가져온 이미지 원본 이름으로 S3 이미지 삭제
-        s3Service.s3Client.deleteObject(s3Service.bucket, imageUrl);
+        //가져온 이미지 리스트 삭제
+        for (String imageurl : imageUrls) {
+            s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
+        }
         //해당 보드 삭제 상태 변경
         deleteBoard.deleteBoards();
         boardRepository.save(deleteBoard);

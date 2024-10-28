@@ -13,6 +13,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -64,5 +66,29 @@ public class S3Service {
 
     public void deleteObject(String bucket, String imageName) {
         s3Client.deleteObject(bucket, imageName);
+    }
+
+    //여러 이미지 업로드
+    public List<String> uploadImageListToS3(List<MultipartFile> images,String bucket) throws IOException {
+        List<String> imageUrls = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            String imageUrl = uploadImageToS3(image, bucket);
+            imageUrls.add(imageUrl);
+        }
+
+        return imageUrls;
+    }
+
+    //이미지 리스트 원본파일이름으로 디코딩
+    public List<String> extractFileNamesFromUrls(List<String> urls) {
+        List<String> fileNames = new ArrayList<>();
+
+        for (String url : urls) {
+            String fileName = extractFileNameFromUrl(url); // 복호화
+            fileNames.add(fileName);
+        }
+
+        return fileNames;
     }
 }
