@@ -17,6 +17,7 @@ import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class BoardService {
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board board = new Board(requestDto.getTitle(), requestDto.getContents(),requestDto.getPublicStatus() ,user, imageUrl);
+        Board board = new Board(requestDto.getTitle(), requestDto.getContents(), requestDto.getPublicStatus(), user, imageUrl);
         //저장
         Board savedBoard = boardRepository.save(board);
         //responseDto 반환
@@ -80,10 +81,12 @@ public class BoardService {
         User user = userService.findUser(userId);
         //게시글 찾기
         Board deleteBoard = getBoardById(id);
-
-        //게시글 본인 확인
-        if (!deleteBoard.getUser().equals(user)) {
-            throw new NotUserOfBoardException();
+        //어드민 일시 본인 확인 넘어가기
+        if (!user.getUserRole().equals(UserRole.ROLE_ADMIN)) {
+            //게시글 본인 확인
+            if (!deleteBoard.getUser().equals(user)) {
+                throw new NotUserOfBoardException();
+            }
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
         String imageUrl = s3Service.extractFileNameFromUrl(deleteBoard.getImageUrl());
@@ -100,7 +103,7 @@ public class BoardService {
         //게시글 찾기
         Board board = getBoardById(id);
         //댓글 찾기
-        List<Comment> commentList = getCommentsByBoardId(board.getId());
+        List<Comment> commentList = board.getComments();
 
         List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
         for (Comment comments : commentList) {
@@ -113,7 +116,8 @@ public class BoardService {
         return new BoardDetailResponseDto(board, dtoList);
     }
 
-    public BoardPageResponseDto getMyBoards(Long userId, int page, int size) {
+    //내게시글 조회
+    public Page<BoardDetailResponseDto> getMyBoards(Long userId, int page, int size) {
         //사용자 찾기
         User user = userService.findUser(userId);
         //페이지 요청 객체 생성 (페이지 숫자가 실제로는 0부터 시작하므로 원하는 숫자 -1을 입력해야 해당 페이지가 나온다)
@@ -125,7 +129,7 @@ public class BoardService {
         List<BoardDetailResponseDto> boardDetails = new ArrayList<>();
         for (Board board : boards) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = getCommentsByBoardId(board.getId());
+            List<Comment> commentList = board.getComments();
             List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
             for (Comment comment : commentList) {
                 dtoList.add(new CommentSimpleResponseDto(
@@ -138,15 +142,32 @@ public class BoardService {
             // BoardDetailResponseDto 생성
             boardDetails.add(new BoardDetailResponseDto(board, dtoList));
         }
+        return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
+    }
 
-        // BoardsPageResponseDto 생성
-        return new BoardPageResponseDto(
-                boardDetails,
-                boards.getTotalPages(),
-                boards.getTotalElements(),
-                boards.getSize(),
-                boards.getNumber() + 1
-        );
+    //전체게시글 조회
+    public Page<BoardDetailResponseDto> getAllBoards(int page, int size){
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL,pageable);
+
+        List<BoardDetailResponseDto> dtoList = new ArrayList<>();
+        for (Board board : boardsPage.getContent()) {
+            // 댓글 리스트 가져오기
+            List<Comment> commentList = board.getComments();
+            List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
+            for (Comment comment : commentList) {
+                commentDtos.add(new CommentSimpleResponseDto(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getModifiedAt(),
+                        comment.getCommentLikesCount()
+                ));
+            }
+            dtoList.add(new BoardDetailResponseDto(board,commentDtos));
+        }
+        return new PageImpl<>(dtoList, pageable,boardsPage.getTotalElements());
     }
 
     //뉴스피드
@@ -163,14 +184,14 @@ public class BoardService {
                 user,
                 friends,
                 PublicStatus.FRIENDS, // 친구의 게시글 상태
-                PublicStatus.ALL,      // 전체 공개 게시글 상태
+                PublicStatus.ALL,// 친구의 전체 게시글 상태
                 pageable               // Pageable 객체 전달
         );
 
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = getCommentsByBoardId(board.getId());
+            List<Comment> commentList = board.getComments();
             List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
             for (Comment comment : commentList) {
                 commentDtos.add(new CommentSimpleResponseDto(
@@ -188,12 +209,7 @@ public class BoardService {
 
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
-        return boardRepository.findActiveBoardById(id,StatusEnum.ACTIVATED)
+        return boardRepository.findActiveBoardById(id, StatusEnum.ACTIVATED)
                 .orElseThrow(NotFoundBoardException::new);
-    }
-
-    //Board에 연관된 댓글리스트 불러오기
-    public List<Comment> getCommentsByBoardId(Long boardId) {
-        return boardRepository.findCommentsByBoardId(boardId, StatusEnum.ACTIVATED);
     }
 }

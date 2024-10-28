@@ -25,7 +25,7 @@ public class CommentLikeService {
 
     // 댓글에 좋아요 등록
     @Transactional
-    public CommentLikeReponseDto postCommentLike(Long commentId, Long userId) {
+    public CommentLikeReponseDto postCommentLike(Long userId,Long commentId) {
         // 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundCommentException());
@@ -48,7 +48,7 @@ public class CommentLikeService {
 
     // 댓글에 좋아요 취소
     @Transactional
-    public void deleteCommentLike(Long commentId, Long userId) {
+    public void deleteCommentLike(Long userId,Long commentId) {
         // 댓글의 좋아요 수를 줄이기 위함
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundCommentException());

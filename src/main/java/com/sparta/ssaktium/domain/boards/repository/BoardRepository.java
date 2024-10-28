@@ -18,11 +18,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByUserIdAndStatusEnum(Long id, StatusEnum statusEnum, Pageable pageable);
 
-    @Query("SELECT b FROM Board b WHERE (b.user = :user) OR " +
+    @Query("SELECT b FROM Board b WHERE " +
+            "(b.user = :user) OR " +
             "(b.publicStatus = :friendsStatus AND b.user IN :friends) OR " +
-            "(b.publicStatus = :allStatus) " +
+            "(b.publicStatus = :allStatus AND b.user IN :friends) " +
             "ORDER BY b.modifiedAt DESC")
-        // modifiedAtDate를 기준으로 내림차순 정렬
     Page<Board> findAllForNewsFeed(
             @Param("user") User user,
             @Param("friends") List<User> friends,
@@ -34,6 +34,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b FROM Board b WHERE b.id = :id AND b.statusEnum = :status")
     Optional<Board> findActiveBoardById(@Param("id") Long id, @Param("status") StatusEnum status);
 
-    @Query("SELECT c FROM Comment c WHERE c.board.id = :boardId AND c.board.statusEnum = :status")
-    List<Comment> findCommentsByBoardId(@Param("boardId") Long boardId, @Param("status") StatusEnum status);
+    @Query("SELECT b FROM Board b WHERE b.publicStatus = :publicStatus")
+    Page<Board> findAllByPublicStatus(@Param("publicStatus") PublicStatus publicStatus,Pageable pageable);
 }

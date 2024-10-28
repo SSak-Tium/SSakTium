@@ -26,7 +26,7 @@ public class BoardLikeService {
 
     // 게시글에 좋아요 등록
     @Transactional
-    public BoardLikeResponseDto postBoardLikes(Long boardId, Long userId) {
+    public BoardLikeResponseDto postBoardLikes(Long userId, Long boardId) {
         // 게시글이 있는지 확인
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundBoardException());
@@ -49,7 +49,7 @@ public class BoardLikeService {
 
     // 게시글에 좋아요 취소
     @Transactional
-    public void deleteBoardLikes(Long boardId, Long userId) {
+    public void deleteBoardLikes(Long userId, Long boardId) {
         // 게시글의 좋아요 수를 줄이기 위함
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundBoardException());

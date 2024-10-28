@@ -44,7 +44,7 @@ public class CommentService {
 
     // 댓글 등록
     @Transactional
-    public CommentResponseDto postComment(Long boardId, Long userId, CommentRequestDto commentRequestDto) {
+    public CommentResponseDto postComment(Long userId, Long boardId, CommentRequestDto commentRequestDto) {
         // 댓글을 작성할 게시글이 있는지 확인
         Board board = boardService.getBoardById(boardId);
 
@@ -60,7 +60,7 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public CommentResponseDto updateComment(Long boardId, Long commentId, Long userId, CommentRequestDto commentRequestDto) {
+    public CommentResponseDto updateComment(Long userId, Long commentId, Long boardId, CommentRequestDto commentRequestDto) {
         // 댓글을 수정할 게시글이 있는지 확인
         boardService.getBoardById(boardId);
 
@@ -81,7 +81,7 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long commentId, Long userId) {
+    public void deleteComment(Long userId, Long commentId) {
         // 삭제할 댓글이 있는지 확인
         Comment comment = findComment(commentId);
 
