@@ -89,4 +89,18 @@ public class PlantDiaryController {
         PlantDiaryResponseDto responseDto = plantDiaryService.updateDiary(authUser.getUserId(), id, diaryId, requestDto, image);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
+
+    /**
+     * plantDiary 삭제 API
+     * @param authUser
+     * @param id
+     * @param diaryId
+     * @return
+     */
+    @DeleteMapping("/plants/{id}/diaries/{diaryId}")
+    public ResponseEntity<ApiResponse<String>> deleteDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                                          @PathVariable Long id,
+                                                                          @PathVariable Long diaryId) {
+        return ResponseEntity.ok(ApiResponse.success(plantDiaryService.deleteDiary(authUser.getUserId(), id, diaryId)));
+    }
 }

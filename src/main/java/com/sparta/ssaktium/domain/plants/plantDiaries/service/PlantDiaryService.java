@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.plants.plantDiaries.service;
 
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
@@ -17,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -57,9 +54,11 @@ public class PlantDiaryService {
 
     }
 
-    public PlantDiaryResponseDto getDiary(long userId, Long id, Long diaryId) {
+    public PlantDiaryResponseDto getDiary(Long userId, Long id, Long diaryId) {
 
         userService.findUser(userId);
+
+        plantService.findPlant(id);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
 
@@ -67,9 +66,11 @@ public class PlantDiaryService {
     }
 
     @Transactional
-    public PlantDiaryResponseDto updateDiary(long userId, Long id, Long diaryId, PlantDiaryRequestDto requestDto, MultipartFile image) {
+    public PlantDiaryResponseDto updateDiary(Long userId, Long id, Long diaryId, PlantDiaryRequestDto requestDto, MultipartFile image) {
 
         userService.findUser(userId);
+
+        plantService.findPlant(id);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
 
@@ -84,5 +85,23 @@ public class PlantDiaryService {
         plantDiaryRepository.save(plantDiary);
 
         return new PlantDiaryResponseDto(plantDiary);
+    }
+
+    @Transactional
+    public String deleteDiary(Long userId, Long id, Long diaryId) {
+
+        userService.findUser(userId);
+
+        plantService.findPlant(id);
+
+        PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+
+        String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
+
+        s3Service.deleteObject(s3Service.bucket, imageName);
+
+        plantDiaryRepository.delete(plantDiary);
+
+        return "정상적으로 삭제되었습니다.";
     }
 }
