@@ -31,9 +31,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT b FROM Board b WHERE b.id = :id AND b.publicStatus <> :deletedStatus")
-    Optional<Board> findActiveBoardById(@Param("id") Long id, @Param("deletedStatus") StatusEnum deletedStatus);
+    @Query("SELECT b FROM Board b WHERE b.id = :id AND b.statusEnum = :status")
+    Optional<Board> findActiveBoardById(@Param("id") Long id, @Param("status") StatusEnum status);
 
-    @Query("SELECT b FROM Board b LEFT JOIN FETCH b.comments WHERE b.id = :id AND b.publicStatus <> :deletedStatus")
-    List<Comment> findCommentsByBoardId(@Param("id") Long id, @Param("deletedStatus") StatusEnum deletedStatus);
+    @Query("SELECT c FROM Comment c WHERE c.board.id = :boardId AND c.board.statusEnum = :status")
+    List<Comment> findCommentsByBoardId(@Param("boardId") Long boardId, @Param("status") StatusEnum status);
 }

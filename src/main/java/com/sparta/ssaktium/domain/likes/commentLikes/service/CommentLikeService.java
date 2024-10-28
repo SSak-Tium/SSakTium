@@ -49,7 +49,7 @@ public class CommentLikeService {
     // 댓글에 좋아요 취소
     @Transactional
     public void deleteCommentLike(Long commentId, Long userId) {
-        // 댓글이 있는지 확인
+        // 댓글의 좋아요 수를 줄이기 위함
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundCommentException());
 
@@ -57,14 +57,8 @@ public class CommentLikeService {
         CommentLike commentLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
                 .orElseThrow(() -> new NotFoundCommentLikeException());
 
-        // 좋아요 한 유저가 맞는지 확인
-        if (!commentLike.getUserId().equals(userId)) {
-            throw new LikeOwnerMismatchException();
-        }
-
         // 좋아요 취소
         commentLikeRepository.delete(commentLike);
         comment.decrementLikesCount();
-
     }
 }

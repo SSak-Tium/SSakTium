@@ -32,11 +32,11 @@ public class CommentService {
     // 댓글 조회
     public Page<CommentResponseDto> getComments(Long boardId, int page, int size) {
         // 게시글이 있는지 확인
-        boardService.getBoardById(boardId);
+        Board board = boardService.getBoardById(boardId);
 
         // 페이지네이션 생성
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Comment> comments = commentRepository.findByBoardId(boardId, pageable);
+        Page<Comment> comments = commentRepository.findByBoard(board, pageable);
 
         // 댓글 리스트를 Dto 로 반환
         return comments.map(comment -> new CommentResponseDto(comment));
@@ -85,8 +85,8 @@ public class CommentService {
         // 삭제할 댓글이 있는지 확인
         Comment comment = findComment(commentId);
 
-        // 해당 게시글 또는 해당 댓글 작성자인지 확인
-        if (!comment.getUser().getId().equals(userId)) {
+        // 해당 댓글 또는 해당 게시글 작성자인지 확인
+        if (!comment.getUser().getId().equals(userId) || !comment.getBoard().getUser().getId().equals(userId)) {
             throw new CommentOwnerMismatchException();
         }
 

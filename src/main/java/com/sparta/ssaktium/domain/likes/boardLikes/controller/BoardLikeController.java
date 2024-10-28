@@ -17,11 +17,6 @@ public class BoardLikeController {
 
     private final BoardLikeService boardLikeService;
 
-    // 좋아요 조회
-    @GetMapping
-    public ResponseEntity<ApiResponse<BoardLikeResponseDto>> getBoardLikes(@PathVariable Long boardId){
-        return ResponseEntity.ok(ApiResponse.success(boardLikeService.getBoardLikes(boardId)));
-    }
 
     // 좋아요 등록
     @PostMapping

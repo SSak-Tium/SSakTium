@@ -24,15 +24,6 @@ public class BoardLikeService {
     private final BoardLikeRepository boardLikeRepository;
 
 
-    // 게시글 좋아요 조회 = 필요없는 기능일수도!!
-    public BoardLikeResponseDto getBoardLikes(Long boardId) {
-        // 게시글이 있는지 확인
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NotFoundBoardException());
-
-        return new BoardLikeResponseDto(boardId, board.getBoardLikesCount());
-    }
-
     // 게시글에 좋아요 등록
     @Transactional
     public BoardLikeResponseDto postBoardLikes(Long boardId, Long userId) {
@@ -59,18 +50,13 @@ public class BoardLikeService {
     // 게시글에 좋아요 취소
     @Transactional
     public void deleteBoardLikes(Long boardId, Long userId) {
-        // 게시글이 있는지 확인
+        // 게시글의 좋아요 수를 줄이기 위함
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundBoardException());
 
         // 게시글에 해당 유저의 좋아요가 있는지 확인
         BoardLike boardLike = boardLikeRepository.findByBoardIdAndUserId(boardId, userId)
                 .orElseThrow(() -> new NotFoundBoardLikeException());
-
-        // 좋아요 한 유저가 맞는지 확인
-        if (!boardLike.getUserId().equals(userId)) {
-            throw new LikeOwnerMismatchException();
-        }
 
         // 좋아요 취소
         boardLikeRepository.delete(boardLike);
