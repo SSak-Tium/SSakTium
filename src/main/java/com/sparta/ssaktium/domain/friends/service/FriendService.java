@@ -28,6 +28,7 @@ public class FriendService {
 
     @Transactional
     public FriendResponseDto requestOrAcceptFriend(Long userId, Long friendId) {
+
         if (Objects.equals(userId, friendId)) {
             throw new SelfRequestException();
         }
