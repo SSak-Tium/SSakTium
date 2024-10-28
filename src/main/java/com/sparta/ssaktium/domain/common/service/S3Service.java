@@ -69,7 +69,7 @@ public class S3Service {
     }
 
     //여러 이미지 업로드
-    public List<String> uploadImageListToS3(List<MultipartFile> images,String bucket) throws IOException {
+    public List<String> uploadImageListToS3(List<MultipartFile> images,String bucket){
         List<String> imageUrls = new ArrayList<>();
 
         for (MultipartFile image : images) {
