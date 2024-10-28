@@ -43,7 +43,7 @@ public class BoardService {
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) throws IOException {
+    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) {
         //유저 확인
         User user = userService.findUser(userId);
         // 업로드한 파일의 S3 URL 주소
@@ -57,7 +57,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) throws IOException {
+    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
@@ -66,10 +66,17 @@ public class BoardService {
         if (!updateBoard.getUser().equals(user)) {
             throw new NotUserOfBoardException();
         }
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        List<String> imageUrls = s3Service.extractFileNamesFromUrls(updateBoard.getImageList());
+
+        //가져온 이미지 리스트 삭제
+        for (String imageurl : imageUrls) {
+            s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
+        }
         // 업로드한 파일의 S3 URL 주소
         List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
         //게시글 수정
-        updateBoard.updateBoards(requestDto, imageUrl);
+        updateBoard.updateBoards(requestDto.getTitle(),requestDto.getContents(),requestDto.getPublicStatus(), imageUrl);
         boardRepository.save(updateBoard);
         //responseDto 반환
         return new BoardSaveResponseDto(updateBoard);

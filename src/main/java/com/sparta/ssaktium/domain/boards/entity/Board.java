@@ -54,11 +54,11 @@ public class Board extends Timestamped {
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto, List<String> imageList) {
-        this.title = boardSaveRequestDto.getTitle();
-        this.content = boardSaveRequestDto.getContents();
+    public void updateBoards(String title,String content, PublicStatus publicStatus,List<String> imageList) {
+        this.title = title;
+        this.content = content;
         this.imageList = imageList;
-        this.publicStatus = boardSaveRequestDto.getPublicStatus();
+        this.publicStatus = publicStatus;
     }
 
     // 좋아요 등록
