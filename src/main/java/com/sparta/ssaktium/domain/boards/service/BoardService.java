@@ -49,7 +49,7 @@ public class BoardService {
         // 업로드한 파일의 S3 URL 주소
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board board = new Board(requestDto.getTitle(), requestDto.getContents(),requestDto.getPublicStatus() ,user, imageUrl);
+        Board board = new Board(requestDto.getTitle(), requestDto.getContents(), requestDto.getPublicStatus(), user, imageUrl);
         //저장
         Board savedBoard = boardRepository.save(board);
         //responseDto 반환
@@ -82,7 +82,7 @@ public class BoardService {
         //게시글 찾기
         Board deleteBoard = getBoardById(id);
         //어드민 일시 본인 확인 넘어가기
-        if(!user.getUserRole().equals(UserRole.ROLE_ADMIN)) {
+        if (!user.getUserRole().equals(UserRole.ROLE_ADMIN)) {
             //게시글 본인 확인
             if (!deleteBoard.getUser().equals(user)) {
                 throw new NotUserOfBoardException();
@@ -116,7 +116,7 @@ public class BoardService {
         return new BoardDetailResponseDto(board, dtoList);
     }
 
-    public BoardPageResponseDto getMyBoards(Long userId, int page, int size) {
+    public Page<BoardDetailResponseDto> getMyBoards(Long userId, int page, int size) {
         //사용자 찾기
         User user = userService.findUser(userId);
         //페이지 요청 객체 생성 (페이지 숫자가 실제로는 0부터 시작하므로 원하는 숫자 -1을 입력해야 해당 페이지가 나온다)
@@ -141,15 +141,7 @@ public class BoardService {
             // BoardDetailResponseDto 생성
             boardDetails.add(new BoardDetailResponseDto(board, dtoList));
         }
-
-        // BoardsPageResponseDto 생성
-        return new BoardPageResponseDto(
-                boardDetails,
-                boards.getTotalPages(),
-                boards.getTotalElements(),
-                boards.getSize(),
-                boards.getNumber() + 1
-        );
+        return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
     }
 
     //뉴스피드
@@ -166,7 +158,7 @@ public class BoardService {
                 user,
                 friends,
                 PublicStatus.FRIENDS, // 친구의 게시글 상태
-                PublicStatus.ALL,      // 전체 공개 게시글 상태
+                PublicStatus.ALL,// 친구의 전체 게시글 상태
                 pageable               // Pageable 객체 전달
         );
 
@@ -191,7 +183,7 @@ public class BoardService {
 
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
-        return boardRepository.findActiveBoardById(id,StatusEnum.DELETED)
+        return boardRepository.findActiveBoardById(id, StatusEnum.DELETED)
                 .orElseThrow(NotFoundBoardException::new);
     }
 

@@ -85,8 +85,8 @@ public class BoardController {
      * @param page
      * @param size     댓글 페이지네이션 빠져있음
      */
-    @GetMapping("/boards/me")
-    public ResponseEntity<ApiResponse<BoardPageResponseDto>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
+    @GetMapping("/boards")
+    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
                                                                          @RequestParam(defaultValue = "1") int page,
                                                                          @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser.getUserId(), page, size)));
@@ -105,6 +105,7 @@ public class BoardController {
                                                                                  @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
+
 
 //    @GetMapping("/search")
 //    public ResponseEntity<ApiResponse<Page<>>>
