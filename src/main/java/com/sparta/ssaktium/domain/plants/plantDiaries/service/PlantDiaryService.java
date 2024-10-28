@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.plants.plantDiaries.service;
 
 import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
-import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
+import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.entity.PlantDiary;
 import com.sparta.ssaktium.domain.plants.plantDiaries.exception.NotFoundPlantDiaryException;
