@@ -22,7 +22,7 @@ public class AuthController {
 
     /**
      * 회원가입
-     * @param signupRequestDto
+     * @param signupRequestDto 사용자 등록 회원정보 : Email, Password, 이름, 출생년도
      * @return
      */
     @PostMapping("/v1/auth/signup")
@@ -32,12 +32,11 @@ public class AuthController {
 
     /**
      * 로그인
-     * @param signinRequestDto
+     * @param signinRequestDto 로그인 : Email, Password
      * @return
-     * @throws AuthException
      */
     @PostMapping("/v1/auth/signin")
-    public ResponseEntity<ApiResponse<SigninResponseDto>> signin(@Valid @RequestBody SigninRequestDto signinRequestDto) throws AuthException {
+    public ResponseEntity<ApiResponse<SigninResponseDto>> signin(@Valid @RequestBody SigninRequestDto signinRequestDto) {
         return ResponseEntity.ok(ApiResponse.success(authService.signin(signinRequestDto)));
     }
 }
