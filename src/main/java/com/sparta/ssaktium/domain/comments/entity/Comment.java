@@ -25,6 +25,7 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    private int commentLikesCount = 0;
 
     public Comment(String content, Board board, User user) {
         this.content = content;
@@ -32,9 +33,7 @@ public class Comment extends Timestamped {
         this.user = user;
     }
 
-    private int commentLikesCount = 0;
-
-    public void incrementLikesCount() {
+    public void incrementLikesCount(){
         commentLikesCount++;
     }
 

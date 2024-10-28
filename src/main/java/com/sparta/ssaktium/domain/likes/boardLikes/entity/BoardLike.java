@@ -15,13 +15,13 @@ public class BoardLike {
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable =false)
+    @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @Column(name = "user_id",nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public BoardLike(Board board, Long userId){
+    public BoardLike(Board board, Long userId) {
         this.board = board;
         this.userId = userId;
     }
