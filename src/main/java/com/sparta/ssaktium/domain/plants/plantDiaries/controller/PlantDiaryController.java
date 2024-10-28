@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.plants.plantDiaries.controller;
 
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
-import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
+import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.service.PlantDiaryService;
 import lombok.RequiredArgsConstructor;
