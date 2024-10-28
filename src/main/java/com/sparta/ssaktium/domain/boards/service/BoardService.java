@@ -54,7 +54,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardUpdateImageDto updateImagesBoards(Long userId, Long id, List<MultipartFile> imageList,List<String> remainingImages) {
+    public BoardUpdateImageDto updateImagesBoards(Long userId, Long id, List<MultipartFile> imageList, List<String> remainingImages) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
@@ -69,8 +69,8 @@ public class BoardService {
 
         //가져온 이미지 리스트 삭제
         for (String imageUrl : imageUrls) {
-            if(!remainingImages.contains(imageUrl)){
-            s3Service.deleteObject(s3Service.bucket, imageUrl);
+            if (!remainingImages.contains(imageUrl)) {
+                s3Service.deleteObject(s3Service.bucket, imageUrl);
             } // 반복적으로 삭제
         }
         // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
@@ -187,11 +187,11 @@ public class BoardService {
     }
 
     //전체게시글 조회
-    public Page<BoardDetailResponseDto> getAllBoards(int page, int size){
+    public Page<BoardDetailResponseDto> getAllBoards(int page, int size) {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL,pageable);
+        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL, pageable);
 
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage.getContent()) {
@@ -206,9 +206,9 @@ public class BoardService {
                         comment.getCommentLikesCount()
                 ));
             }
-            dtoList.add(new BoardDetailResponseDto(board,commentDtos));
+            dtoList.add(new BoardDetailResponseDto(board, commentDtos));
         }
-        return new PageImpl<>(dtoList, pageable,boardsPage.getTotalElements());
+        return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
 
     //뉴스피드

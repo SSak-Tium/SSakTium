@@ -16,7 +16,7 @@ public class BoardDetailResponseDto {
     private final int boardLikesCount;
     private final List<CommentSimpleResponseDto> comments;
 
-    public BoardDetailResponseDto(Board board,List<CommentSimpleResponseDto> comments) {
+    public BoardDetailResponseDto(Board board, List<CommentSimpleResponseDto> comments) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.contents = board.getContent();

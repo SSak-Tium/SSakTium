@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.boards.entity;
 
-import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
@@ -10,7 +9,6 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -45,7 +43,7 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(String title,String content,PublicStatus publicStatus, User user, List<String> imageList) {
+    public Board(String title, String content, PublicStatus publicStatus, User user, List<String> imageList) {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
@@ -58,7 +56,7 @@ public class Board extends Timestamped {
         this.imageList = imageList;
     }
 
-    public void updateBoards(String title,String content,PublicStatus publicStatus){
+    public void updateBoards(String title, String content, PublicStatus publicStatus) {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
