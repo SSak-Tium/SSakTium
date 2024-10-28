@@ -57,4 +57,18 @@ public class PlantDiaryController {
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
+    /**
+     * plantDiary 단일조회 API
+     * @param authUser
+     * @param id
+     * @param diaryId
+     * @return
+     */
+    @GetMapping("/plants/{id}/diaries/{diaryId}")
+    public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> getDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                                       @PathVariable Long id,
+                                                                       @PathVariable Long diaryId) {
+        PlantDiaryResponseDto responseDto = plantDiaryService.getDiary(authUser.getUserId(), id, diaryId);
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
+    }
 }

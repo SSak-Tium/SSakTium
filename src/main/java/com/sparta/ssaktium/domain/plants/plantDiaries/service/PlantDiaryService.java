@@ -5,6 +5,7 @@ import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.entity.PlantDiary;
+import com.sparta.ssaktium.domain.plants.plantDiaries.exception.NotFoundPlantDiaryException;
 import com.sparta.ssaktium.domain.plants.plantDiaries.repository.PlantDiaryRepository;
 import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.plants.service.PlantService;
@@ -55,5 +56,15 @@ public class PlantDiaryService {
         return plantDiaryPage.map(PlantDiaryResponseDto::new);
 
     }
+
+    public PlantDiaryResponseDto getDiary(long userId, Long id, Long diaryId) {
+
+        userService.findUser(userId);
+
+        PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+
+        return new PlantDiaryResponseDto(plantDiary);
+    }
+
 
 }
