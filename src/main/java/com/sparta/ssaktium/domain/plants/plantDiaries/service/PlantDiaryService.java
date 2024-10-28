@@ -40,7 +40,13 @@ public class PlantDiaryService {
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
-        PlantDiary plantDiary = new PlantDiary(plant, requestDto.getContent(), imageUrl, requestDto.getItemDate(), user);
+        PlantDiary plantDiary = new PlantDiary(
+                plant,
+                requestDto.getTitle(),
+                requestDto.getContent(),
+                imageUrl,
+                requestDto.getItemDate(),
+                user);
 
         PlantDiary savedPlantDiary = plantDiaryRepository.save(plantDiary);
 
