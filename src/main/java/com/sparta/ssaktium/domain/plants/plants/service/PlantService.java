@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ public class PlantService {
     @Transactional
     public PlantResponseDto createPlant(Long userId,
                                         PlantRequestDto requestDto,
-                                        MultipartFile image) throws IOException {
+                                        MultipartFile image) {
 
         User user = userService.findUser(userId);
 
@@ -63,7 +62,7 @@ public class PlantService {
     }
 
     @Transactional
-    public PlantResponseDto updatePlant(Long userId, Long id, PlantRequestDto requestDto, MultipartFile image) throws IOException {
+    public PlantResponseDto updatePlant(Long userId, Long id, PlantRequestDto requestDto, MultipartFile image) {
 
         userService.findUser(userId);
 
@@ -71,7 +70,7 @@ public class PlantService {
 
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
-        s3Service.s3Client.deleteObject(s3Service.bucket, imageName);
+        s3Service.deleteObject(s3Service.bucket, imageName);
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
@@ -83,7 +82,7 @@ public class PlantService {
     }
 
     @Transactional
-    public String deltePlant(Long userId, Long id) {
+    public String deletePlant(Long userId, Long id) {
 
         userService.findUser(userId);
 
@@ -91,7 +90,7 @@ public class PlantService {
 
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
-        s3Service.s3Client.deleteObject(s3Service.bucket, imageName);
+        s3Service.deleteObject(s3Service.bucket, imageName);
 
         plantRepository.delete(plant);
 
