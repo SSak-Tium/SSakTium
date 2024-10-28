@@ -103,7 +103,7 @@ public class BoardService {
         //게시글 찾기
         Board board = getBoardById(id);
         //댓글 찾기
-        List<Comment> commentList = getCommentsByBoardId(board.getId());
+        List<Comment> commentList = board.getComments();
 
         List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
         for (Comment comments : commentList) {
@@ -129,7 +129,7 @@ public class BoardService {
         List<BoardDetailResponseDto> boardDetails = new ArrayList<>();
         for (Board board : boards) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = getCommentsByBoardId(board.getId());
+            List<Comment> commentList = board.getComments();
             List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
             for (Comment comment : commentList) {
                 dtoList.add(new CommentSimpleResponseDto(
@@ -155,7 +155,7 @@ public class BoardService {
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage.getContent()) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = getCommentsByBoardId(board.getId());
+            List<Comment> commentList = board.getComments();
             List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
             for (Comment comment : commentList) {
                 commentDtos.add(new CommentSimpleResponseDto(
@@ -191,7 +191,7 @@ public class BoardService {
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = getCommentsByBoardId(board.getId());
+            List<Comment> commentList = board.getComments();
             List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
             for (Comment comment : commentList) {
                 commentDtos.add(new CommentSimpleResponseDto(
@@ -209,12 +209,12 @@ public class BoardService {
 
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
-        return boardRepository.findActiveBoardById(id, StatusEnum.DELETED)
+        return boardRepository.findActiveBoardById(id, StatusEnum.ACTIVATED)
                 .orElseThrow(NotFoundBoardException::new);
     }
 
     //Board에 연관된 댓글리스트 불러오기
     public List<Comment> getCommentsByBoardId(Long boardId) {
-        return boardRepository.findCommentsByBoardId(boardId, StatusEnum.DELETED);
+        return boardRepository.findCommentsByBoardId(boardId, StatusEnum.ACTIVATED);
     }
 }
