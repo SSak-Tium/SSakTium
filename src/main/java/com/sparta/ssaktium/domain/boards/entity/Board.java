@@ -54,10 +54,13 @@ public class Board extends Timestamped {
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(String title,String content, PublicStatus publicStatus,List<String> imageList) {
+    public void updateImagesBoards(List<String> imageList) {
+        this.imageList = imageList;
+    }
+
+    public void updateBoards(String title,String content,PublicStatus publicStatus){
         this.title = title;
         this.content = content;
-        this.imageList = imageList;
         this.publicStatus = publicStatus;
     }
 
