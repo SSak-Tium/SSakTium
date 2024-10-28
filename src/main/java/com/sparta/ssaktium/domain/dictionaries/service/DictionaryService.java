@@ -22,7 +22,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class DictionaryService {
 
     private final DictionaryRepository dictionaryRepository;
@@ -30,7 +30,8 @@ public class DictionaryService {
     private final S3Service s3Service;
 
     // 식물도감 등록
-    public DictionaryResponseDto createDictionary(long userId, DictionaryRequestDto dictionaryRequestDto, MultipartFile image) throws IOException {
+    @Transactional
+    public DictionaryResponseDto createDictionary(long userId, DictionaryRequestDto dictionaryRequestDto, MultipartFile image){
         // 유저 조회
         User user = userService.findUser(userId);
 
@@ -38,17 +39,16 @@ public class DictionaryService {
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
         // Entity 생성
-        Dictionary dictionary = new Dictionary(dictionaryRequestDto, user.getUserName(), imageUrl);
+        Dictionary dictionary = new Dictionary(dictionaryRequestDto, user, imageUrl);
 
         // DB 저장
-        dictionaryRepository.save(dictionary);
+        Dictionary savedDictionary = dictionaryRepository.save(dictionary);
 
         // Dto 반환
-        return new DictionaryResponseDto(dictionary);
+        return new DictionaryResponseDto(savedDictionary);
     }
 
     // 식물도감 단건 조회
-    @Transactional(readOnly = true)
     public DictionaryResponseDto getDictionary(long userId, long dictionaryId) {
         // 유저 조회
         userService.findUser(userId);
@@ -61,8 +61,10 @@ public class DictionaryService {
     }
 
     // 식물도감 리스트 조회
-    @Transactional(readOnly = true)
-    public Page<DictionaryListResponseDto> getDictionaryList(int page, int size) {
+    public Page<DictionaryListResponseDto> getDictionaryList(long userId, int page, int size) {
+        // 유저 조회
+        User user = userService.findUser(userId);
+
         // Pageable 객체 생성
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -70,15 +72,12 @@ public class DictionaryService {
         Page<Dictionary> dictionariesPage = dictionaryRepository.findAll(pageable);
 
         // Dto 변환
-        Page<DictionaryListResponseDto> dtoPage = dictionariesPage.map(dictionary -> {
-           DictionaryListResponseDto dictionaryListResponseDto = new DictionaryListResponseDto(dictionary.getTitle(), dictionary.getUserName());
-           return dictionaryListResponseDto;
-        });
-        return dtoPage;
+        return dictionariesPage.map(dictionary -> new DictionaryListResponseDto(dictionary.getTitle(), user.getUserName()));
     }
 
     // 식물도감 수정
-    public DictionaryResponseDto updateDictionary(long userId, DictionaryUpdateRequestDto dictionaryUpdateRequestDto, MultipartFile image, long dictionaryId) throws IOException {
+    @Transactional
+    public DictionaryResponseDto updateDictionary(long userId, DictionaryUpdateRequestDto dictionaryUpdateRequestDto, MultipartFile image, long dictionaryId){
         // 유저 조회
         userService.findUser(userId);
 
@@ -99,6 +98,7 @@ public class DictionaryService {
     }
 
     // 식물도감 삭제
+    @Transactional
     public String deleteDictionary(long userId, long dictionaryId) {
         // 유저 조회
         userService.findUser(userId);
@@ -107,10 +107,10 @@ public class DictionaryService {
         Dictionary dictionary = findDictionary(dictionaryId);
 
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        String ImageName = s3Service.extractFileNameFromUrl(dictionary.getImageUrl());
+        String imageName = s3Service.extractFileNameFromUrl(dictionary.getImageUrl());
 
         // 가져온 이미지 원본 이름으로 S3 이미지 삭제
-        s3Service.s3Client.deleteObject(s3Service.bucket, ImageName);
+        s3Service.deleteObject(s3Service.bucket, imageName);
 
         // DB 삭제
         dictionaryRepository.delete(dictionary);

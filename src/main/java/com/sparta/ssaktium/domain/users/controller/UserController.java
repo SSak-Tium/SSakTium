@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.users.controller;
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.dto.request.UserChangePasswordRequestDto;
+import com.sparta.ssaktium.domain.users.dto.request.UserChangeRequestDto;
 import com.sparta.ssaktium.domain.users.dto.request.UserCheckPasswordRequestDto;
 import com.sparta.ssaktium.domain.users.dto.response.UserResponseDto;
 import com.sparta.ssaktium.domain.users.service.UserService;
@@ -18,33 +19,39 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * 유저 조회 ( id )
-     * @param userId
+     * 프로필 조회 ( id )
+     * @param userId 사용자 id
      * @return
      */
-    @GetMapping("/users/{userId}")
+    @GetMapping("/v1/users/{userId}")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@PathVariable long userId) {
         return ResponseEntity.ok(ApiResponse.success(userService.getUser(userId)));
     }
 
     /**
-     * 유저 비밀번호 변경
-     * @param authUser
-     * @param userChangePasswordRequestDto
+     * 유저 비밀번호 수정
+     * @param authUser 로그인 유저
+     * @param userChangePasswordRequestDto 비밀번호 확인 : 이전 비밀번호, 새 비밀번호
      * @return
      */
-    @PutMapping("/users")
+    @PostMapping("/v1/users/change-password")
     public ResponseEntity<ApiResponse<String>> changePassword(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto) {
         return ResponseEntity.ok(ApiResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
     }
 
+    // 수정해야함 //
+    @PutMapping("/vi/users")
+    public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserChangeRequestDto userChangeRequestDto) {
+        return ResponseEntity.ok(ApiResponse.success(userService.updateUser(authUser.getUserId(), userChangeRequestDto)));
+    }
+
     /**
      * 유저 회원탈퇴
-     * @param authUser
-     * @param userCheckPasswordRequestDto
+     * @param authUser 로그인 유저
+     * @param userCheckPasswordRequestDto 비밀번호 확인 : Password
      * @return
      */
-    @DeleteMapping("/users")
+    @DeleteMapping("/v1/users")
     public ResponseEntity<ApiResponse<String>> deleteUser(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
         return ResponseEntity.ok(ApiResponse.success(userService.deleteUser(authUser.getUserId(), userCheckPasswordRequestDto)));
     }

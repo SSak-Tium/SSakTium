@@ -25,8 +25,8 @@ public class User extends Timestamped {
     private String email;
     private String password;
     private String userName;
-
     private String birthYear;
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
@@ -84,6 +84,12 @@ public class User extends Timestamped {
     // 유저 비밀번호 변경
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    // 유저 정보 변경
+    public void updateUser(String userName, String profileImageUrl) {
+        this.userName = userName;
+        this.profileImageUrl = profileImageUrl;
     }
 
     // 유저 상태 삭제 처리

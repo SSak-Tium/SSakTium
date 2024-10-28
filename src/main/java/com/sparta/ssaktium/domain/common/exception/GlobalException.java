@@ -10,8 +10,8 @@ public class GlobalException extends RuntimeException {
     private final HttpStatus httpStatus;
 
     public GlobalException(GlobalExceptionConst globalExceptionConst) {
-        super(globalExceptionConst.getHttpStatus() + " " + globalExceptionConst.name() + globalExceptionConst.getMessage());
-        log.info(globalExceptionConst.getHttpStatus() + " " + globalExceptionConst.name() + globalExceptionConst.getMessage());
+        super(globalExceptionConst.getHttpStatus() + " " + globalExceptionConst.name() + " " + globalExceptionConst.getMessage());
+        log.info(globalExceptionConst.getHttpStatus() + " " + globalExceptionConst.name() + " " + globalExceptionConst.getMessage());
         this.httpStatus = globalExceptionConst.getHttpStatus();
     }
 }

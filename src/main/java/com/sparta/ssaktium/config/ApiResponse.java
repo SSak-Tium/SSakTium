@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public class ApiResponse<T> {
 
     private enum Status {
-        SUCCESS, FAIL, ERROR
+        SUCCESS, FAIL
     }
 
     private final Status status;
@@ -19,10 +19,6 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(Status.SUCCESS, data, "요청이 성공적으로 처리되었습니다");
-    }
-
-    public static ApiResponse<?> successWithNoContent() {
-        return new ApiResponse<>(Status.SUCCESS, null, "요청이 성공적으로 처리되었지만 내용이 없습니다");
     }
 
 
