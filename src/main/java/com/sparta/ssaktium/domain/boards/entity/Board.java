@@ -57,7 +57,6 @@ public class Board extends Timestamped {
         this.content = boardSaveRequestDto.getContents();
         this.imageUrl = imageUrl;
         this.publicStatus = boardSaveRequestDto.getPublicStatus();
-        this.statusEnum = StatusEnum.ACTIVATED;
     }
 
     // 좋아요 등록
