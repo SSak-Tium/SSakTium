@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name = "comments")
 public class Comment extends Timestamped {
 
     @Id
