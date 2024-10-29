@@ -8,11 +8,15 @@ import com.sparta.ssaktium.domain.users.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 
 @Getter
 @Entity
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 @NoArgsConstructor
 @Table(name = "users")
 public class User extends Timestamped {
@@ -31,8 +35,7 @@ public class User extends Timestamped {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    private boolean deleted = Boolean.FALSE;
 
     private Long kakaoId;
 
@@ -43,7 +46,6 @@ public class User extends Timestamped {
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
-        this.userStatus = UserStatus.ACTIVE;
     }
 
     public User(String email, String password, String userName, UserRole userRole) {
@@ -51,7 +53,6 @@ public class User extends Timestamped {
         this.password = password;
         this.userName = userName;
         this.userRole = userRole;
-        this.userStatus = UserStatus.ACTIVE;
     }
 
     // AuthUser -> User
@@ -68,7 +69,6 @@ public class User extends Timestamped {
         this.password = encodedPassword;
         this.birthYear = birthYear;
         this.userRole = userRole;
-        this.userStatus = UserStatus.ACTIVE;
         this.kakaoId = kakaoId;
     }
 
@@ -90,11 +90,6 @@ public class User extends Timestamped {
     public void updateUser(String profileImageUrl, String userName) {
         this.profileImageUrl = profileImageUrl;
         this.userName = userName;
-    }
-
-    // 유저 상태 삭제 처리
-    public void delete() {
-        this.userStatus = UserStatus.DELETED;
     }
 
     public User kakaoIdUpdate(Long kakaoId) {
