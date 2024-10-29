@@ -20,7 +20,7 @@ public class CommentLikeController {
     @PostMapping
     public ResponseEntity<ApiResponse<CommentLikeReponseDto>> postCommentLike (@AuthenticationPrincipal AuthUser authUser,
                                                                                @PathVariable Long commentId){
-        return ResponseEntity.ok(ApiResponse.success(commentLikeService.postCommentLike(commentId,authUser.getUserId())));
+        return ResponseEntity.ok(ApiResponse.success(commentLikeService.postCommentLike(authUser.getUserId(), commentId)));
     }
 
     // 좋아요 취소
