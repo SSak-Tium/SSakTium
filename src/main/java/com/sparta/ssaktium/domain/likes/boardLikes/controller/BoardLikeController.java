@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.likes.boardLikes.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
 import com.sparta.ssaktium.domain.likes.boardLikes.service.BoardLikeService;
@@ -20,9 +20,9 @@ public class BoardLikeController {
 
     // 좋아요 등록
     @PostMapping
-    public ResponseEntity<ApiResponse<BoardLikeResponseDto>> postBoardLikes(@AuthenticationPrincipal AuthUser authUser,
-                                                                            @PathVariable Long boardId){
-        return ResponseEntity.ok(ApiResponse.success(boardLikeService.postBoardLikes(boardId,authUser.getUserId())));
+    public ResponseEntity<CommonResponse<BoardLikeResponseDto>> postBoardLikes(@AuthenticationPrincipal AuthUser authUser,
+                                                                               @PathVariable Long boardId){
+        return ResponseEntity.ok(CommonResponse.success(boardLikeService.postBoardLikes(boardId,authUser.getUserId())));
     }
 
     // 좋아요 취소

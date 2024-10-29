@@ -36,7 +36,7 @@ public class PlantService {
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
-        Plant plant = new Plant(user, requestDto.getPlantName(), requestDto.getPlantNickname(),imageUrl);
+        Plant plant = new Plant(user, requestDto.getPlantName(), requestDto.getPlantNickname(), imageUrl);
 
         Plant savePlant = plantRepository.save(plant);
 
@@ -116,7 +116,7 @@ public class PlantService {
 
     }
 
-    public Plant findPlant (Long id) {
+    public Plant findPlant(Long id) {
         return plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
     }
 

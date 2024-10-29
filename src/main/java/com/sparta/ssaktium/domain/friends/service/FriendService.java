@@ -48,8 +48,7 @@ public class FriendService {
 
         if (existingFriendRequest.getFriendStatus() == FriendStatus.ACCEPTED) {
             throw new AlreadyFriendsException();
-        }
-        else if (existingFriendRequest.getFriendStatus() == FriendStatus.PENDING) {
+        } else if (existingFriendRequest.getFriendStatus() == FriendStatus.PENDING) {
             if (existingFriendRequest.getUser().getId().equals(userId)) {
                 throw new FriendRequestAlreadySentException();
             } else {

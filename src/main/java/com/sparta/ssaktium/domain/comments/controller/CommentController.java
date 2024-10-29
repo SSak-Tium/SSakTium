@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.comments.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.comments.dto.request.CommentRequestDto;
 import com.sparta.ssaktium.domain.comments.dto.response.CommentResponseDto;
 import com.sparta.ssaktium.domain.comments.service.CommentService;
@@ -20,27 +20,27 @@ public class CommentController {
 
     // 댓글 조회
     @GetMapping("/{boardId}/comments")
-    public ResponseEntity<ApiResponse<Page<CommentResponseDto>>> getComments(@PathVariable Long boardId,
-                                                                             @RequestParam(defaultValue = "1") int page,
-                                                                             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(boardId, page, size)));
+    public ResponseEntity<CommonResponse<Page<CommentResponseDto>>> getComments(@PathVariable Long boardId,
+                                                                                @RequestParam(defaultValue = "1") int page,
+                                                                                @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(CommonResponse.success(commentService.getComments(boardId, page, size)));
     }
 
     // 댓글 등록
     @PostMapping("/{boardId}/comments")
-    public ResponseEntity<ApiResponse<CommentResponseDto>> postComment(@AuthenticationPrincipal AuthUser authUser,
-                                                                       @PathVariable Long boardId,
-                                                                       @RequestBody CommentRequestDto commentRequestDto) {
-        return ResponseEntity.ok(ApiResponse.success(commentService.postComment(authUser.getUserId(), boardId, commentRequestDto)));
+    public ResponseEntity<CommonResponse<CommentResponseDto>> postComment(@AuthenticationPrincipal AuthUser authUser,
+                                                                          @PathVariable Long boardId,
+                                                                          @RequestBody CommentRequestDto commentRequestDto) {
+        return ResponseEntity.ok(CommonResponse.success(commentService.postComment(authUser.getUserId(), boardId, commentRequestDto)));
     }
 
     // 댓글 수정
     @PutMapping("/{boardId}/comments/{commentId}")
-    public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(@AuthenticationPrincipal AuthUser authUser,
-                                                                         @PathVariable Long boardId,
-                                                                         @PathVariable Long commentId,
-                                                                         @RequestBody CommentRequestDto commentRequestDto) {
-        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(authUser.getUserId(), boardId, commentId, commentRequestDto)));
+    public ResponseEntity<CommonResponse<CommentResponseDto>> updateComment(@AuthenticationPrincipal AuthUser authUser,
+                                                                            @PathVariable Long boardId,
+                                                                            @PathVariable Long commentId,
+                                                                            @RequestBody CommentRequestDto commentRequestDto) {
+        return ResponseEntity.ok(CommonResponse.success(commentService.updateComment(authUser.getUserId(), boardId, commentId, commentRequestDto)));
     }
 
     // 댓글 삭제
