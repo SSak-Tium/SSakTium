@@ -35,7 +35,8 @@ public class DictionaryController {
     public ResponseEntity<ApiResponse<DictionaryResponseDto>> createDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestPart DictionaryRequestDto dictionaryRequestDto,
-            @RequestPart MultipartFile image) {
+            @RequestPart MultipartFile image
+    ) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto, image)));
     }
 
@@ -47,7 +48,10 @@ public class DictionaryController {
      * @return
      */
     @GetMapping("/v1/dictionaries/{id}")
-    public ResponseEntity<ApiResponse<DictionaryResponseDto>> getDictionary(@AuthenticationPrincipal AuthUser authUser, @PathVariable long id) {
+    public ResponseEntity<ApiResponse<DictionaryResponseDto>> getDictionary(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable long id
+    ) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionary(authUser.getUserId(), id)));
     }
 
@@ -62,7 +66,8 @@ public class DictionaryController {
     public ResponseEntity<ApiResponse<Page<DictionaryListResponseDto>>> getDictionaryList(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionaryList(authUser.getUserId(), page, size)));
     }
 
@@ -111,7 +116,10 @@ public class DictionaryController {
      */
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/v1/dictionaries/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteDictionary(@AuthenticationPrincipal AuthUser authUser, @PathVariable long id) {
+    public ResponseEntity<ApiResponse<String>> deleteDictionary(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable long id
+    ) {
         return ResponseEntity.ok(ApiResponse.success(dictionaryService.deleteDictionary(authUser.getUserId(), id)));
     }
 }
