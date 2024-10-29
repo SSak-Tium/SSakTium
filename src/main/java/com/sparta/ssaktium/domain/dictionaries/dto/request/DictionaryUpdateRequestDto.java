@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DictionaryUpdateRequestDto {
 
+    private String profileImageUrl;
     private String title;
     private String content;
 }

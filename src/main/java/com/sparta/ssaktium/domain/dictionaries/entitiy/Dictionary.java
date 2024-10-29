@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.dictionaries.entitiy;
 
-import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryRequestDto;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryUpdateRequestDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
@@ -22,7 +21,7 @@ public class Dictionary {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Dictionary(String title, String content, User user, String imageUrl) {
@@ -32,16 +31,9 @@ public class Dictionary {
         this.imageUrl = imageUrl;
     }
 
-    public Dictionary(DictionaryRequestDto dictionaryRequestDto, User user, String imageUrl) {
-        this.title = dictionaryRequestDto.getTitle();
-        this.content = dictionaryRequestDto.getContent();
-        this.user = user;
-        this.imageUrl = imageUrl;
-    }
-
-    public void update(DictionaryUpdateRequestDto dictionaryUpdateRequestDto, String imageUrl) {
+    public void update(DictionaryUpdateRequestDto dictionaryUpdateRequestDto) {
         this.title = dictionaryUpdateRequestDto.getTitle();
         this.content = dictionaryUpdateRequestDto.getContent();
-        this.imageUrl = imageUrl;
+        this.imageUrl = dictionaryUpdateRequestDto.getProfileImageUrl();
     }
 }

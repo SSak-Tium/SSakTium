@@ -118,7 +118,7 @@ class DictionaryServiceTest {
         given(dictionaryRepository.findAll(any(Pageable.class))).willReturn(dictionaryPage);
 
         // when
-        Page<DictionaryListResponseDto> responsePage = dictionaryService.getDictionaryList(page, size);
+        Page<DictionaryListResponseDto> responsePage = dictionaryService.getDictionaryList(userId, page, size);
 
         // then
         assertThat(responsePage.getContent()).hasSize(2);
@@ -129,16 +129,16 @@ class DictionaryServiceTest {
     @Test
     void 식물도감_수정_성공() throws IOException {
         // given
-        DictionaryUpdateRequestDto requestDto = new DictionaryUpdateRequestDto("new title", "content");
+        DictionaryUpdateRequestDto requestDto = new DictionaryUpdateRequestDto(imageUrl,"new title", "content");
         given(userService.findUser(1L)).willReturn(user);
         given(dictionaryRepository.findById(anyLong())).willReturn(Optional.of(dictionary));
         given(s3Service.uploadImageToS3(any(MultipartFile.class), any())).willReturn(imageUrl);
 
-        dictionary.update(requestDto, imageUrl);
+        dictionary.update(requestDto);
         given(dictionaryRepository.save(any(Dictionary.class))).willReturn(dictionary);
 
         // when
-        DictionaryResponseDto responseDto = dictionaryService.updateDictionary(userId, requestDto, image, dictionaryId);
+        DictionaryResponseDto responseDto = dictionaryService.updateDictionary(userId, requestDto, dictionaryId);
 
         assertThat(responseDto.getTitle()).isEqualTo("new title");
     }
