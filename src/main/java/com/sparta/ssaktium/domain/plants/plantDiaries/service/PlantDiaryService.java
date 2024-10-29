@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.plants.plantDiaries.service;
 
-import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryUpdateRequestDto;
@@ -54,12 +53,12 @@ public class PlantDiaryService {
 
     public Page<PlantDiaryResponseDto> getAllDiaries(Long userId, Long id, int page, int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<PlantDiary> plantDiaryPage = plantDiaryRepository.findAllByPlantIdAndUserId(id, userId, pageable);
 
         if (plantDiaryPage.isEmpty()) {
-            throw new UauthorizedAccessException();
+            throw new NotFoundPlantDiaryException();
         }
 
         return plantDiaryPage.map(PlantDiaryResponseDto::new);
@@ -69,7 +68,7 @@ public class PlantDiaryService {
 
         plantService.findPlant(id, userId);
 
-        PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+        PlantDiary plantDiary = plantDiaryRepository.findByIdAndUserId(diaryId, userId).orElseThrow(NotFoundPlantDiaryException::new);
 
         return new PlantDiaryResponseDto(plantDiary);
     }
@@ -79,8 +78,7 @@ public class PlantDiaryService {
 
         plantService.findPlant(id, userId);
 
-        PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
-
+        PlantDiary plantDiary = plantDiaryRepository.findByIdAndUserId(diaryId, userId).orElseThrow(NotFoundPlantDiaryException::new);
 
         String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
 
@@ -98,7 +96,7 @@ public class PlantDiaryService {
 
         plantService.findPlant(id, userId);
 
-        PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
+        PlantDiary plantDiary = plantDiaryRepository.findByIdAndUserId(diaryId, userId).orElseThrow(NotFoundPlantDiaryException::new);
 
         String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
 
