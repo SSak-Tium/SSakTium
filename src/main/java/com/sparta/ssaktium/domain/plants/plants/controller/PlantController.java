@@ -76,9 +76,10 @@ public class PlantController {
     @Operation(summary = "내 식물 삭제", description = "내 식물 삭제하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     @Parameter(description = "내 식물 아이디", example = "2")
-    public ResponseEntity<CommonResponse<String>> deletePlant(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<CommonResponse<Void>> deletePlant(@AuthenticationPrincipal AuthUser authUser,
                                                               @PathVariable Long id) {
-        return ResponseEntity.ok(CommonResponse.success(plantService.deletePlant(authUser.getUserId(), id)));
+        plantService.deletePlant(authUser.getUserId(), id);
+        return ResponseEntity.ok(CommonResponse.success(null));
     }
 
     @PostMapping("/plants/image")

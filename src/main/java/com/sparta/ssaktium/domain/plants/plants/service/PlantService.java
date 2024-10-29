@@ -82,7 +82,7 @@ public class PlantService {
     }
 
     @Transactional
-    public String deletePlant(Long userId, Long id) {
+    public void deletePlant(Long userId, Long id) {
 
         Plant plant = plantRepository.findByPlantIdAndUserId(id, userId).orElseThrow(NotFoundPlantException::new);
 
@@ -91,8 +91,6 @@ public class PlantService {
         s3Service.deleteObject(s3Service.bucket, imageName);
 
         plantRepository.delete(plant);
-
-        return "정상적으로 삭제되었습니다.";
     }
 
     public String uploadPlantImage(MultipartFile image) {
