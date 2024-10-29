@@ -23,7 +23,6 @@ public class BoardLikeService {
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
 
-
     // 게시글에 좋아요 등록
     @Transactional
     public BoardLikeResponseDto postBoardLikes(Long userId, Long boardId) {
@@ -61,5 +60,9 @@ public class BoardLikeService {
         // 좋아요 취소
         boardLikeRepository.delete(boardLike);
         board.decrementLikesCount();
+
+        // 게시글에 등록된 좋아요 수 감소
+        board.decrementLikesCount();
+        boardRepository.save(board);
     }
 }

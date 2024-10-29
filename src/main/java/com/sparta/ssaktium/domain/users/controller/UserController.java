@@ -28,7 +28,9 @@ public class UserController {
      * @return
      */
     @GetMapping("/v1/users/{userId}")
-    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(@PathVariable long userId) {
+    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(
+            @PathVariable long userId
+    ) {
         return ResponseEntity.ok(CommonResponse.success(userService.getUser(userId)));
     }
 
@@ -40,7 +42,10 @@ public class UserController {
      * @return
      */
     @PostMapping("/v1/users/change-password")
-    public ResponseEntity<CommonResponse<String>> changePassword(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto) {
+    public ResponseEntity<CommonResponse<String>> changePassword(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto
+    ) {
         return ResponseEntity.ok(CommonResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
     }
 
@@ -83,7 +88,10 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/v1/users")
-    public ResponseEntity<CommonResponse<String>> deleteUser(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
+    public ResponseEntity<CommonResponse<String>> deleteUser(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto
+    ) {
         return ResponseEntity.ok(CommonResponse.success(userService.deleteUser(authUser.getUserId(), userCheckPasswordRequestDto)));
     }
 }

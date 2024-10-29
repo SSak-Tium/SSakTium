@@ -25,7 +25,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/v1/auth/signup")
-    public ResponseEntity<CommonResponse<SignupResponseDto>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<CommonResponse<SignupResponseDto>> signup(
+            @Valid @RequestBody SignupRequestDto signupRequestDto
+    ) {
         return ResponseEntity.ok(CommonResponse.success(authService.signup(signupRequestDto)));
     }
 
@@ -35,7 +37,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/v1/auth/signin")
-    public ResponseEntity<CommonResponse<SigninResponseDto>> signin(@Valid @RequestBody SigninRequestDto signinRequestDto) {
+    public ResponseEntity<CommonResponse<SigninResponseDto>> signin(
+            @Valid @RequestBody SigninRequestDto signinRequestDto
+    ) {
         return ResponseEntity.ok(CommonResponse.success(authService.signin(signinRequestDto)));
     }
 }

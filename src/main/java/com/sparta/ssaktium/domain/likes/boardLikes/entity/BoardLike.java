@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "boardLikes")
 public class BoardLike {
 
     @Id
@@ -25,5 +26,4 @@ public class BoardLike {
         this.board = board;
         this.userId = userId;
     }
-
 }

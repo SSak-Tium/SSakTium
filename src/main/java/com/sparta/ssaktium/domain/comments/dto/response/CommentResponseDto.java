@@ -2,11 +2,11 @@ package com.sparta.ssaktium.domain.comments.dto.response;
 
 import com.sparta.ssaktium.domain.comments.entity.Comment;
 import lombok.Getter;
-
 import java.time.LocalDateTime;
 
 @Getter
 public class CommentResponseDto {
+
     private final Long id;
     private final String content;
     private final LocalDateTime createdAt;
@@ -32,16 +32,15 @@ public class CommentResponseDto {
     }
 
     // 객체 받아서 Dto 만들기
-    public CommentResponseDto (Comment comment){
+    public CommentResponseDto(Comment comment) {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
         this.boardId = comment.getBoard().getId();
         this.userId = comment.getUser().getId();
-        this.commentLikesCount =comment.getCommentLikesCount();
+        this.commentLikesCount = comment.getCommentLikesCount();
     }
-
 }
 
 

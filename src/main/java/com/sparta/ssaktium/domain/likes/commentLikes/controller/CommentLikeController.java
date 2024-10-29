@@ -19,8 +19,8 @@ public class CommentLikeController {
     // 좋아요 등록
     @PostMapping
     public ResponseEntity<CommonResponse<CommentLikeReponseDto>> postCommentLike (@AuthenticationPrincipal AuthUser authUser,
-                                                                                  @PathVariable Long commentId){
-        return ResponseEntity.ok(CommonResponse.success(commentLikeService.postCommentLike(commentId,authUser.getUserId())));
+                                                                               @PathVariable Long commentId){
+        return ResponseEntity.ok(CommonResponse.success(commentLikeService.postCommentLike(authUser.getUserId(), commentId)));
     }
 
     // 좋아요 취소

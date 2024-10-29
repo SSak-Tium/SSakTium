@@ -98,5 +98,4 @@ public class CommentService {
     public Comment findComment(long id) {
         return commentRepository.findById(id).orElseThrow(NotFoundCommentException::new);
     }
-
 }

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name = "comments")
 public class Comment extends Timestamped {
 
     @Id
@@ -33,7 +34,7 @@ public class Comment extends Timestamped {
         this.user = user;
     }
 
-    public void incrementLikesCount(){
+    public void incrementLikesCount() {
         commentLikesCount++;
     }
 
@@ -48,6 +49,4 @@ public class Comment extends Timestamped {
     public void updateComment(String content) {
         this.content = content;
     }
-
-
 }
