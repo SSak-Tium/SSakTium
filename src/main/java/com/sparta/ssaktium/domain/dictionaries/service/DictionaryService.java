@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.dictionaries.service;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryRequestDto;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryUpdateRequestDto;
+import com.sparta.ssaktium.domain.dictionaries.dto.response.DictionaryImageResponseDto;
 import com.sparta.ssaktium.domain.dictionaries.dto.response.DictionaryListResponseDto;
 import com.sparta.ssaktium.domain.dictionaries.dto.response.DictionaryResponseDto;
 import com.sparta.ssaktium.domain.dictionaries.entitiy.Dictionary;
@@ -39,7 +40,7 @@ public class DictionaryService {
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
         // Entity 생성
-        Dictionary dictionary = new Dictionary(dictionaryRequestDto, user, imageUrl);
+        Dictionary dictionary = Dictionary.addDictionary(dictionaryRequestDto.getTitle(), dictionaryRequestDto.getContent(), user, imageUrl);
 
         // DB 저장
         Dictionary savedDictionary = dictionaryRepository.save(dictionary);
@@ -63,7 +64,7 @@ public class DictionaryService {
     // 식물도감 리스트 조회
     public Page<DictionaryListResponseDto> getDictionaryList(long userId, int page, int size) {
         // 유저 조회
-        User user = userService.findUser(userId);
+        userService.findUser(userId);
 
         // Pageable 객체 생성
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -72,29 +73,42 @@ public class DictionaryService {
         Page<Dictionary> dictionariesPage = dictionaryRepository.findAll(pageable);
 
         // Dto 변환
-        return dictionariesPage.map(dictionary -> new DictionaryListResponseDto(dictionary.getTitle(), user.getUserName()));
+        return dictionariesPage.map(dictionary -> new DictionaryListResponseDto(dictionary.getTitle()));
     }
 
     // 식물도감 수정
     @Transactional
-    public DictionaryResponseDto updateDictionary(long userId, DictionaryUpdateRequestDto dictionaryUpdateRequestDto, MultipartFile image, long dictionaryId){
+    public DictionaryResponseDto updateDictionary(long userId, DictionaryUpdateRequestDto dictionaryUpdateRequestDto, long dictionaryId){
         // 유저 조회
         userService.findUser(userId);
 
         // 식물도감 조회
         Dictionary dictionary = findDictionary(dictionaryId);
 
-        // 업로드한 파일의 S3 URL 주소
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-
         // Entity 수정
-        dictionary.update(dictionaryUpdateRequestDto, imageUrl);
+        dictionary.update(dictionaryUpdateRequestDto);
 
         // DB 저장
         dictionaryRepository.save(dictionary);
 
         // DTO 반환
         return new DictionaryResponseDto(dictionary);
+    }
+
+    // 식물도감 이미지 변경
+    @Transactional
+    public DictionaryImageResponseDto updateDictionaryImage(long userId, long dictionaryId,  MultipartFile image) {
+        // 유저 조회
+        userService.findUser(userId);
+
+        // 식물도감 조회
+        findDictionary(dictionaryId);
+
+        // 업로드한 파일의 S3 URL 주소
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+
+        // DTO 반환
+        return new DictionaryImageResponseDto(imageUrl);
     }
 
     // 식물도감 삭제

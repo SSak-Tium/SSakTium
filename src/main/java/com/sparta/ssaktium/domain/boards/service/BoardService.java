@@ -2,8 +2,8 @@ package com.sparta.ssaktium.domain.boards.service;
 
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
@@ -12,8 +12,6 @@ import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.comments.dto.response.CommentSimpleResponseDto;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
-import com.sparta.ssaktium.domain.comments.service.CommentService;
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
@@ -28,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +40,7 @@ public class BoardService {
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) throws IOException {
+    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) {
         //유저 확인
         User user = userService.findUser(userId);
         // 업로드한 파일의 S3 URL 주소
@@ -57,22 +54,64 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoards(Long userId, Long id, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) throws IOException {
+    public BoardUpdateImageDto updateImagesBoards(Long userId, Long id, List<MultipartFile> imageList, List<String> remainingImages) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
-        Board updateBoard = getBoardById(id);
+        Board board = getBoardById(id);
         //게시글 본인 확인
-        if (!updateBoard.getUser().equals(user)) {
+        if (!board.getUser().equals(user)) {
             throw new NotUserOfBoardException();
         }
-        // 업로드한 파일의 S3 URL 주소
-        List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
+
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        List<String> imageUrls = board.getImageList();
+
+        //가져온 이미지 리스트 삭제
+        for (String imageUrl : imageUrls) {
+            if (!remainingImages.contains(imageUrl)) {
+                s3Service.deleteObject(s3Service.bucket, imageUrl);
+            } // 반복적으로 삭제
+        }
+        // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
+        List<String> updatedImageList = new ArrayList<>(remainingImages);
+        for (MultipartFile image : imageList) {
+            String originalFileName = image.getOriginalFilename();
+            // 이미 존재하는 파일 이름을 유지
+            if (!updatedImageList.contains(originalFileName)) {
+                String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+                updatedImageList.add(newImageUrl);
+            }
+        }
+
         //게시글 수정
-        updateBoard.updateBoards(requestDto, imageUrl);
-        boardRepository.save(updateBoard);
+        board.updateImagesBoards(updatedImageList);
+        boardRepository.save(board);
         //responseDto 반환
-        return new BoardSaveResponseDto(updateBoard);
+        return new BoardUpdateImageDto(updatedImageList);
+    }
+
+    @Transactional
+    public BoardSaveResponseDto updateBoardContent(Long userId, Long id, BoardSaveRequestDto requestDto) {
+        // 유저 확인
+        User user = userService.findUser(userId);
+        // 게시글 찾기
+        Board board = getBoardById(id);
+        // 게시글 본인 확인
+        if (!board.getUser().equals(user)) {
+            throw new NotUserOfBoardException();
+        }
+
+        // 기존 데이터 유지
+        String title = requestDto.getTitle() != null ? requestDto.getTitle() : board.getTitle();
+        String content = requestDto.getContents() != null ? requestDto.getContents() : board.getContent();
+        PublicStatus publicStatus = requestDto.getPublicStatus() != null ? requestDto.getPublicStatus() : board.getPublicStatus();
+
+        // 게시글 수정
+        board.updateBoards(title, content, publicStatus); // 이미지 리스트는 그대로 유지
+        Board updatedBoard = boardRepository.save(board);
+        // responseDto 반환
+        return new BoardSaveResponseDto(updatedBoard);
     }
 
     @Transactional
@@ -148,11 +187,11 @@ public class BoardService {
     }
 
     //전체게시글 조회
-    public Page<BoardDetailResponseDto> getAllBoards(int page, int size){
+    public Page<BoardDetailResponseDto> getAllBoards(int page, int size) {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL,pageable);
+        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL, pageable);
 
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage.getContent()) {
@@ -167,9 +206,9 @@ public class BoardService {
                         comment.getCommentLikesCount()
                 ));
             }
-            dtoList.add(new BoardDetailResponseDto(board,commentDtos));
+            dtoList.add(new BoardDetailResponseDto(board, commentDtos));
         }
-        return new PageImpl<>(dtoList, pageable,boardsPage.getTotalElements());
+        return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
 
     //뉴스피드

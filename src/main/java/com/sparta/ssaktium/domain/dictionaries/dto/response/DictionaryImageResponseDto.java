@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class DictionaryListResponseDto {
-    private final String title;
+public class DictionaryImageResponseDto {
+    private final String profileImageUrl;
 }

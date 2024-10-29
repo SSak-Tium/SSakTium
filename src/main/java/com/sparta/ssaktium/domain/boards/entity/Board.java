@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.boards.entity;
 
-import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
@@ -10,13 +9,14 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "boards")
 public class Board extends Timestamped {
 
     @Id
@@ -37,6 +37,7 @@ public class Board extends Timestamped {
     private User user;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @BatchSize(size = 15)
     private List<Comment> comments;
 
     @Enumerated(EnumType.STRING)
@@ -45,7 +46,7 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(String title,String content,PublicStatus publicStatus, User user, List<String> imageList) {
+    public Board(String title, String content, PublicStatus publicStatus, User user, List<String> imageList) {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
@@ -54,11 +55,14 @@ public class Board extends Timestamped {
         this.statusEnum = StatusEnum.ACTIVATED;
     }
 
-    public void updateBoards(BoardSaveRequestDto boardSaveRequestDto, List<String> imageList) {
-        this.title = boardSaveRequestDto.getTitle();
-        this.content = boardSaveRequestDto.getContents();
+    public void updateImagesBoards(List<String> imageList) {
         this.imageList = imageList;
-        this.publicStatus = boardSaveRequestDto.getPublicStatus();
+    }
+
+    public void updateBoards(String title, String content, PublicStatus publicStatus) {
+        this.title = title;
+        this.content = content;
+        this.publicStatus = publicStatus;
     }
 
     // 좋아요 등록

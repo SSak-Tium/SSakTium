@@ -23,7 +23,9 @@ public class AdminAuthController {
      * @return
      */
     @PostMapping("/v1/auth/admin/signup")
-    public ResponseEntity<ApiResponse<SignupResponseDto>> adminSignup(@Valid @RequestBody AdminSignupRequestDto adminSignupRequestDto) {
+    public ResponseEntity<ApiResponse<SignupResponseDto>> adminSignup(
+            @Valid @RequestBody AdminSignupRequestDto adminSignupRequestDto
+    ) {
         return ResponseEntity.ok(ApiResponse.success(adminAuthService.adminSignup(adminSignupRequestDto)));
     }
 }
