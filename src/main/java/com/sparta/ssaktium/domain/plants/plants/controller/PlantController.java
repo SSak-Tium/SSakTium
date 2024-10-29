@@ -84,10 +84,9 @@ public class PlantController {
     @PostMapping("/plants/image")
     @Operation(summary = "식물 수정이미지 업로드", description = "식물 정보 수정 시 이미지업로드용 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
-    public ResponseEntity<CommonResponse<String>> uploadPlantImage(@AuthenticationPrincipal AuthUser authUser,
-                                                                   @RequestPart
+    public ResponseEntity<CommonResponse<String>> uploadPlantImage(@RequestPart
                                                                    @Parameter(description = "식물 이미지 파일")
                                                                    MultipartFile image) {
-        return ResponseEntity.ok(CommonResponse.success(plantService.uploadPlantImage(authUser.getUserId(), image)));
+        return ResponseEntity.ok(CommonResponse.success(plantService.uploadPlantImage(image)));
     }
 }
