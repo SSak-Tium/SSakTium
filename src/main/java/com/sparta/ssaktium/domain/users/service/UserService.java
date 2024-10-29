@@ -4,6 +4,9 @@ import com.sparta.ssaktium.domain.auth.exception.UnauthorizedPasswordException;
 import com.sparta.ssaktium.domain.common.exception.ForbiddenException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.dictionaries.dto.response.DictionaryImageResponseDto;
+import com.sparta.ssaktium.domain.dictionaries.entitiy.FavoriteDictionary;
+import com.sparta.ssaktium.domain.dictionaries.repository.FavoriteDictionaryRepository;
+import com.sparta.ssaktium.domain.dictionaries.service.FavoriteDictionaryService;
 import com.sparta.ssaktium.domain.users.dto.request.UserChangePasswordRequestDto;
 import com.sparta.ssaktium.domain.users.dto.request.UserChangeRequestDto;
 import com.sparta.ssaktium.domain.users.dto.request.UserCheckPasswordRequestDto;
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,12 +33,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final S3Service s3Service;
+    private final FavoriteDictionaryRepository favoriteDictionaryRepository;
 
     // 유저 조회 ( id )
     public UserResponseDto getUser(long userId) {
         // 유저 조회
         User user = findUser(userId);
-        return new UserResponseDto(user);
+
+        // 관심 식물도감 조회
+        List<Long> favoriteDictionaryList = favoriteDictionaryRepository.findFavoriteDictionaryIdsByUserId(userId);
+
+        return new UserResponseDto(user, favoriteDictionaryList);
     }
 
     // 유저 비밀번호 변경
@@ -63,6 +73,9 @@ public class UserService {
         // 유저 조회
         User user = findUser(userId);
 
+        // 관심 식물도감 조회
+        List<Long> favoriteDictionaryList = favoriteDictionaryRepository.findFavoriteDictionaryIdsByUserId(userId);
+
         // 유저 수정
         user.updateUser(userChangeRequestDto.getProfileImageUrl(), userChangeRequestDto.getUserName());
 
@@ -70,7 +83,7 @@ public class UserService {
         userRepository.save(user);
 
         // DTO 반환
-        return new UserResponseDto(user);
+        return new UserResponseDto(user, favoriteDictionaryList);
     }
 
     // 유저 프로필 사진 변경
