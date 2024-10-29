@@ -5,13 +5,13 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
+import com.sparta.ssaktium.domain.boards.exception.InvalidBoardTypeException;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
-import com.sparta.ssaktium.domain.comments.dto.response.CommentSimpleResponseDto;
-import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
@@ -45,14 +45,22 @@ public class BoardService {
                                            List<MultipartFile> imageList) {
         //유저 확인
         User user = userService.findUser(userId);
-        // 업로드한 파일의 S3 URL 주소
-        List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
+
         //제공받은 정보로 새 보드 만들기
         Board board = new Board(requestDto.getTitle(),
                 requestDto.getContents(),
                 requestDto.getPublicStatus(),
-                user,
-                imageUrl);
+                user);
+
+        // 업로드한 파일의 S3 URL 주소
+        List<String> imageUrls = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
+
+        List<BoardImages> boardImages = new ArrayList<>();
+        for (String imageUrl : imageUrls) {
+            BoardImages boardImage = new BoardImages(imageUrl, board);
+            boardImages.add(boardImage);
+        }
+
         //저장
         Board savedBoard = boardRepository.save(board);
         //responseDto 반환
@@ -61,9 +69,9 @@ public class BoardService {
 
     @Transactional
     public BoardUpdateImageDto updateImages(Long userId,
-                                                  Long id,
-                                                  List<MultipartFile> imageList,
-                                                  List<String> remainingImages) {
+                                            Long id,
+                                            List<MultipartFile> imageList,
+                                            List<String> remainingImages) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
@@ -72,16 +80,19 @@ public class BoardService {
         if (!board.getUser().equals(user)) {
             throw new NotUserOfBoardException();
         }
-
-        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        List<String> imageUrls = board.getImageList();
+        // 기존 등록된 URL로 리스트 생성하기
+        List<BoardImages> existingImages = board.getImageUrls();
+        List<String> imageUrls = existingImages.stream()
+                .map(BoardImages::getImageUrl)
+                .toList();
 
         //가져온 이미지 리스트 삭제
         for (String imageUrl : imageUrls) {
             if (!remainingImages.contains(imageUrl)) {
-                s3Service.deleteObject(s3Service.bucket, imageUrl);
-            } // 반복적으로 삭제
+                s3Service.deleteObject(s3Service.bucket, imageUrl); //S3에서 삭제
+            }
         }
+
         // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
         List<String> updatedImageList = new ArrayList<>(remainingImages);
         for (MultipartFile image : imageList) {
@@ -94,7 +105,6 @@ public class BoardService {
         }
 
         //게시글 수정
-        board.updateImagesBoards(updatedImageList);
         boardRepository.save(board);
         //responseDto 반환
         return new BoardUpdateImageDto(updatedImageList);
@@ -138,11 +148,14 @@ public class BoardService {
                 throw new NotUserOfBoardException();
             }
         }
-        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        List<String> imageUrls = s3Service.extractFileNamesFromUrls(board.getImageList());
 
+        List<String> imageUrls = board.getImageUrls().stream()
+                .map(BoardImages::getImageUrl)
+                .toList();
+        // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
+        List<String> deletedImages = s3Service.extractFileNamesFromUrls(imageUrls);
         //가져온 이미지 리스트 삭제
-        for (String imageurl : imageUrls) {
+        for (String imageurl : deletedImages) {
             s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
         }
         //해당 보드 삭제 상태 변경
@@ -153,73 +166,41 @@ public class BoardService {
     //게시글 단건 조회
     public BoardDetailResponseDto getBoard(Long id) {
         //게시글 찾기
-        Board board = getBoardById(id);
-        //댓글 찾기
-        List<Comment> commentList = board.getComments();
+        Board board = boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED).orElseThrow(NotFoundBoardException::new);
+        // 댓글 수 가져오기
+        int commentCount = boardRepository.countCommentsByBoardId(board.getId());
 
-        List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
-        for (Comment comments : commentList) {
-            dtoList.add(new CommentSimpleResponseDto(comments.getId(),
-                    comments.getContent(),
-                    comments.getModifiedAt(),
-                    comments.getCommentLikesCount()));
-        }
-
-        return new BoardDetailResponseDto(board, dtoList);
+        return new BoardDetailResponseDto(board, commentCount);
     }
 
-    //내게시글 조회
-    public Page<BoardDetailResponseDto> getMyBoards(Long userId, int page, int size) {
-        //사용자 찾기
-        User user = userService.findUser(userId);
-        //페이지 요청 객체 생성 (페이지 숫자가 실제로는 0부터 시작하므로 원하는 숫자 -1을 입력해야 해당 페이지가 나온다)
-        Pageable pageable = PageRequest.of(page - 1, size);
-        //해당 유저가 쓴 게시글 페이지네이션해서 가져오기
-        Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, pageable);
+    public Page<BoardDetailResponseDto> getBoards(Long userId, String type, int page, int size) {
 
-        // BoardsPageResponseDto 생성
+        Pageable pageable = PageRequest.of(page - 1, size);
         List<BoardDetailResponseDto> boardDetails = new ArrayList<>();
-        for (Board board : boards) {
-            // 댓글 리스트 가져오기
-            List<Comment> commentList = board.getComments();
-            List<CommentSimpleResponseDto> dtoList = new ArrayList<>();
-            for (Comment comment : commentList) {
-                dtoList.add(new CommentSimpleResponseDto(
-                        comment.getId(),
-                        comment.getContent(),
-                        comment.getModifiedAt(),
-                        comment.getCommentLikesCount()
-                ));
+
+        if ("me".equalsIgnoreCase(type)) {
+            // 사용자가 쓴 게시글 조회
+            User user = userService.findUser(userId);
+            Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, pageable);
+
+            for (Board board : boards) {
+                int commentCount = boardRepository.countCommentsByBoardId(board.getId());
+                boardDetails.add(new BoardDetailResponseDto(board, commentCount));
             }
-            // BoardDetailResponseDto 생성
-            boardDetails.add(new BoardDetailResponseDto(board, dtoList));
-        }
-        return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
-    }
+            return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
 
-    //전체게시글 조회
-    public Page<BoardDetailResponseDto> getAllBoards(int page, int size) {
+        } else if ("all".equalsIgnoreCase(type)) {
+            // 전체 공개 게시글 조회
+            Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL, pageable);
 
-        Pageable pageable = PageRequest.of(page - 1, size);
-
-        Page<Board> boardsPage = boardRepository.findAllByPublicStatus(PublicStatus.ALL, pageable);
-
-        List<BoardDetailResponseDto> dtoList = new ArrayList<>();
-        for (Board board : boardsPage.getContent()) {
-            // 댓글 리스트 가져오기
-            List<Comment> commentList = board.getComments();
-            List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
-            for (Comment comment : commentList) {
-                commentDtos.add(new CommentSimpleResponseDto(
-                        comment.getId(),
-                        comment.getContent(),
-                        comment.getModifiedAt(),
-                        comment.getCommentLikesCount()
-                ));
+            for (Board board : boardsPage.getContent()) {
+                int commentCount = boardRepository.countCommentsByBoardId(board.getId());
+                boardDetails.add(new BoardDetailResponseDto(board, commentCount));
             }
-            dtoList.add(new BoardDetailResponseDto(board, commentDtos));
+            return new PageImpl<>(boardDetails, pageable, boardsPage.getTotalElements());
+        } else {
+            throw new InvalidBoardTypeException();
         }
-        return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
 
     //뉴스피드
@@ -243,25 +224,16 @@ public class BoardService {
         List<BoardDetailResponseDto> dtoList = new ArrayList<>();
         for (Board board : boardsPage) {
             // 댓글 리스트 가져오기
-            List<Comment> commentList = board.getComments();
-            List<CommentSimpleResponseDto> commentDtos = new ArrayList<>();
-            for (Comment comment : commentList) {
-                commentDtos.add(new CommentSimpleResponseDto(
-                        comment.getId(),
-                        comment.getContent(),
-                        comment.getModifiedAt(),
-                        comment.getCommentLikesCount()
-                ));
-            }
-            // BoardDetailResponseDto 생성
-            dtoList.add(new BoardDetailResponseDto(board, commentDtos));
+            int commentCount = boardRepository.countCommentsByBoardId(board.getId());
+            // 댓글 리스트 대신 댓글 수만 포함하는 DTO 생성
+            dtoList.add(new BoardDetailResponseDto(board, commentCount));
         }
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
 
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
-        return boardRepository.findActiveBoardById(id, StatusEnum.ACTIVATED)
+        return boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED)
                 .orElseThrow(NotFoundBoardException::new);
     }
 }

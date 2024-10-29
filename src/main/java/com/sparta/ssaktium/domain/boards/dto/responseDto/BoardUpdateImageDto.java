@@ -7,9 +7,9 @@ import java.util.List;
 @Getter
 public class BoardUpdateImageDto {
 
-    public final List<String> imageList;
+    public final List<String> imageUrls;
 
-    public BoardUpdateImageDto(List<String> imageList) {
-        this.imageList = imageList;
+    public BoardUpdateImageDto(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

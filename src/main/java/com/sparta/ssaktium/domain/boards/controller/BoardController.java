@@ -97,19 +97,14 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(boardService.getBoard(id)));
     }
 
-    /**
-     * 내 게시글 조회
-     *
-     * @param authUser
-     * @param page     볼 페이지
-     * @param size     페이지 크기
-     * @return 내게시글들
-     */
     @GetMapping("/boards")
-    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
-                                                                                 @RequestParam(defaultValue = "1") int page,
-                                                                                 @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser.getUserId(), page, size)));
+    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getBoards(@AuthenticationPrincipal AuthUser authUser,
+                                                                               @RequestParam(defaultValue = "all") String type, // "me" ,"all"
+                                                                               @RequestParam(defaultValue = "1") int page,
+                                                                               @RequestParam(defaultValue = "5") int size) {
+
+        Long userId = (type.equals("all")) ? null : authUser.getUserId(); // "me"일 때만 userId 사용
+        return ResponseEntity.ok(ApiResponse.success(boardService.getBoards(userId, type, page, size)));
     }
 
     /**
@@ -125,18 +120,5 @@ public class BoardController {
                                                                                  @RequestParam(defaultValue = "1") int page,
                                                                                  @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
-    }
-
-    /**
-     * 전체공개 게시글 조회
-     *
-     * @param page
-     * @param size
-     * @return 전체공개 게시글
-     */
-    @GetMapping("/boards/status-all")
-    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
-                                                                                  @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.getAllBoards(page, size)));
     }
 }
