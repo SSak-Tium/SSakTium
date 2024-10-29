@@ -87,9 +87,9 @@ public class User extends Timestamped {
     }
 
     // 유저 정보 변경
-    public void updateUser(String userName, String profileImageUrl) {
-        this.userName = userName;
+    public void updateUser(String profileImageUrl, String userName) {
         this.profileImageUrl = profileImageUrl;
+        this.userName = userName;
     }
 
     // 유저 상태 삭제 처리

@@ -1,11 +1,10 @@
-package com.sparta.ssaktium.domain.users.dto.request;
+package com.sparta.ssaktium.domain.users.dto.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class UserChangeRequestDto {
+public class UserImageResponseDto {
     private final String profileImageUrl;
-    private final String userName;
 }
