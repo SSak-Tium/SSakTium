@@ -25,9 +25,10 @@ public class BoardController {
 
     /**
      * 게시글 작성
+     *
      * @param authUser
      * @param requestDto 게시글 본문작성
-     * @param images 게시글 이미지 첨부
+     * @param images     게시글 이미지 첨부
      * @return 게시글 저장된 내용 리턴
      */
     @PostMapping("/boards")
@@ -39,9 +40,10 @@ public class BoardController {
 
     /**
      * 게시글 이미지 수정
+     *
      * @param authUser
-     * @param id 수정할 게시글 id
-     * @param images 게시글 이미지 첨부
+     * @param id              수정할 게시글 id
+     * @param images          게시글 이미지 첨부
      * @param remainingImages 기존에 있던 이미지 리스트
      * @return 수정된 이미지 리스트
      */
@@ -55,8 +57,9 @@ public class BoardController {
 
     /**
      * 게시글 본문 수정
+     *
      * @param authUser
-     * @param id 수정할 게시글 id
+     * @param id         수정할 게시글 id
      * @param requestDto 게시글 본문
      * @return 게시글 전체 내용 리턴
      */
@@ -69,6 +72,7 @@ public class BoardController {
 
     /**
      * 게시글 삭제상태
+     *
      * @param authUser
      * @param id
      * @return status.ok
@@ -83,6 +87,7 @@ public class BoardController {
 
     /**
      * 게시글 단건 조회
+     *
      * @param id
      * @return 해당 게시글 본문 내용
      */
@@ -94,9 +99,10 @@ public class BoardController {
 
     /**
      * 내 게시글 조회
+     *
      * @param authUser
-     * @param page 볼 페이지
-     * @param size 페이지 크기
+     * @param page     볼 페이지
+     * @param size     페이지 크기
      * @return 내게시글들
      */
     @GetMapping("/boards")
@@ -108,9 +114,10 @@ public class BoardController {
 
     /**
      * 뉴스피드
+     *
      * @param authUser
-     * @param page 볼 페이지
-     * @param size 페이지 크기
+     * @param page     볼 페이지
+     * @param size     페이지 크기
      * @return 나와 내친구들 게시글
      */
     @GetMapping("/newsfeed")
@@ -122,6 +129,7 @@ public class BoardController {
 
     /**
      * 전체공개 게시글 조회
+     *
      * @param page
      * @param size
      * @return 전체공개 게시글
