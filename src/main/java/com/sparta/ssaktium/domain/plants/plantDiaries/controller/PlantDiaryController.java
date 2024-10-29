@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.plants.plantDiaries.controller;
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryRequestDto;
+import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryUpdateRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.service.PlantDiaryService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ public class PlantDiaryController {
      * @param requestDto
      * @param image
      * @return
-     * @throws IOException
      */
     @PostMapping("/plants/{id}/diaries")
     public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> createDiary(@AuthenticationPrincipal AuthUser authUser,
@@ -77,16 +77,14 @@ public class PlantDiaryController {
      * @param id
      * @param diaryId
      * @param requestDto
-     * @param image
      * @return
      */
     @PutMapping("/plants/{id}/diaries/{diaryId}")
     public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> updateDiary(@AuthenticationPrincipal AuthUser authUser,
                                                                           @PathVariable Long id,
                                                                           @PathVariable Long diaryId,
-                                                                          @RequestPart PlantDiaryRequestDto requestDto,
-                                                                          @RequestPart(required = false) MultipartFile image) {
-        PlantDiaryResponseDto responseDto = plantDiaryService.updateDiary(authUser.getUserId(), id, diaryId, requestDto, image);
+                                                                          @RequestPart PlantDiaryUpdateRequestDto requestDto) {
+        PlantDiaryResponseDto responseDto = plantDiaryService.updateDiary(authUser.getUserId(), id, diaryId, requestDto);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -102,5 +100,17 @@ public class PlantDiaryController {
                                                                           @PathVariable Long id,
                                                                           @PathVariable Long diaryId) {
         return ResponseEntity.ok(ApiResponse.success(plantDiaryService.deleteDiary(authUser.getUserId(), id, diaryId)));
+    }
+
+    /**
+     * 수정 이미지 등록 API
+     * @param authUser
+     * @param image
+     * @return
+     */
+    @PostMapping("/diaries/image")
+    public ResponseEntity<ApiResponse<String>> uploadDiaryImage(@AuthenticationPrincipal AuthUser authUser,
+                                                                @RequestParam MultipartFile image) {
+        return ResponseEntity.ok(ApiResponse.success(plantDiaryService.uploadDiaryImage(authUser.getUserId(), image)));
     }
 }

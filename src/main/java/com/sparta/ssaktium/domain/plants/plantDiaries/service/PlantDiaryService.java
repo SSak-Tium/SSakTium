@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.plants.plantDiaries.service;
 import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryRequestDto;
+import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryUpdateRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.entity.PlantDiary;
 import com.sparta.ssaktium.domain.plants.plantDiaries.exception.NotFoundPlantDiaryException;
@@ -82,7 +83,7 @@ public class PlantDiaryService {
     }
 
     @Transactional
-    public PlantDiaryResponseDto updateDiary(Long userId, Long id, Long diaryId, PlantDiaryRequestDto requestDto, MultipartFile image) {
+    public PlantDiaryResponseDto updateDiary(Long userId, Long id, Long diaryId, PlantDiaryUpdateRequestDto requestDto) {
 
         userService.findUser(userId);
 
@@ -96,9 +97,7 @@ public class PlantDiaryService {
 
         s3Service.deleteObject(s3Service.bucket, imageName);
 
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-
-        plantDiary.update(requestDto.getContent(), requestDto.getItemDate(), imageUrl);
+        plantDiary.update(requestDto.getContent(), requestDto.getItemDate(), requestDto.getImageUrl());
 
         plantDiaryRepository.save(plantDiary);
 
@@ -124,6 +123,16 @@ public class PlantDiaryService {
 
         return "정상적으로 삭제되었습니다.";
     }
+
+    public String uploadDiaryImage(Long userId, MultipartFile image) {
+
+        userService.findUser(userId);
+
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+
+        return imageUrl;
+    }
+
 
     private void validateOwner(Long userId, PlantDiary plantDiary) {
         if (!plantDiary.getUser().getId().equals(userId)) {
