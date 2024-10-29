@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.tools.Diagnostic;
+
 @Getter
 @Entity
 @NoArgsConstructor
@@ -24,13 +26,19 @@ public class Dictionary {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Dictionary(String title, String content, User user, String imageUrl) {
+    private Dictionary(String title, String content, User user, String imageUrl) {
         this.title = title;
         this.content = content;
         this.user = user;
         this.imageUrl = imageUrl;
     }
 
+    // 식물도감 생성
+    public static Dictionary addDictionary(String title, String content, User user, String imageUrl) {
+        return new Dictionary(title, content, user, imageUrl);
+    }
+
+    // 식물도감 수정
     public void update(DictionaryUpdateRequestDto dictionaryUpdateRequestDto) {
         this.title = dictionaryUpdateRequestDto.getTitle();
         this.content = dictionaryUpdateRequestDto.getContent();

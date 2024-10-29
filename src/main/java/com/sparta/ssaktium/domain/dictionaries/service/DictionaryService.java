@@ -40,7 +40,7 @@ public class DictionaryService {
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
         // Entity 생성
-        Dictionary dictionary = new Dictionary(dictionaryRequestDto.getTitle(), dictionaryRequestDto.getContent(), user, imageUrl);
+        Dictionary dictionary = Dictionary.addDictionary(dictionaryRequestDto.getTitle(), dictionaryRequestDto.getContent(), user, imageUrl);
 
         // DB 저장
         Dictionary savedDictionary = dictionaryRepository.save(dictionary);
@@ -64,7 +64,7 @@ public class DictionaryService {
     // 식물도감 리스트 조회
     public Page<DictionaryListResponseDto> getDictionaryList(long userId, int page, int size) {
         // 유저 조회
-        User user = userService.findUser(userId);
+        userService.findUser(userId);
 
         // Pageable 객체 생성
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -73,7 +73,7 @@ public class DictionaryService {
         Page<Dictionary> dictionariesPage = dictionaryRepository.findAll(pageable);
 
         // Dto 변환
-        return dictionariesPage.map(dictionary -> new DictionaryListResponseDto(dictionary.getTitle(), user.getUserName()));
+        return dictionariesPage.map(dictionary -> new DictionaryListResponseDto(dictionary.getTitle()));
     }
 
     // 식물도감 수정
