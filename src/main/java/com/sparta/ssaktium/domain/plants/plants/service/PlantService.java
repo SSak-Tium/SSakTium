@@ -45,11 +45,7 @@ public class PlantService {
 
     public PlantResponseDto getPlant(Long userId, Long id) {
 
-        userService.findUser(userId);
-
-        Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
-
-        validateOwner(userId, plant);
+        Plant plant = plantRepository.findByPlantIdAndUserId(id, userId).orElseThrow(NotFoundPlantException::new);
 
         return new PlantResponseDto(plant);
     }
@@ -58,7 +54,7 @@ public class PlantService {
 
         User user = userService.findUser(userId);
 
-        List<Plant> plantList = plantRepository.findByUser(user);
+        List<Plant> plantList = plantRepository.findAllByUser(user);
 
         if (plantList.isEmpty()) {
             throw new UauthorizedAccessException();
@@ -72,11 +68,7 @@ public class PlantService {
     @Transactional
     public PlantResponseDto updatePlant(Long userId, Long id, PlantUpdateRequestDto requestDto) {
 
-        userService.findUser(userId);
-
-        Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
-
-        validateOwner(userId, plant);
+        Plant plant = plantRepository.findByPlantIdAndUserId(id, userId).orElseThrow(NotFoundPlantException::new);
 
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
@@ -92,11 +84,7 @@ public class PlantService {
     @Transactional
     public String deletePlant(Long userId, Long id) {
 
-        userService.findUser(userId);
-
-        Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
-
-        validateOwner(userId, plant);
+        Plant plant = plantRepository.findByPlantIdAndUserId(id, userId).orElseThrow(NotFoundPlantException::new);
 
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
@@ -107,22 +95,13 @@ public class PlantService {
         return "정상적으로 삭제되었습니다.";
     }
 
-    public String uploadPlantImage(Long userId, MultipartFile image) {
-        userService.findUser(userId);
+    public String uploadPlantImage(MultipartFile image) {
 
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-
-        return imageUrl;
+        return s3Service.uploadImageToS3(image, s3Service.bucket);
 
     }
 
-    public Plant findPlant(Long id) {
-        return plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
-    }
-
-    public void validateOwner(Long userId, Plant plant) {
-        if (!plant.getUser().getId().equals(userId)) {
-            throw new UauthorizedAccessException();
-        }
+    public Plant findPlant(Long id, Long userId) {
+        return plantRepository.findByPlantIdAndUserId(id, userId).orElseThrow(NotFoundPlantException::new);
     }
 }
