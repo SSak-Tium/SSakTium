@@ -78,7 +78,7 @@ public class User extends Timestamped {
     }
 
     public static User addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
-        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), userRole);
+        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), null, userRole);
     }
 
     // 유저 비밀번호 변경
