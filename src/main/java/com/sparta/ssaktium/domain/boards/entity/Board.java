@@ -9,12 +9,14 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "boards")
 public class Board extends Timestamped {
 
     @Id
@@ -35,6 +37,7 @@ public class Board extends Timestamped {
     private User user;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @BatchSize(size = 15)
     private List<Comment> comments;
 
     @Enumerated(EnumType.STRING)

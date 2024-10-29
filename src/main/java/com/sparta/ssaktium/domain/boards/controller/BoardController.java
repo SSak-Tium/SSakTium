@@ -27,8 +27,9 @@ public class BoardController {
      * 게시글 작성
      *
      * @param authUser
-     * @param requestDto
-     * @return
+     * @param requestDto 게시글 본문작성
+     * @param images     게시글 이미지 첨부
+     * @return 게시글 저장된 내용 리턴
      */
     @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
@@ -41,7 +42,10 @@ public class BoardController {
      * 게시글 이미지 수정
      *
      * @param authUser
-     * @param id
+     * @param id              수정할 게시글 id
+     * @param images          게시글 이미지 첨부
+     * @param remainingImages 기존에 있던 이미지 리스트
+     * @return 수정된 이미지 리스트
      */
     @PostMapping("/boards/{id}/images")
     public ResponseEntity<ApiResponse<BoardUpdateImageDto>> updateImagesBoard(@AuthenticationPrincipal AuthUser authUser,
@@ -52,10 +56,12 @@ public class BoardController {
     }
 
     /**
-     * 게시글 내용 수정
+     * 게시글 본문 수정
      *
      * @param authUser
-     * @param id
+     * @param id         수정할 게시글 id
+     * @param requestDto 게시글 본문
+     * @return 게시글 전체 내용 리턴
      */
     @PutMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoardContent(@AuthenticationPrincipal AuthUser authUser,
@@ -65,10 +71,11 @@ public class BoardController {
     }
 
     /**
-     * 게시글 삭제변환
+     * 게시글 삭제상태
      *
      * @param authUser
      * @param id
+     * @return status.ok
      */
     @DeleteMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
@@ -82,7 +89,7 @@ public class BoardController {
      * 게시글 단건 조회
      *
      * @param id
-     * @return
+     * @return 해당 게시글 본문 내용
      */
     @GetMapping("/boards/{id}")
     public ResponseEntity<ApiResponse<BoardDetailResponseDto>> getBoard(@PathVariable Long id) {
@@ -94,8 +101,9 @@ public class BoardController {
      * 내 게시글 조회
      *
      * @param authUser
-     * @param page
-     * @param size     댓글 페이지네이션 빠져있음
+     * @param page     볼 페이지
+     * @param size     페이지 크기
+     * @return 내게시글들
      */
     @GetMapping("/boards")
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
@@ -108,8 +116,9 @@ public class BoardController {
      * 뉴스피드
      *
      * @param authUser
-     * @param page
-     * @param size
+     * @param page     볼 페이지
+     * @param size     페이지 크기
+     * @return 나와 내친구들 게시글
      */
     @GetMapping("/newsfeed")
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
@@ -119,11 +128,11 @@ public class BoardController {
     }
 
     /**
-     * 게시글 전체 조회
+     * 전체공개 게시글 조회
      *
      * @param page
      * @param size
-     * @return
+     * @return 전체공개 게시글
      */
     @GetMapping("/boards/status-all")
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
