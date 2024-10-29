@@ -48,11 +48,11 @@ public class BoardController {
      * @return 수정된 이미지 리스트
      */
     @PostMapping("/boards/{id}/images")
-    public ResponseEntity<ApiResponse<BoardUpdateImageDto>> updateImagesBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                              @PathVariable Long id,
-                                                                              @RequestPart(value = "newimages", required = false) List<MultipartFile> images,
-                                                                              @RequestPart(value = "images", required = false) List<String> remainingImages) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateImagesBoards(authUser.getUserId(), id, images, remainingImages)));
+    public ResponseEntity<ApiResponse<BoardUpdateImageDto>> updateImages(@AuthenticationPrincipal AuthUser authUser,
+                                                                         @PathVariable Long id,
+                                                                         @RequestPart(value = "newimages", required = false) List<MultipartFile> images,
+                                                                         @RequestPart(value = "images", required = false) List<String> remainingImages) {
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateImages(authUser.getUserId(), id, images, remainingImages)));
     }
 
     /**

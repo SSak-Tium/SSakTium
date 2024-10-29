@@ -40,13 +40,19 @@ public class BoardService {
 
 
     @Transactional
-    public BoardSaveResponseDto saveBoards(Long userId, BoardSaveRequestDto requestDto, List<MultipartFile> imageList) {
+    public BoardSaveResponseDto saveBoards(Long userId,
+                                           BoardSaveRequestDto requestDto,
+                                           List<MultipartFile> imageList) {
         //유저 확인
         User user = userService.findUser(userId);
         // 업로드한 파일의 S3 URL 주소
         List<String> imageUrl = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
         //제공받은 정보로 새 보드 만들기
-        Board board = new Board(requestDto.getTitle(), requestDto.getContents(), requestDto.getPublicStatus(), user, imageUrl);
+        Board board = new Board(requestDto.getTitle(),
+                requestDto.getContents(),
+                requestDto.getPublicStatus(),
+                user,
+                imageUrl);
         //저장
         Board savedBoard = boardRepository.save(board);
         //responseDto 반환
@@ -54,7 +60,10 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardUpdateImageDto updateImagesBoards(Long userId, Long id, List<MultipartFile> imageList, List<String> remainingImages) {
+    public BoardUpdateImageDto updateImages(Long userId,
+                                                  Long id,
+                                                  List<MultipartFile> imageList,
+                                                  List<String> remainingImages) {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
@@ -92,7 +101,9 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponseDto updateBoardContent(Long userId, Long id, BoardSaveRequestDto requestDto) {
+    public BoardSaveResponseDto updateBoardContent(Long userId,
+                                                   Long id,
+                                                   BoardSaveRequestDto requestDto) {
         // 유저 확인
         User user = userService.findUser(userId);
         // 게시글 찾기
@@ -119,24 +130,24 @@ public class BoardService {
         //유저 확인
         User user = userService.findUser(userId);
         //게시글 찾기
-        Board deleteBoard = getBoardById(id);
+        Board board = getBoardById(id);
         //어드민 일시 본인 확인 넘어가기
         if (!user.getUserRole().equals(UserRole.ROLE_ADMIN)) {
             //게시글 본인 확인
-            if (!deleteBoard.getUser().equals(user)) {
+            if (!board.getUser().equals(user)) {
                 throw new NotUserOfBoardException();
             }
         }
         // 기존 등록된 URL 가지고 이미지 원본 이름 가져오기
-        List<String> imageUrls = s3Service.extractFileNamesFromUrls(deleteBoard.getImageList());
+        List<String> imageUrls = s3Service.extractFileNamesFromUrls(board.getImageList());
 
         //가져온 이미지 리스트 삭제
         for (String imageurl : imageUrls) {
             s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
         }
         //해당 보드 삭제 상태 변경
-        deleteBoard.deleteBoards();
-        boardRepository.save(deleteBoard);
+        board.deleteBoards();
+        boardRepository.save(board);
     }
 
     //게시글 단건 조회
