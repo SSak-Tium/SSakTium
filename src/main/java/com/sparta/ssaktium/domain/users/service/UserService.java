@@ -58,6 +58,7 @@ public class UserService {
     }
 
     // 유저 회원정보 수정
+    @Transactional
     public UserResponseDto updateUser(long userId, UserChangeRequestDto userChangeRequestDto) {
         // 유저 조회
         User user = findUser(userId);
@@ -96,14 +97,14 @@ public class UserService {
             throw new UnauthorizedPasswordException();
         }
 
-        // UserStatus DELETED 로 수정
-        user.delete();
+        // soft delete
+        userRepository.delete(user);
 
         return "회원탈퇴가 정상적으로 완료되었습니다.";
     }
 
     // 유저 조회 메서드 ( id )
     public User findUser(long userId) {
-        return userRepository.findByIdAndUserStatus(userId, UserStatus.ACTIVE).orElseThrow(NotFoundUserException::new);
+        return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
     }
 }
