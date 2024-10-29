@@ -2,6 +2,7 @@ package com.sparta.ssaktium.domain.plants.plants.controller;
 
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantUpdateRequestDto;
 import com.sparta.ssaktium.domain.plants.plants.dto.responseDto.PlantResponseDto;
 import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.plants.service.PlantService;
@@ -28,7 +29,6 @@ public class PlantController {
      * @param requestDto
      * @param image
      * @return
-     * @throws IOException
      */
     @PostMapping("/plants")
     public ResponseEntity<ApiResponse<PlantResponseDto>> createPlant(@AuthenticationPrincipal AuthUser authUser,
@@ -66,12 +66,18 @@ public class PlantController {
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
+    /**
+     *
+     * @param authUser
+     * @param id
+     * @param requestDto
+     * @return
+     */
     @PutMapping("/plants/{id}")
     public ResponseEntity<ApiResponse<PlantResponseDto>> updatePlant(@AuthenticationPrincipal AuthUser authUser,
                                                                      @PathVariable Long id,
-                                                                     @RequestPart PlantRequestDto requestDto,
-                                                                     @RequestPart(required = false) MultipartFile image) {
-        PlantResponseDto responseDto = plantService.updatePlant(authUser.getUserId(), id, requestDto, image);
+                                                                     @RequestPart PlantUpdateRequestDto requestDto) {
+        PlantResponseDto responseDto = plantService.updatePlant(authUser.getUserId(), id, requestDto);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
@@ -86,5 +92,17 @@ public class PlantController {
     public ResponseEntity<ApiResponse<String>> deletePlant(@AuthenticationPrincipal AuthUser authUser,
                                                            @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(plantService.deletePlant(authUser.getUserId(), id)));
+    }
+
+    /**
+     * 수정 시 이미지 등록 API
+     * @param authUser
+     * @param image
+     * @return
+     */
+    @PostMapping("/plants/image")
+    public ResponseEntity<ApiResponse<String>> uploadPlantImage(@AuthenticationPrincipal AuthUser authUser,
+                                                                @RequestPart MultipartFile image) {
+        return ResponseEntity.ok(ApiResponse.success(plantService.uploadPlantImage(authUser.getUserId(), image)));
     }
 }

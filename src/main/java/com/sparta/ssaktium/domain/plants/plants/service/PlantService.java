@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.plants.plants.service;
 import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantRequestDto;
+import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantUpdateRequestDto;
 import com.sparta.ssaktium.domain.plants.plants.dto.responseDto.PlantResponseDto;
 import com.sparta.ssaktium.domain.plants.plants.entity.Plant;
 import com.sparta.ssaktium.domain.plants.plants.exception.NotFoundPlantException;
@@ -69,7 +70,7 @@ public class PlantService {
     }
 
     @Transactional
-    public PlantResponseDto updatePlant(Long userId, Long id, PlantRequestDto requestDto, MultipartFile image) {
+    public PlantResponseDto updatePlant(Long userId, Long id, PlantUpdateRequestDto requestDto) {
 
         userService.findUser(userId);
 
@@ -81,9 +82,7 @@ public class PlantService {
 
         s3Service.deleteObject(s3Service.bucket, imageName);
 
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-
-        plant.update(requestDto.getPlantName(), requestDto.getPlantNickname(), imageUrl);
+        plant.update(requestDto.getPlantName(), requestDto.getPlantNickname(), requestDto.getImageUrl());
 
         plantRepository.save(plant);
 
@@ -108,6 +107,15 @@ public class PlantService {
         return "정상적으로 삭제되었습니다.";
     }
 
+    public String uploadPlantImage(Long userId, MultipartFile image) {
+        userService.findUser(userId);
+
+        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+
+        return imageUrl;
+
+    }
+
     public Plant findPlant (Long id) {
         return plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
     }
@@ -117,5 +125,4 @@ public class PlantService {
             throw new UauthorizedAccessException();
         }
     }
-
 }
