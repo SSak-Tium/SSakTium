@@ -28,7 +28,9 @@ public class UserController {
      * @return
      */
     @GetMapping("/v1/users/{userId}")
-    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@PathVariable long userId) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(
+            @PathVariable long userId
+    ) {
         return ResponseEntity.ok(ApiResponse.success(userService.getUser(userId)));
     }
 
@@ -40,7 +42,10 @@ public class UserController {
      * @return
      */
     @PostMapping("/v1/users/change-password")
-    public ResponseEntity<ApiResponse<String>> changePassword(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto) {
+    public ResponseEntity<ApiResponse<String>> changePassword(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto
+    ) {
         return ResponseEntity.ok(ApiResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
     }
 
@@ -83,7 +88,10 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/v1/users")
-    public ResponseEntity<ApiResponse<String>> deleteUser(@AuthenticationPrincipal AuthUser authUser, @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
+    public ResponseEntity<ApiResponse<String>> deleteUser(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto
+    ) {
         return ResponseEntity.ok(ApiResponse.success(userService.deleteUser(authUser.getUserId(), userCheckPasswordRequestDto)));
     }
 }

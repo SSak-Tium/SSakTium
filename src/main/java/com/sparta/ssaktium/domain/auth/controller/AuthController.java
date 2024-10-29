@@ -26,7 +26,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/v1/auth/signup")
-    public ResponseEntity<ApiResponse<SignupResponseDto>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<ApiResponse<SignupResponseDto>> signup(
+            @Valid @RequestBody SignupRequestDto signupRequestDto
+    ) {
         return ResponseEntity.ok(ApiResponse.success(authService.signup(signupRequestDto)));
     }
 
@@ -36,7 +38,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/v1/auth/signin")
-    public ResponseEntity<ApiResponse<SigninResponseDto>> signin(@Valid @RequestBody SigninRequestDto signinRequestDto) {
+    public ResponseEntity<ApiResponse<SigninResponseDto>> signin(
+            @Valid @RequestBody SigninRequestDto signinRequestDto
+    ) {
         return ResponseEntity.ok(ApiResponse.success(authService.signin(signinRequestDto)));
     }
 }
