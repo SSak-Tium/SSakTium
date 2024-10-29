@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.boards.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
@@ -32,10 +32,10 @@ public class BoardController {
      * @return 게시글 저장된 내용 리턴
      */
     @PostMapping("/boards")
-    public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                       @RequestPart BoardSaveRequestDto requestDto,
-                                                                       @RequestPart(value = "image", required = false) List<MultipartFile> images) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, images)));
+    public ResponseEntity<CommonResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                          @RequestPart BoardSaveRequestDto requestDto,
+                                                                          @RequestPart(value = "image", required = false) List<MultipartFile> images) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, images)));
     }
 
     /**
@@ -48,11 +48,11 @@ public class BoardController {
      * @return 수정된 이미지 리스트
      */
     @PostMapping("/boards/{id}/images")
-    public ResponseEntity<ApiResponse<BoardUpdateImageDto>> updateImagesBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                              @PathVariable Long id,
-                                                                              @RequestPart(value = "newimages", required = false) List<MultipartFile> images,
-                                                                              @RequestPart(value = "images", required = false) List<String> remainingImages) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateImagesBoards(authUser.getUserId(), id, images, remainingImages)));
+    public ResponseEntity<CommonResponse<BoardUpdateImageDto>> updateImagesBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                                 @PathVariable Long id,
+                                                                                 @RequestPart(value = "newimages", required = false) List<MultipartFile> images,
+                                                                                 @RequestPart(value = "images", required = false) List<String> remainingImages) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.updateImagesBoards(authUser.getUserId(), id, images, remainingImages)));
     }
 
     /**
@@ -64,10 +64,10 @@ public class BoardController {
      * @return 게시글 전체 내용 리턴
      */
     @PutMapping("/boards/{id}")
-    public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoardContent(@AuthenticationPrincipal AuthUser authUser,
-                                                                                @PathVariable Long id,
-                                                                                @RequestPart BoardSaveRequestDto requestDto) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoardContent(authUser.getUserId(), id, requestDto)));
+    public ResponseEntity<CommonResponse<BoardSaveResponseDto>> updateBoardContent(@AuthenticationPrincipal AuthUser authUser,
+                                                                                   @PathVariable Long id,
+                                                                                   @RequestPart BoardSaveRequestDto requestDto) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.updateBoardContent(authUser.getUserId(), id, requestDto)));
     }
 
     /**
@@ -78,10 +78,10 @@ public class BoardController {
      * @return status.ok
      */
     @DeleteMapping("/boards/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                         @PathVariable Long id) {
+    public ResponseEntity<CommonResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                            @PathVariable Long id) {
         boardService.deleteBoards(authUser.getUserId(), id);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(CommonResponse.success(null));
     }
 
 
@@ -92,9 +92,9 @@ public class BoardController {
      * @return 해당 게시글 본문 내용
      */
     @GetMapping("/boards/{id}")
-    public ResponseEntity<ApiResponse<BoardDetailResponseDto>> getBoard(@PathVariable Long id) {
+    public ResponseEntity<CommonResponse<BoardDetailResponseDto>> getBoard(@PathVariable Long id) {
         boardService.getBoard(id);
-        return ResponseEntity.ok(ApiResponse.success(boardService.getBoard(id)));
+        return ResponseEntity.ok(CommonResponse.success(boardService.getBoard(id)));
     }
 
     /**
@@ -106,10 +106,10 @@ public class BoardController {
      * @return 내게시글들
      */
     @GetMapping("/boards")
-    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
-                                                                                 @RequestParam(defaultValue = "1") int page,
-                                                                                 @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser.getUserId(), page, size)));
+    public ResponseEntity<CommonResponse<Page<BoardDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
+                                                                                    @RequestParam(defaultValue = "1") int page,
+                                                                                    @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.getMyBoards(authUser.getUserId(), page, size)));
     }
 
     /**
@@ -121,10 +121,10 @@ public class BoardController {
      * @return 나와 내친구들 게시글
      */
     @GetMapping("/newsfeed")
-    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
-                                                                                 @RequestParam(defaultValue = "1") int page,
-                                                                                 @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
+    public ResponseEntity<CommonResponse<Page<BoardDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
+                                                                                    @RequestParam(defaultValue = "1") int page,
+                                                                                    @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
 
     /**
@@ -135,8 +135,8 @@ public class BoardController {
      * @return 전체공개 게시글
      */
     @GetMapping("/boards/status-all")
-    public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
-                                                                                  @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(boardService.getAllBoards(page, size)));
+    public ResponseEntity<CommonResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
+                                                                                     @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.getAllBoards(page, size)));
     }
 }

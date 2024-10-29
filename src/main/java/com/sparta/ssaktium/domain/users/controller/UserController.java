@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.users.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.dto.request.UserChangePasswordRequestDto;
 import com.sparta.ssaktium.domain.users.dto.request.UserChangeRequestDto;
@@ -28,10 +28,10 @@ public class UserController {
      * @return
      */
     @GetMapping("/v1/users/{userId}")
-    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(
+    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(
             @PathVariable long userId
     ) {
-        return ResponseEntity.ok(ApiResponse.success(userService.getUser(userId)));
+        return ResponseEntity.ok(CommonResponse.success(userService.getUser(userId)));
     }
 
     /**
@@ -42,11 +42,11 @@ public class UserController {
      * @return
      */
     @PostMapping("/v1/users/change-password")
-    public ResponseEntity<ApiResponse<String>> changePassword(
+    public ResponseEntity<CommonResponse<String>> changePassword(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto
     ) {
-        return ResponseEntity.ok(ApiResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
+        return ResponseEntity.ok(CommonResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
     }
 
     /**
@@ -57,11 +57,11 @@ public class UserController {
      * @return
      */
     @PutMapping("/v1/users")
-    public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(
+    public ResponseEntity<CommonResponse<UserResponseDto>> updateUser(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestBody UserChangeRequestDto userChangeRequestDto
     ) {
-        return ResponseEntity.ok(ApiResponse.success(userService.updateUser(authUser.getUserId(), userChangeRequestDto)));
+        return ResponseEntity.ok(CommonResponse.success(userService.updateUser(authUser.getUserId(), userChangeRequestDto)));
     }
 
     /**
@@ -73,11 +73,11 @@ public class UserController {
      */
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/v1/users/image")
-    public ResponseEntity<ApiResponse<UserImageResponseDto>> updateDictionary(
+    public ResponseEntity<CommonResponse<UserImageResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestPart MultipartFile image
     ) {
-        return ResponseEntity.ok(ApiResponse.success(userService.updateUserImage(authUser.getUserId(), image)));
+        return ResponseEntity.ok(CommonResponse.success(userService.updateUserImage(authUser.getUserId(), image)));
     }
 
     /**
@@ -88,10 +88,10 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/v1/users")
-    public ResponseEntity<ApiResponse<String>> deleteUser(
+    public ResponseEntity<CommonResponse<String>> deleteUser(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto
     ) {
-        return ResponseEntity.ok(ApiResponse.success(userService.deleteUser(authUser.getUserId(), userCheckPasswordRequestDto)));
+        return ResponseEntity.ok(CommonResponse.success(userService.deleteUser(authUser.getUserId(), userCheckPasswordRequestDto)));
     }
 }

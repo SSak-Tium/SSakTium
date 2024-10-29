@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.dictionaries.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryRequestDto;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryUpdateRequestDto;
@@ -32,12 +32,12 @@ public class DictionaryController {
      */
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/v1/dictionaries")
-    public ResponseEntity<ApiResponse<DictionaryResponseDto>> createDictionary(
+    public ResponseEntity<CommonResponse<DictionaryResponseDto>> createDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestPart DictionaryRequestDto dictionaryRequestDto,
             @RequestPart MultipartFile image
     ) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto, image)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.createDictionary(authUser.getUserId(), dictionaryRequestDto, image)));
     }
 
     /**
@@ -48,11 +48,11 @@ public class DictionaryController {
      * @return
      */
     @GetMapping("/v1/dictionaries/{id}")
-    public ResponseEntity<ApiResponse<DictionaryResponseDto>> getDictionary(
+    public ResponseEntity<CommonResponse<DictionaryResponseDto>> getDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable long id
     ) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionary(authUser.getUserId(), id)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.getDictionary(authUser.getUserId(), id)));
     }
 
     /**
@@ -63,12 +63,12 @@ public class DictionaryController {
      * @return
      */
     @GetMapping("/v1/dictionaries")
-    public ResponseEntity<ApiResponse<Page<DictionaryListResponseDto>>> getDictionaryList(
+    public ResponseEntity<CommonResponse<Page<DictionaryListResponseDto>>> getDictionaryList(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.getDictionaryList(authUser.getUserId(), page, size)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.getDictionaryList(authUser.getUserId(), page, size)));
     }
 
     /**
@@ -81,12 +81,12 @@ public class DictionaryController {
      */
     @Secured("ROLE_ADMIN")
     @PutMapping(value = "/v1/dictionaries/{id}")
-    public ResponseEntity<ApiResponse<DictionaryResponseDto>> updateDictionary(
+    public ResponseEntity<CommonResponse<DictionaryResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestBody DictionaryUpdateRequestDto dictionaryUpdateRequestDto,
             @PathVariable long id
     ) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, id)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, id)));
     }
 
     /**
@@ -99,12 +99,12 @@ public class DictionaryController {
      */
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/v1/dictionaries/{id}/image")
-    public ResponseEntity<ApiResponse<DictionaryImageResponseDto>> updateDictionary(
+    public ResponseEntity<CommonResponse<DictionaryImageResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable long id,
             @RequestPart MultipartFile image
     ) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.updateDictionaryImage(authUser.getUserId(), id, image)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.updateDictionaryImage(authUser.getUserId(), id, image)));
     }
 
     /**
@@ -116,10 +116,10 @@ public class DictionaryController {
      */
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/v1/dictionaries/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteDictionary(
+    public ResponseEntity<CommonResponse<String>> deleteDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable long id
     ) {
-        return ResponseEntity.ok(ApiResponse.success(dictionaryService.deleteDictionary(authUser.getUserId(), id)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.deleteDictionary(authUser.getUserId(), id)));
     }
 }

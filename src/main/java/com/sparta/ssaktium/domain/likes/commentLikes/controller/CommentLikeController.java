@@ -1,6 +1,6 @@
 package com.sparta.ssaktium.domain.likes.commentLikes.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
 import com.sparta.ssaktium.domain.likes.commentLikes.service.CommentLikeService;
@@ -18,9 +18,9 @@ public class CommentLikeController {
 
     // 좋아요 등록
     @PostMapping
-    public ResponseEntity<ApiResponse<CommentLikeReponseDto>> postCommentLike (@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<CommonResponse<CommentLikeReponseDto>> postCommentLike (@AuthenticationPrincipal AuthUser authUser,
                                                                                @PathVariable Long commentId){
-        return ResponseEntity.ok(ApiResponse.success(commentLikeService.postCommentLike(authUser.getUserId(), commentId)));
+        return ResponseEntity.ok(CommonResponse.success(commentLikeService.postCommentLike(authUser.getUserId(), commentId)));
     }
 
     // 좋아요 취소

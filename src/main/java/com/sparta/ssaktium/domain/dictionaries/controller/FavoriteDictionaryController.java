@@ -1,13 +1,12 @@
 package com.sparta.ssaktium.domain.dictionaries.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.dictionaries.service.FavoriteDictionaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,10 +23,10 @@ public class FavoriteDictionaryController {
      * @return
      */
     @PutMapping(value = "/v1/favorites/dictionaries/{id}")
-    public ResponseEntity<ApiResponse<String>> updateDictionary(
+    public ResponseEntity<CommonResponse<String>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable long id
     ) {
-        return ResponseEntity.ok(ApiResponse.success(favoriteDictionaryService.toggleFavoriteDictionary(authUser.getUserId(), id)));
+        return ResponseEntity.ok(CommonResponse.success(favoriteDictionaryService.toggleFavoriteDictionary(authUser.getUserId(), id)));
     }
 }
