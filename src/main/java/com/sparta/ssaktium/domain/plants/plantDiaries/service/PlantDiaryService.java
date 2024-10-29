@@ -35,9 +35,7 @@ public class PlantDiaryService {
 
         User user = userService.findUser(userId);
 
-        Plant plant = plantService.findPlant(id);
-
-        plantService.validateOwner(userId, plant);
+        Plant plant = plantService.findPlant(id, userId);
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
@@ -56,11 +54,9 @@ public class PlantDiaryService {
 
     public Page<PlantDiaryResponseDto> getAllDiaries(Long userId, Long id, int page, int size) {
 
-        userService.findUser(userId);
-
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<PlantDiary> plantDiaryPage = plantDiaryRepository.findAllByPlantId(id, pageable);
+        Page<PlantDiary> plantDiaryPage = plantDiaryRepository.findAllByPlantIdAndUserId(id, userId, pageable);
 
         if (plantDiaryPage.isEmpty()) {
             throw new UauthorizedAccessException();
@@ -71,13 +67,9 @@ public class PlantDiaryService {
 
     public PlantDiaryResponseDto getDiary(Long userId, Long id, Long diaryId) {
 
-        userService.findUser(userId);
-
-        plantService.findPlant(id);
+        plantService.findPlant(id, userId);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
-
-        validateOwner(userId, plantDiary);
 
         return new PlantDiaryResponseDto(plantDiary);
     }
@@ -85,13 +77,10 @@ public class PlantDiaryService {
     @Transactional
     public PlantDiaryResponseDto updateDiary(Long userId, Long id, Long diaryId, PlantDiaryUpdateRequestDto requestDto) {
 
-        userService.findUser(userId);
-
-        plantService.findPlant(id);
+        plantService.findPlant(id, userId);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
 
-        validateOwner(userId, plantDiary);
 
         String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
 
@@ -105,38 +94,21 @@ public class PlantDiaryService {
     }
 
     @Transactional
-    public String deleteDiary(Long userId, Long id, Long diaryId) {
+    public void deleteDiary(Long userId, Long id, Long diaryId) {
 
-        userService.findUser(userId);
-
-        plantService.findPlant(id);
+        plantService.findPlant(id, userId);
 
         PlantDiary plantDiary = plantDiaryRepository.findById(diaryId).orElseThrow(NotFoundPlantDiaryException::new);
-
-        validateOwner(userId, plantDiary);
 
         String imageName = s3Service.extractFileNameFromUrl(plantDiary.getImageUrl());
 
         s3Service.deleteObject(s3Service.bucket, imageName);
 
         plantDiaryRepository.delete(plantDiary);
-
-        return "정상적으로 삭제되었습니다.";
     }
 
-    public String uploadDiaryImage(Long userId, MultipartFile image) {
+    public String uploadDiaryImage(MultipartFile image) {
 
-        userService.findUser(userId);
-
-        String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-
-        return imageUrl;
-    }
-
-
-    private void validateOwner(Long userId, PlantDiary plantDiary) {
-        if (!plantDiary.getUser().getId().equals(userId)) {
-            throw new UauthorizedAccessException();
-        }
+        return s3Service.uploadImageToS3(image, s3Service.bucket);
     }
 }
