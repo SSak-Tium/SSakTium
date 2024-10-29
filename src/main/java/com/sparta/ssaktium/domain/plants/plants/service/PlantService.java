@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.plants.plants.service;
 
+import com.sparta.ssaktium.domain.common.exception.UauthorizedAccessException;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.plants.plants.dto.requestDto.PlantRequestDto;
 import com.sparta.ssaktium.domain.plants.plants.dto.responseDto.PlantResponseDto;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +29,7 @@ public class PlantService {
     @Transactional
     public PlantResponseDto createPlant(Long userId,
                                         PlantRequestDto requestDto,
-                                        MultipartFile image) throws IOException {
+                                        MultipartFile image) {
 
         User user = userService.findUser(userId);
 
@@ -48,6 +48,8 @@ public class PlantService {
 
         Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
+        validateOwner(userId, plant);
+
         return new PlantResponseDto(plant);
     }
 
@@ -57,21 +59,27 @@ public class PlantService {
 
         List<Plant> plantList = plantRepository.findByUser(user);
 
+        if (plantList.isEmpty()) {
+            throw new UauthorizedAccessException();
+        }
+
         return plantList.stream()
                 .map(PlantResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public PlantResponseDto updatePlant(Long userId, Long id, PlantRequestDto requestDto, MultipartFile image) throws IOException {
+    public PlantResponseDto updatePlant(Long userId, Long id, PlantRequestDto requestDto, MultipartFile image) {
 
         userService.findUser(userId);
 
         Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
+        validateOwner(userId, plant);
+
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
-        s3Service.s3Client.deleteObject(s3Service.bucket, imageName);
+        s3Service.deleteObject(s3Service.bucket, imageName);
 
         String imageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
 
@@ -83,15 +91,17 @@ public class PlantService {
     }
 
     @Transactional
-    public String deltePlant(Long userId, Long id) {
+    public String deletePlant(Long userId, Long id) {
 
         userService.findUser(userId);
 
         Plant plant = plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
 
+        validateOwner(userId, plant);
+
         String imageName = s3Service.extractFileNameFromUrl(plant.getImageUrl());
 
-        s3Service.s3Client.deleteObject(s3Service.bucket, imageName);
+        s3Service.deleteObject(s3Service.bucket, imageName);
 
         plantRepository.delete(plant);
 
@@ -101,4 +111,11 @@ public class PlantService {
     public Plant findPlant (Long id) {
         return plantRepository.findById(id).orElseThrow(NotFoundPlantException::new);
     }
+
+    public void validateOwner(Long userId, Plant plant) {
+        if (!plant.getUser().getId().equals(userId)) {
+            throw new UauthorizedAccessException();
+        }
+    }
+
 }

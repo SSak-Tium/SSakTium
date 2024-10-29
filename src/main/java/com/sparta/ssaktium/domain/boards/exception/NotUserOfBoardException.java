@@ -6,5 +6,7 @@ import static com.sparta.ssaktium.domain.common.exception.GlobalExceptionConst.N
 
 
 public class NotUserOfBoardException extends GlobalException {
-    public  NotUserOfBoardException(){super (NOT_USER_OF_BOARD);}
+    public NotUserOfBoardException() {
+        super(NOT_USER_OF_BOARD);
+    }
 }

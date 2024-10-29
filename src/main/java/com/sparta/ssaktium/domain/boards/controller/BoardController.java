@@ -3,8 +3,8 @@ package com.sparta.ssaktium.domain.boards.controller;
 import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
-import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,23 +33,35 @@ public class BoardController {
     @PostMapping("/boards")
     public ResponseEntity<ApiResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                        @RequestPart BoardSaveRequestDto requestDto,
-                                                                       @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, image)));
+                                                                       @RequestPart(value = "image", required = false) List<MultipartFile> images) {
+        return ResponseEntity.ok(ApiResponse.success(boardService.saveBoards(authUser.getUserId(), requestDto, images)));
     }
 
     /**
-     * 게시글 수정
+     * 게시글 이미지 수정
      *
      * @param authUser
      * @param id
-     * @param requestDto
+     */
+    @PostMapping("/boards/{id}/images")
+    public ResponseEntity<ApiResponse<BoardUpdateImageDto>> updateImagesBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                              @PathVariable Long id,
+                                                                              @RequestPart(value = "newimages", required = false) List<MultipartFile> images,
+                                                                              @RequestPart(value = "images", required = false) List<String> remainingImages) {
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateImagesBoards(authUser.getUserId(), id, images, remainingImages)));
+    }
+
+    /**
+     * 게시글 내용 수정
+     *
+     * @param authUser
+     * @param id
      */
     @PutMapping("/boards/{id}")
-    public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                         @PathVariable Long id,
-                                                                         @RequestPart BoardSaveRequestDto requestDto,
-                                                                         @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoards(authUser.getUserId(), id, requestDto, image)));
+    public ResponseEntity<ApiResponse<BoardSaveResponseDto>> updateBoardContent(@AuthenticationPrincipal AuthUser authUser,
+                                                                                @PathVariable Long id,
+                                                                                @RequestPart BoardSaveRequestDto requestDto) {
+        return ResponseEntity.ok(ApiResponse.success(boardService.updateBoardContent(authUser.getUserId(), id, requestDto)));
     }
 
     /**
@@ -87,8 +99,8 @@ public class BoardController {
      */
     @GetMapping("/boards")
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getMyBoards(@AuthenticationPrincipal AuthUser authUser,
-                                                                         @RequestParam(defaultValue = "1") int page,
-                                                                         @RequestParam(defaultValue = "5") int size) {
+                                                                                 @RequestParam(defaultValue = "1") int page,
+                                                                                 @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(ApiResponse.success(boardService.getMyBoards(authUser.getUserId(), page, size)));
     }
 
@@ -106,12 +118,16 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
 
+    /**
+     * 게시글 전체 조회
+     *
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/boards/status-all")
     public ResponseEntity<ApiResponse<Page<BoardDetailResponseDto>>> getAllBoards(@RequestParam(defaultValue = "1") int page,
-                                                                                  @RequestParam(defaultValue = "5") int size){
-        return ResponseEntity.ok(ApiResponse.success(boardService.getAllBoards(page,size)));
+                                                                                  @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(ApiResponse.success(boardService.getAllBoards(page, size)));
     }
-
-//    @GetMapping("/search")
-//    public ResponseEntity<ApiResponse<Page<>>>
 }
