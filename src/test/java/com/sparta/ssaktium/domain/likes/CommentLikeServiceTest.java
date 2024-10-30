@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.likes;
 
+import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
@@ -56,6 +57,19 @@ public class CommentLikeServiceTest {
         assertEquals(1, response.getCommentLikesCount()); // 좋아요 수 증가 검증
     }
 
+    @Test
+    void 댓글_좋아요_등록_실패_댓글이_존재하지_않음() {
+        // given
+        Long userId = 1L;
+        Long commentId = 1L;
+
+        // Mock 설정
+        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NotFoundCommentException.class, () -> commentLikeService.postCommentLike(userId, commentId));
+    }
+
 //    @Test
 //    public void 댓글_좋아요_등록_실패_이미_좋아요를_누른_경우() {
 //        // given
@@ -71,7 +85,7 @@ public class CommentLikeServiceTest {
 //        assertThrows(AlreadyLikedException.class, () ->
 //                commentLikeService.postCommentLike(commentId, authUser));
 //    }
-//
+
 //    @Test
 //    public void 댓글_좋아요_취소_성공() {
 //        // given
