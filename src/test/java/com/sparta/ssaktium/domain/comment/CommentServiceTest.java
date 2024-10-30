@@ -273,9 +273,9 @@ class CommentServiceTest {
 
     // 찾기 메서드 테스트 성공
     @Test
-    public void findComment_성공() throws Exception{
+    public void findComment_성공() throws Exception {
         // given
-        Long commentId =1L;
+        Long commentId = 1L;
 
         // Mock 설정: 찾아올 댓글이 존재하는 경우
         Comment existingComment = new Comment(); // 기존 댓글 객체 생성
@@ -290,15 +290,15 @@ class CommentServiceTest {
 
     // 찾기 메서드 테스트 실패
     @Test
-    public void findComment_실패(){
+    public void findComment_실패() {
         // given
-        Long commentId =1L;
+        Long commentId = 1L;
 
         // when
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
 
         // then
-        assertThrows(NotFoundCommentException.class,()->
+        assertThrows(NotFoundCommentException.class, () ->
                 commentService.findComment(commentId));
     }
 

@@ -109,7 +109,21 @@ public class BoardLikeServiceTest {
     }
 
     @Test
-    public void 게시글_좋아요_취소_실패_좋아요가_없는_경우() {
+    public void 게시글_좋아요_취소_실패_게시글이_존재하지_않음() {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
+        // Mock 설정: 해당 게시글이 존재하지 않는 경우
+        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+
+        // when & then: 예외 발생 검증
+        assertThrows(NotFoundBoardException.class, () ->
+                boardLikeService.deleteBoardLikes(userId, boardId));
+    }
+
+    @Test
+    public void 게시글_좋아요_취소_실패_좋아요가_존재하지_않음() {
         // given
         Long userId = 1L;
         Long boardId = 1L;

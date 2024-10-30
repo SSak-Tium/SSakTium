@@ -3,14 +3,12 @@ package com.sparta.ssaktium.domain.likes;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
 import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
 import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
 import com.sparta.ssaktium.domain.likes.commentLikes.service.CommentLikeService;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
 import com.sparta.ssaktium.domain.likes.exception.NotFoundCommentLikeException;
-import com.sparta.ssaktium.domain.users.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -87,7 +85,7 @@ public class CommentLikeServiceTest {
     @Test
     public void 댓글_좋아요_취소_성공() {
         // given
-        Long userId =1L;
+        Long userId = 1L;
         Long commentId = 1L;
 
         // Mock 설정: 해당 댓글에 좋아요가 있는 경우 + 좋아요 수는 1
@@ -99,14 +97,14 @@ public class CommentLikeServiceTest {
         when(commentLikeRepository.findByCommentIdAndUserId(commentId, userId)).thenReturn(Optional.of(commentLike));
 
         // when: 댓글 좋아요 취소
-        commentLikeService.deleteCommentLike(userId,commentId);
+        commentLikeService.deleteCommentLike(userId, commentId);
 
         // then: 좋아요 수가 감소했는지 확인
         assertEquals(0, comment.getCommentLikesCount()); // 좋아요 수 감소 검증
     }
 
     @Test
-    public void 댓글_좋아요_취소_실패_댓글이_존재하지_않는_경우() {
+    public void 댓글_좋아요_취소_실패_댓글이_존재하지_않음() {
         // given
         Long userId = 1L;
         Long commentId = 1L;
@@ -120,7 +118,7 @@ public class CommentLikeServiceTest {
     }
 
     @Test
-    public void 댓글_좋아요_취소_실패_좋아요가_존재하지_않는_경우() {
+    public void 댓글_좋아요_취소_실패_좋아요가_존재하지_않음() {
         // given
         Long userId = 1L;
         Long commentId = 1L;
@@ -134,23 +132,4 @@ public class CommentLikeServiceTest {
                 commentLikeService.deleteCommentLike(userId, commentId));
     }
 
-//    @Test
-//    public void 댓글_좋아요_취소_좋아요_주인이_다른_경우() {
-//        // given
-//        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
-//        Long commentId = 1L;
-//        Long likeId = 1L;
-//
-//        // Mock 설정: 해당 댓글에 좋아요가 있는 경우 + 다른 사람이 취소 요청
-//        Comment comment = new Comment();
-//        CommentLike commentLike = new CommentLike(comment, 2L); // 다른 유저 ID
-//
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-//        when(commentLikeRepository.existsByCommentIdAndUserId(commentId, authUser.getUserId())).thenReturn(true);
-//        when(commentLikeRepository.findById(likeId)).thenReturn(Optional.of(commentLike));
-//
-//        // when & then: 좋아요 주인이 다른 경우 예외 발생
-//        assertThrows(LikeOwnerMismatchException.class, () ->
-//                commentLikeService.deleteCommentLike(commentId, likeId, authUser));
-//    }
 }
