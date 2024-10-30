@@ -1,92 +1,97 @@
-//package com.sparta.ssaktium.domain.board;
-//
-//import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
-//import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
-//import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardPageResponseDto;
-//import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
-//import com.sparta.ssaktium.domain.boards.entity.Board;
-//import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-//import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
-//import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
-//import com.sparta.ssaktium.domain.boards.service.BoardService;
-//import com.sparta.ssaktium.domain.comments.entity.Comment;
-//import com.sparta.ssaktium.domain.comments.service.CommentService;
-//import com.sparta.ssaktium.domain.common.dto.AuthUser;
-//import com.sparta.ssaktium.domain.common.service.S3Service;
-//import com.sparta.ssaktium.domain.friends.service.FriendService;
-//import com.sparta.ssaktium.domain.users.entity.User;
-//import com.sparta.ssaktium.domain.users.enums.UserRole;
-//import com.sparta.ssaktium.domain.users.service.UserService;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageImpl;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.mock.web.MockMultipartFile;
-//import org.springframework.test.util.ReflectionTestUtils;
-//import org.springframework.web.multipart.MultipartFile;
-//
-//import java.io.IOException;
-//import java.lang.reflect.Field;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.List;
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertNotNull;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyLong;
-//import static org.mockito.Mockito.when;
-//
-//@ExtendWith(MockitoExtension.class)
-//public class BoardServiceTest {
-//
-//    @Mock
-//    private BoardRepository boardRepository;
-//
-//    @Mock
-//    private UserService userService;
-//
-//    @Mock
-//    private CommentService commentService;
-//
-//    @Mock
-//    private FriendService friendService;
-//
-//    @Mock
-//    private S3Service s3Service;
-//
-//    @Mock
-//    private MultipartFile multipartFile;
-//
-//    @InjectMocks
-//    private BoardService boardService;
-//
-//    @Test
-//    public void 보드_생성_성공() throws IOException {
-//        //given
-//        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
-//        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
-//        // 임시 이미지 파일 생성 (Mocking MultipartFile)
-//        MultipartFile image = new MockMultipartFile("image", "test-image.jpg", "image/jpeg", "test image content".getBytes());
-//
-//        // S3 업로드 메서드 Mocking
-//        String mockImageUrl = "http://mock-s3-url/test-image.jpg";
-//        when(s3Service.uploadImageToS3(any(MultipartFile.class), any())).thenReturn(mockImageUrl);
-//
-//        //when
-//        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser.getUserId(),requestDto,image);
-//        //then
-//        assertNotNull(requestDto);
-//        assertEquals(responseDto.getTitle(), requestDto.getTitle());
-//        assertEquals(responseDto.getContents(), requestDto.getContents());
-//        assertNotNull(responseDto.getImageUrl());
-//    }
-//
+package com.sparta.ssaktium.domain.board;
+
+import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
+import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
+import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
+import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.boards.service.BoardService;
+import com.sparta.ssaktium.domain.comments.entity.Comment;
+import com.sparta.ssaktium.domain.comments.service.CommentService;
+import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.common.service.S3Service;
+import com.sparta.ssaktium.domain.friends.service.FriendService;
+import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
+import com.sparta.ssaktium.domain.users.service.UserService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class BoardServiceTest {
+
+    @Mock
+    private BoardRepository boardRepository;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private FriendService friendService;
+
+    @Mock
+    private S3Service s3Service;
+
+    @Mock
+    private MultipartFile multipartFile;
+
+    @Mock
+    private BoardImagesRepository boardImagesRepository;
+
+    @InjectMocks
+    private BoardService boardService;
+
+    @Test
+    public void 보드_생성_성공() {
+        //given
+        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
+        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
+        // 임시 이미지 파일 생성 (Mocking MultipartFile)
+        MultipartFile image = new MockMultipartFile("image", "test-image.jpg", "image/jpeg", "test image content".getBytes());
+        List<MultipartFile> imageList = List.of(image);
+        // S3 업로드 메서드 Mocking
+        String mockImageUrl = "http://mock-s3-url/test-image.jpg";
+        when(s3Service.uploadImageListToS3(anyList(), any())).thenReturn(List.of(mockImageUrl));
+
+        Board mockBoard = new Board("aa", "aaa", PublicStatus.ALL, new User());
+        ReflectionTestUtils.setField(mockBoard,"id",1L); // ID 설정
+
+        when(boardRepository.save(any(Board.class))).thenReturn(mockBoard);
+
+        //when
+        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser.getUserId(),requestDto,imageList);
+        //then
+        assertNotNull(responseDto);
+        assertEquals(responseDto.getTitle(), requestDto.getTitle());
+        assertEquals(responseDto.getContents(), requestDto.getContents());
+        assertNotNull(imageList);
+        assertEquals(1, imageList.size()); // 이미지 URL의 개수 확인
+    }
+
 //    @Test
 //    public void 보드_수정_성공() throws IllegalAccessException, NoSuchFieldException, IOException {
 //        //given
@@ -200,8 +205,8 @@
 //        assertEquals(mockBoards.size(), responseDto.getTotalElements());
 //
 //    }
-//
-//}
-//
-//
-//
+
+}
+
+
+
