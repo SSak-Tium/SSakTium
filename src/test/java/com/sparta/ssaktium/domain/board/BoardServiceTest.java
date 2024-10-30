@@ -95,7 +95,7 @@ public class BoardServiceTest {
     }
 
     @Test
-    public void 보드_이미지_수정_성공() throws IllegalAccessException, NoSuchFieldException, IOException {
+    public void 보드_이미지_수정_성공() {
         //given
         AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
         long boardId = 1L;
@@ -130,39 +130,35 @@ public class BoardServiceTest {
         assertTrue(responseDto.getImageUrls().contains("oldImageUrl1")); // 남은 이미지 확인
         assertTrue(responseDto.getImageUrls().contains(newImageUrl));
     }
-//
-//
-//    public void 보드_본문_수정_성공() throws IllegalAccessException, NoSuchFieldException, IOException {
-//        //given
-//        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
-//        long boardId = 1L;
-//        BoardSaveRequestDto oldrequestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
-//        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa2","aaa2", PublicStatus.ALL);
-//        // 게시글 소유자 생성
-//        User ownerUser = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
-//        // 임시 이미지 파일 생성 (Mocking MultipartFile)
-//        MultipartFile image = new MockMultipartFile("image", "test-image.jpg", "image/jpeg", "test image content".getBytes());
-//
-//        // S3 업로드 메서드 Mocking
-//        String mockImageUrl = "http://mock-s3-url/test-image.jpg";
-//        when(s3Service.uploadImageToS3(any(MultipartFile.class), any())).thenReturn(mockImageUrl);
-//
-//        // reflection을 사용하여 user 필드 설정
-//        Board updateBoard = new Board(oldrequestDto, ownerUser, "http://mock-s3-url/test-image.jpg"); // 기본 생성자 호출
-//        Field userField = Board.class.getDeclaredField("user");
-//        userField.setAccessible(true);
-//        userField.set(updateBoard, ownerUser);
-//
-//        when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(updateBoard));
-//        // when
-//        BoardSaveResponseDto responseDto = boardService.updateBoards(authUser.getUserId(), boardId, requestDto,image);
-//        //then
-//        assertNotNull(requestDto);
-//        assertEquals(responseDto.getTitle(), requestDto.getTitle());
-//        assertEquals(responseDto.getContents(), requestDto.getContents());
-//        assertEquals(responseDto.getImageUrl(), mockImageUrl);
-//    }
+
+    @Test
+    public void 보드_본문_수정_성공() {
+        //given
+        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
+        long boardId = 1L;
+        BoardSaveRequestDto oldRequestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
+        BoardSaveRequestDto updateRequestDto = new BoardSaveRequestDto("aa2","aaa2", PublicStatus.ALL);
+        // 게시글 소유자 생성
+        User ownerUser = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
+
+        // reflection을 사용하여 user 필드 설정
+        Board updateBoard = new Board(oldRequestDto.getTitle(),oldRequestDto.getContents(),oldRequestDto.getPublicStatus(),ownerUser); // 기본 생성자 호출
+        ReflectionTestUtils.setField(updateBoard,"id",1L);
+
+        // BoardImages 객체 생성
+        List<BoardImages> imageUrls = List.of(new BoardImages("aaa", updateBoard));
+        ReflectionTestUtils.setField(updateBoard, "imageUrls", imageUrls);
+
+        when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
+        when(boardRepository.findByIdAndStatusEnum(boardId,StatusEnum.ACTIVATED)).thenReturn(Optional.of(updateBoard));
+        when(boardRepository.save(any(Board.class))).thenReturn(updateBoard);
+        // when
+        BoardSaveResponseDto responseDto = boardService.updateBoardContent(authUser.getUserId(), boardId, updateRequestDto);
+        //then
+        assertNotNull(responseDto);
+        assertEquals(responseDto.getTitle(), updateRequestDto.getTitle());
+        assertEquals(responseDto.getContents(), updateRequestDto.getContents());
+    }
 //    @Test
 //    public void 보드_단건조회_성공 () throws IOException {
 //        //given
