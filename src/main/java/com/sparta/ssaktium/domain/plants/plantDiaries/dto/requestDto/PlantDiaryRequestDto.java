@@ -17,4 +17,9 @@ public class PlantDiaryRequestDto {
     @Schema(description = "활동날짜", example = "2021-12-14")
     private LocalDate itemDate;
 
+    public PlantDiaryRequestDto(String title, String content, LocalDate itemDate) {
+        this.title = title;
+        this.content = content;
+        this.itemDate = itemDate;
+    }
 }
