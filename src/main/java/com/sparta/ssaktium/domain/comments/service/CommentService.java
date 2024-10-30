@@ -60,7 +60,7 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public CommentResponseDto updateComment(Long userId, Long commentId, Long boardId, CommentRequestDto commentRequestDto) {
+    public CommentResponseDto updateComment(Long userId, Long boardId, Long commentId, CommentRequestDto commentRequestDto) {
         // 댓글을 수정할 게시글이 있는지 확인
         boardService.getBoardById(boardId);
 

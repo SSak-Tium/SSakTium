@@ -3,7 +3,6 @@ package com.sparta.ssaktium.domain.comment;
 
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
-import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.comments.dto.request.CommentRequestDto;
 import com.sparta.ssaktium.domain.comments.dto.response.CommentResponseDto;
@@ -12,10 +11,8 @@ import com.sparta.ssaktium.domain.comments.exception.CommentOwnerMismatchExcepti
 import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
 import com.sparta.ssaktium.domain.comments.service.CommentService;
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
-import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,18 +20,18 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 // 댓글 서비스 테스트
 @ExtendWith(MockitoExtension.class) // Mockito 사용 설정
@@ -55,8 +52,7 @@ class CommentServiceTest {
 
     @Test
     public void 댓글_조회_성공() {
-        // given
-        Long userId = 1L;
+        // given 0번 부터 조회할 예정이기 때문에 page 0
         Long boardId = 1L;
         Pageable pageable = PageRequest.of(0, 10); // 페이지 설정
 
@@ -66,16 +62,34 @@ class CommentServiceTest {
         Page<Comment> commentPage = new PageImpl<>(List.of(comment1, comment2), pageable, 2); // 두 개의 댓글을 가진 페이지
 
         // Mock 설정
-        when(boardService.findBoard(boardId)).thenReturn(board);
-        when(commentRepository.findByBoardId(boardId, pageable)).thenReturn(commentPage);
+        when(boardService.getBoardById(boardId)).thenReturn(board);
+        when(commentRepository.findByBoard(board, pageable)).thenReturn(commentPage);
 
-        // when
-        Page<CommentResponseDto> responseDtos = commentService.getComments(boardId, userId, 0, 10);
+        // when 테스트 시 getComments 의 page -1 을 고려해서 page 에 1 넣음
+        Page<CommentResponseDto> responseDtos = commentService.getComments(boardId, 1, 10);
 
         // then
         assertNotNull(responseDtos);
         assertEquals(2, responseDtos.getTotalElements()); // 총 댓글 수가 일치해야 함
     }
+
+    @Test
+    void 댓글_조회_실패_게시글_존재하지_않음() {
+        // given
+        Long boardId = 1L; // 조회할 게시글 ID
+        int page = 1;      // 요청한 페이지
+        int size = 10;     // 페이지 크기
+
+        // 게시글이 없을 때 예외 처리 발생 해야함
+        when(boardService.getBoardById(boardId))
+                .thenThrow(new NotFoundBoardException());
+
+        // when & then: 예외가 발생하는지 확인
+        assertThrows(NotFoundBoardException.class, () -> {
+            commentService.getComments(boardId, page, size);
+        });
+    }
+
 
     @Test
     public void 댓글_등록_성공() {
@@ -88,8 +102,8 @@ class CommentServiceTest {
         Board board = new Board(); // 게시글 객체
 
         // 게시글 및 사용자 반환 설정
-        when(boardService.findBoard(boardId)).thenReturn(board); // 게시글이 존재함
-        when(userService.findUser(userId)).thenReturn(Optional.of(user)); // 사용자 존재함
+        when(boardService.getBoardById(boardId)).thenReturn(board); // 게시글이 존재함
+        when(userService.findUser(userId)).thenReturn(user); // 사용자 존재함
         when(commentRepository.save(ArgumentMatchers.any(Comment.class))).
                 thenAnswer(invocation -> invocation.getArgument(0)); // 댓글 저장 시 입력된 댓글 객체 반환
 
@@ -104,23 +118,23 @@ class CommentServiceTest {
     @Test
     public void 댓글_등록_실패_게시글_존재하지_않음() {
         // given
-        Long userId =1L;
+        Long userId = 1L;
         Long boardId = 1L;
         CommentRequestDto requestDto = new CommentRequestDto("댓글 내용");
 
         // Mock 설정: 게시글이 존재하지 않는 경우
-        when(boardService.findBoard(boardId)).thenReturn(Optional.empty());
+        when(boardService.getBoardById(boardId)).thenThrow(new NotFoundBoardException());
 
         // when
         assertThrows(NotFoundBoardException.class, () ->
                 commentService.postComment(boardId, userId, requestDto));
     }
 
-    // 댓글 수정 성공 테스트
+    //     댓글 수정 성공 테스트
     @Test
-    public void 댓글_수정_성공() {
+    public void 댓글_수정_성공() throws Exception {
         // given
-        Long userId =1L;
+        Long userId = 1L;
         Long boardId = 1L; // 게시글 ID
         Long commentId = 1L; // 댓글 ID
         String newContent = "수정된 댓글 내용"; // 수정할 댓글 내용
@@ -128,17 +142,18 @@ class CommentServiceTest {
 
         // Mock 설정: 게시글이 존재하는 경우
         Board board = new Board(); // 게시글 객체 생성
-        when(boardService.findBoard(boardId)).thenReturn(board); // 게시글 존재 설정
+        when(boardService.getBoardById(boardId)).thenReturn(board); // 게시글 존재 설정
 
-        // Mock 설정: authUser 로 user 생성
-        User user = User.fromAuthUser(authUser);
+        // Mock 설정: 리플렉션으로 유저 Id 설정
+        User user = new User();
+        setField(user, "id", userId);
 
         // Mock 설정: 댓글이 존재하는 경우
         Comment existingComment = new Comment("댓글 내용", board, user); // 기존 댓글 객체 생성
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(existingComment)); // 댓글 존재 설정
 
         // when
-        CommentResponseDto responseDto = commentService.updateComment(boardId, commentId, authUser.getUserId(), requestDto); // 댓글 수정 메서드 호출
+        CommentResponseDto responseDto = commentService.updateComment(userId, boardId, commentId, requestDto); // 댓글 수정 메서드 호출
 
         // then
         assertNotNull(responseDto); // 응답 DTO가 null이 아님을 확인
@@ -148,28 +163,26 @@ class CommentServiceTest {
     @Test
     public void 댓글_수정_실패_댓글_존재하지_않음() {
         // given
-        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
+        Long userId = 1L;
         Long boardId = 1L;
         Long commentId = 1L;
         CommentRequestDto requestDto = new CommentRequestDto("수정된 댓글 내용");
 
         // Mock 설정: 게시글은 존재하는데 댓글은 존재하지 않는 경우
         Board board = new Board();
-        when(boardService.findBoard(boardId)).thenReturn(board);
+        when(boardService.getBoardById(boardId)).thenReturn(board);
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
 
         // when
         assertThrows(NotFoundCommentException.class, () ->
-                commentService.updateComment(boardId, commentId, authUser.getUserId(), requestDto));
+                commentService.updateComment(userId, boardId, commentId, requestDto));
     }
 
     // 댓글 수정 실패 테스트
     @Test
-    public void 댓글_수정_실패_작성자_아님() {
+    public void 댓글_수정_실패_작성자_아님() throws Exception {
         // given
-        AuthUser writeAuthUser = new AuthUser(1, "user@example.com", UserRole.ROLE_USER); // 작성자
-        AuthUser requestUpdateAuthUser = new AuthUser(2, "user@example.com", UserRole.ROLE_USER); // 수정 요청자
-
+        Long userId = 1L;
         Long boardId = 1L; // 게시글 ID
         Long commentId = 1L; // 댓글 ID
         String newContent = "수정된 댓글 내용"; // 수정할 댓글 내용
@@ -177,46 +190,43 @@ class CommentServiceTest {
 
         // Mock 설정: 게시글이 존재하는 경우
         Board board = new Board(); // 게시글 객체 생성
-        when(boardService.findBoard(boardId)).thenReturn(board); // 게시글 존재 설정
+        when(boardService.getBoardById(boardId)).thenReturn(board); // 게시글 존재 설정
 
-        // Mock 설정: authUser 로 user 생성(댓글 작성자)
-        User user = User.fromAuthUser(writeAuthUser);
+        // Mock 설정: 리플렉션으로 유저 Id 설정
+        User user = new User();
+        setField(user, "id", userId);
 
-        // Mock 설정: 작성자가 아닌 사용자가 수정 시도할 때 예외 발생 확인
+        // Mock 설정: 댓글이 존재하는 경우
         Comment existingComment = new Comment("댓글 내용", board, user); // 기존 댓글 객체 생성
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(existingComment)); // 댓글 존재 설정
 
-        // when
-        assertThrows(CommentOwnerMismatchException.class, ()->
-                commentService.updateComment(boardId, commentId, requestUpdateAuthUser.getUserId(), requestDto));
-
-        // then
-        verify(commentRepository,never()).save(ArgumentMatchers.any(Comment.class));
+        // when & then
+        assertThrows(CommentOwnerMismatchException.class, () -> {
+            commentService.updateComment(2L, boardId, commentId, requestDto); // 댓글 수정 메서드 호출
+        });
     }
 
     @Test
-    public void 댓글_삭제_성공() {
+    public void 댓글_삭제_성공() throws Exception {
         // given
         Long userId = 1L;
-        AuthUser authUser = new AuthUser(userId, "user@example.com", UserRole.ROLE_USER); // 삭제 요청자
         Long boardId = 1L; // 게시글 ID
         Long commentId = 1L; // 댓글 ID
 
+        // Mock 설정: 리플렉션으로 유저 Id 설정
+        User user = new User();
+        setField(user, "id", userId);
 
-        // Mock 설정: 게시글이 존재하는 경우
+        // Mock 설정: 댓글을 생성하기 위한 게시글
         Board board = new Board(); // 게시글 객체 생성
-        when(boardService.findBoard(boardId)).thenReturn(board); // 게시글 존재 설정
+        setField(board, "user", user);
 
-        // authUser 로 user 생성(댓글 작성자)
-        User user = User.fromAuthUser(authUser);
-
-        // 리플렉션 통해서 user Id 설정. 1 , 2 둘 다 해서 1은 성공, 2는 실패 테스트
         // Mock 설정: 삭제할 댓글이 존재하는 경우
         Comment existingComment = new Comment("댓글 내용", board, user); // 기존 댓글 객체 생성
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(existingComment)); // 댓글 존재 설정
 
         // when
-        commentService.deleteComment(boardId, commentId, authUser.getUserId()); // 댓글 삭제 메서드 호출
+        commentService.deleteComment(userId, commentId); // 댓글 삭제 메서드 호출
 
         // then
         verify(commentRepository).delete(existingComment); // 댓글 삭제가 호출되었는지 검증
@@ -225,51 +235,79 @@ class CommentServiceTest {
     @Test
     public void 댓글_삭제_실패_댓글_존재하지_않음() {
         // given
-        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
-        Long boardId = 1L;
+        Long userId = 1L;
         Long commentId = 1L;
 
-        // Mock 설정: 게시글은 존재하는데 댓글은 존재하지 않는 경우
-        Board board = new Board();
-        when(boardService.findBoard(boardId)).thenReturn(board);
+        // Mock 설정:  댓글이 존재하지 않는 경우
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
 
         // when
         assertThrows(NotFoundCommentException.class, () ->
-                commentService.deleteComment(boardId, commentId, authUser.getUserId()));
+                commentService.deleteComment(userId, commentId));
     }
 
     @Test
-    public void 댓글_삭제_실패_작성자_아님() {
+    public void 댓글_삭제_실패_댓글_게시글_작성자_아님() throws Exception {
         // given
-        AuthUser writeAuthUser = new AuthUser(1, "user@example.com", UserRole.ROLE_USER); // 작성자
-        AuthUser deleteRequestAuthUser = new AuthUser(2, "user@example.com", UserRole.ROLE_USER); // 삭제 요청자
-
+        Long userId = 1L;
         Long boardId = 1L; // 게시글 ID
         Long commentId = 1L; // 댓글 ID
 
+        // Mock 설정: 리플렉션으로 유저 Id 설정
+        User BoardOwner = new User();
+        setField(BoardOwner, "id", userId);
+        User commentOwner = new User();
+        setField(commentOwner, "id", 2L);
 
-        // Mock 설정: 게시글이 존재하는 경우
+        // Mock 설정: 댓글을 생성하기 위한 게시글
         Board board = new Board(); // 게시글 객체 생성
-        when(boardService.findBoard(boardId)).thenReturn(board); // 게시글 존재 설정
-
-        // authUser 로 user 생성(댓글 작성자)
-        User user = User.fromAuthUser(writeAuthUser);
+        setField(board, "user", BoardOwner);
 
         // Mock 설정: 삭제할 댓글이 존재하는 경우
-        Comment existingComment = new Comment("댓글 내용", board, user); //  댓글 객체 생성
+        Comment existingComment = new Comment("댓글 내용", board, commentOwner); // 기존 댓글 객체 생성
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(existingComment)); // 댓글 존재 설정
 
-        // when 일치하지않으면 예외처리 발생
-        assertThrows(CommentOwnerMismatchException.class, ()->
-                commentService.deleteComment(boardId, commentId, deleteRequestAuthUser.getUserId()));
-
-        // then
-        verify(commentRepository, never()).delete(existingComment); // 댓글 삭제가 호출되었는지 검증
+        assertThrows(CommentOwnerMismatchException.class, () ->
+                commentService.deleteComment(3L, commentId));
     }
 
+    // 찾기 메서드 테스트 성공
+    @Test
+    public void findComment_성공() throws Exception{
+        // given
+        Long commentId =1L;
 
+        // Mock 설정: 찾아올 댓글이 존재하는 경우
+        Comment existingComment = new Comment(); // 기존 댓글 객체 생성
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(existingComment));
 
+        // when
+        Comment foundComment = commentService.findComment(commentId);
+
+        // then
+        assertEquals(existingComment, foundComment);
+    }
+
+    // 찾기 메서드 테스트 실패
+    @Test
+    public void findComment_실패(){
+        // given
+        Long commentId =1L;
+
+        // when
+        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(NotFoundCommentException.class,()->
+                commentService.findComment(commentId));
+    }
+
+    // 리플렉션을 통해 필드 값을 설정하는 메서드
+    private void setField(Object obj, String fieldName, Object value) throws Exception {
+        Field field = obj.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(obj, value);
+    }
 }
 
 
