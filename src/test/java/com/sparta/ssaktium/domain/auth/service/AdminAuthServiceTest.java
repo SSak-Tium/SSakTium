@@ -94,6 +94,6 @@ class AdminAuthServiceTest {
         );
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("409 CONFLICT DUPLICATE_EMAIL 중복된 이메일입니다.");
+        assertThat(exception.getMessage()).isEqualTo("409 DUPLICATE_EMAIL 중복된 이메일입니다.");
     }
 }
