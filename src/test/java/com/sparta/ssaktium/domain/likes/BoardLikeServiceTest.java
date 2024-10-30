@@ -55,12 +55,12 @@ public class BoardLikeServiceTest {
         assertEquals(1, response.getBoardLikesCount()); // 좋아요 수 증가 검증
     }
 
-//    @Test
-//    public void 게시글_좋아요_등록_실패_이미_좋아요한_경우() {
-//        // given
-//        Long userId = 1L;
-//        Long boardId = 1L;
-//
+    @Test
+    public void 게시글_좋아요_등록_실패_이미_좋아요한_경우() {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
 //        // Mock 설정: 해당 게시글에 이미 좋아요 누른 경우
 //        Board board = new Board();
 //        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
@@ -68,7 +68,7 @@ public class BoardLikeServiceTest {
 //
 //        // when & then: 예외 발생 검증
 //        assertThrows(AlreadyLikedException.class, () -> boardLikeService.postBoardLikes(boardId, userId));
-//    }
+    }
 
 //    @Test
 //    public void 게시글_좋아요_취소_성공() {
