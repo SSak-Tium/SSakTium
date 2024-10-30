@@ -9,7 +9,6 @@ import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLike;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
 import com.sparta.ssaktium.domain.likes.boardLikes.service.BoardLikeService;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
-import com.sparta.ssaktium.domain.likes.exception.LikeOwnerMismatchException;
 import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardLikeException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,24 +121,4 @@ public class BoardLikeServiceTest {
         // when & then: 예외 발생 검증
         assertThrows(NotFoundBoardLikeException.class, () -> boardLikeService.deleteBoardLikes(userId, boardId));
     }
-
-//    @Test
-//    public void 게시글_좋아요_취소_실패_좋아요_소유자_불일치() {
-//        // given
-//        Long userId = 1L;
-//        Long requestUserId = 2L;
-//        Long boardId = 1L;
-//        Long likeId = 1L;
-//
-//        // Mock 설정: 해당 게시글에 이미 좋아요 누른경우 + 다른 사람이 좋아요 취소 요청한 경우(anotherUser)
-//        Board board = new Board();
-//        BoardLike boardLike = new BoardLike(board, userId);
-//
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-//        when(boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)).thenReturn(true);
-//        when(boardLikeRepository.findById(likeId)).thenReturn(Optional.of(boardLike));
-//
-//        // when & then: 예외 발생 검증
-//        assertThrows(LikeOwnerMismatchException.class, () -> boardLikeService.deleteBoardLikes(boardId, likeId, requestUserId));
-//    }
 }

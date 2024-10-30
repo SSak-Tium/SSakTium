@@ -7,7 +7,6 @@ import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
 import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLike;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
-import com.sparta.ssaktium.domain.likes.exception.LikeOwnerMismatchException;
 import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardLikeException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
