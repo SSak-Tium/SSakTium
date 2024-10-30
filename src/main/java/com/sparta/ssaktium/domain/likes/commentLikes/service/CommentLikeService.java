@@ -61,7 +61,6 @@ public class CommentLikeService {
         comment.decrementLikesCount();
 
         // 댓글에 등록된 좋아요 수 감소
-        comment.decrementLikesCount();
         commentRepository.save(comment);
     }
 }

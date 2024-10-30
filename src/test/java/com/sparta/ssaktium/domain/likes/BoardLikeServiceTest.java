@@ -88,28 +88,26 @@ public class BoardLikeServiceTest {
         assertThrows(AlreadyLikedException.class, () -> boardLikeService.postBoardLikes(boardId, userId));
     }
 
-//    @Test
-//    public void 게시글_좋아요_취소_성공() {
-//        // given
-//        Long userId = 1L;
-//        Long boardId = 1L;
-//        Long likeId = 1L;
-//
-//        // Mock 설정: 해당 게시글에 이미 좋아요 누른경우 + 좋아요 수는 1
-//        Board board = new Board();
-//        BoardLike boardLike = new BoardLike(board, userId);
-//        board.incrementLikesCount();
-//
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-//        when(boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)).thenReturn(true);
-//        when(boardLikeRepository.findById(likeId)).thenReturn(Optional.of(boardLike));
-//
-//        // when: 좋아요 취소
-//        boardLikeService.deleteBoardLikes(userId, boardId);
-//
-//        // then: 좋아요 수가 감소했는지 확인
-//        assertEquals(0, board.getBoardLikesCount()); // 좋아요 수 감소 검증
-//    }
+    @Test
+    public void 게시글_좋아요_취소_성공() {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
+        // Mock 설정: 해당 게시글에 이미 좋아요 누른경우 + 좋아요 수는 1
+        Board board = new Board();
+        BoardLike boardLike = new BoardLike(board, userId);
+        board.incrementLikesCount();
+
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardLikeRepository.findByBoardIdAndUserId(boardId, userId)).thenReturn(Optional.of(boardLike)); // 좋아요 객체 반환
+
+        // when: 좋아요 취소
+        boardLikeService.deleteBoardLikes(userId, boardId);
+
+        // then: 좋아요 수가 감소했는지 확인
+        assertEquals(0, board.getBoardLikesCount()); // 좋아요 수 감소 검증
+    }
 //
 //    @Test
 //    public void 게시글_좋아요_취소_실패_좋아요가_없는_경우() {
