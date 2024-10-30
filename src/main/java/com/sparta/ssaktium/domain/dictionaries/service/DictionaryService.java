@@ -50,9 +50,7 @@ public class DictionaryService {
     }
 
     // 식물도감 단건 조회
-    public DictionaryResponseDto getDictionary(long userId, long dictionaryId) {
-        // 유저 조회
-        userService.findUser(userId);
+    public DictionaryResponseDto getDictionary(long dictionaryId) {
 
         // 식물도감 조회
         Dictionary dictionary = findDictionary(dictionaryId);
@@ -62,9 +60,7 @@ public class DictionaryService {
     }
 
     // 식물도감 리스트 조회
-    public Page<DictionaryListResponseDto> getDictionaryList(long userId, int page, int size) {
-        // 유저 조회
-        userService.findUser(userId);
+    public Page<DictionaryListResponseDto> getDictionaryList(int page, int size) {
 
         // Pageable 객체 생성
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -78,9 +74,7 @@ public class DictionaryService {
 
     // 식물도감 수정
     @Transactional
-    public DictionaryResponseDto updateDictionary(long userId, DictionaryUpdateRequestDto dictionaryUpdateRequestDto, long dictionaryId){
-        // 유저 조회
-        userService.findUser(userId);
+    public DictionaryResponseDto updateDictionary(DictionaryUpdateRequestDto dictionaryUpdateRequestDto, long dictionaryId){
 
         // 식물도감 조회
         Dictionary dictionary = findDictionary(dictionaryId);
@@ -97,9 +91,7 @@ public class DictionaryService {
 
     // 식물도감 이미지 변경
     @Transactional
-    public DictionaryImageResponseDto updateDictionaryImage(long userId, long dictionaryId,  MultipartFile image) {
-        // 유저 조회
-        userService.findUser(userId);
+    public DictionaryImageResponseDto updateDictionaryImage(long dictionaryId,  MultipartFile image) {
 
         // 식물도감 조회
         findDictionary(dictionaryId);
@@ -113,9 +105,7 @@ public class DictionaryService {
 
     // 식물도감 삭제
     @Transactional
-    public String deleteDictionary(long userId, long dictionaryId) {
-        // 유저 조회
-        userService.findUser(userId);
+    public String deleteDictionary(long dictionaryId) {
 
         // 식물도감 조회
         Dictionary dictionary = findDictionary(dictionaryId);

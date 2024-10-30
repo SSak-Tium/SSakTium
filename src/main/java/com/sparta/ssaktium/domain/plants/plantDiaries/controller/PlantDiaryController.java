@@ -88,16 +88,16 @@ public class PlantDiaryController {
     }
 
     @DeleteMapping("/plants/{plantId}/diaries/{diaryId}")
-    @Operation(summary = "내 식물 다이어리 수정", description = "내 식물 다이어리를 다건 조회하는 API")
+    @Operation(summary = "내 식물 다이어리 삭제", description = "내 식물 다이어리를 삭제하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<Void>> deleteDiary(@AuthenticationPrincipal AuthUser authUser,
                                                               @PathVariable
                                                               @Parameter(description = "식물 아이디")
-                                                              Long id,
+                                                              Long plantId,
                                                               @PathVariable
                                                               @Parameter(description = "식물 다이어리 아이디")
                                                               Long diaryId) {
-        plantDiaryService.deleteDiary(authUser.getUserId(), id, diaryId);
+        plantDiaryService.deleteDiary(authUser.getUserId(), plantId, diaryId);
         return ResponseEntity.ok(CommonResponse.success(null));
     }
 

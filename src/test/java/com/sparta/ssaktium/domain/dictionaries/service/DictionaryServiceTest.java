@@ -152,7 +152,7 @@ class DictionaryServiceTest {
         given(s3Service.extractFileNameFromUrl(dictionary.getImageUrl())).willReturn(imageName);
 
         // when
-        String result = dictionaryService.deleteDictionary(userId, dictionaryId);
+        String result = dictionaryService.deleteDictionary(dictionaryId);
 
         // then
         assertThat(result).isEqualTo("정상적으로 삭제되었습니다.");

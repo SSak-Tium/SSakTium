@@ -15,4 +15,9 @@ public class PlantUpdateRequestDto {
     @Schema(description = "식물 수정이미지")
     private String imageUrl;
 
+    public PlantUpdateRequestDto(String plantName, String plantNickname, String imageUrl) {
+        this.plantName = plantName;
+        this.plantNickname = plantNickname;
+        this.imageUrl = imageUrl;
+    }
 }
