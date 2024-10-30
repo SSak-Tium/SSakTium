@@ -3,7 +3,9 @@ package com.sparta.ssaktium.domain.board;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
@@ -31,12 +33,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
@@ -92,8 +94,45 @@ public class BoardServiceTest {
         assertEquals(1, imageList.size()); // 이미지 URL의 개수 확인
     }
 
-//    @Test
-//    public void 보드_수정_성공() throws IllegalAccessException, NoSuchFieldException, IOException {
+    @Test
+    public void 보드_이미지_수정_성공() throws IllegalAccessException, NoSuchFieldException, IOException {
+        //given
+        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
+        long boardId = 1L;
+        // 게시글 소유자 생성
+        User ownerUser = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
+
+        Board tempBoard = new Board("aa","aaa",PublicStatus.ALL,ownerUser);
+        ReflectionTestUtils.setField(tempBoard,"id",1L);
+
+        List<BoardImages> existingImages = new ArrayList<>();
+        existingImages.add(new BoardImages("oldImageUrl1", tempBoard));
+        existingImages.add(new BoardImages("oldImageUrl2", tempBoard));
+        ReflectionTestUtils.setField(tempBoard,"imageUrls",existingImages);
+
+        when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
+        when(boardRepository.findByIdAndStatusEnum(boardId,StatusEnum.ACTIVATED)).thenReturn(Optional.of(tempBoard));
+
+        List<String> remainingImages = List.of("oldImageUrl1");
+        List<MultipartFile> imageList = new ArrayList<>();
+        MultipartFile newImage = new MockMultipartFile("image", "newImage.jpg", "image/jpeg", "new image content".getBytes());
+        imageList.add(newImage);
+
+        // S3 메서드 모킹
+        String newImageUrl = "http://mock-s3-url/newImage.jpg";
+        when(s3Service.uploadImageToS3(any(MultipartFile.class), any())).thenReturn(newImageUrl);
+
+        // when
+        BoardUpdateImageDto responseDto = boardService.updateImages(authUser.getUserId(), boardId, imageList,remainingImages);
+        //then
+        assertNotNull(responseDto);
+        assertEquals(2, responseDto.getImageUrls().size()); // 남은 이미지 + 새로 추가된 이미지 확인
+        assertTrue(responseDto.getImageUrls().contains("oldImageUrl1")); // 남은 이미지 확인
+        assertTrue(responseDto.getImageUrls().contains(newImageUrl));
+    }
+//
+//
+//    public void 보드_본문_수정_성공() throws IllegalAccessException, NoSuchFieldException, IOException {
 //        //given
 //        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
 //        long boardId = 1L;
@@ -124,7 +163,6 @@ public class BoardServiceTest {
 //        assertEquals(responseDto.getContents(), requestDto.getContents());
 //        assertEquals(responseDto.getImageUrl(), mockImageUrl);
 //    }
-//
 //    @Test
 //    public void 보드_단건조회_성공 () throws IOException {
 //        //given
