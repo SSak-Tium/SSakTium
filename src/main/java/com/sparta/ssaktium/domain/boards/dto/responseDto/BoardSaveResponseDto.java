@@ -3,18 +3,20 @@ package com.sparta.ssaktium.domain.boards.dto.responseDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class BoardSaveResponseDto {
 
     public final Long id;
     public final String title;
     public final String contents;
-    public final String imageUrl;
+    public final List<String> imageList;
 
     public BoardSaveResponseDto(Board board) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.contents = board.getContent();
-        this.imageUrl = board.getImageUrl();
+        this.imageList = board.getImageList();
     }
 }

@@ -10,8 +10,6 @@ server:
 spring:
   config:
     import: optional:file:.env[.properties]
-  application:
-    name: spring-usersetting
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -38,9 +36,6 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQL8Dialect
-
-file:
-  upload-dir: C:/uploads
 
 jwt:
   secret:

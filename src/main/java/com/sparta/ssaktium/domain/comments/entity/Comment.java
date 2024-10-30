@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name = "comments")
 public class Comment extends Timestamped {
 
     @Id
@@ -25,31 +26,27 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    private int commentLikesCount = 0;
 
-    public Comment(String content, Board board, User user){
+    public Comment(String content, Board board, User user) {
         this.content = content;
         this.board = board;
         this.user = user;
     }
 
-    private int commentLikesCount =0;
-
-    public void incrementLikesCount(){
+    public void incrementLikesCount() {
         commentLikesCount++;
     }
 
-    public void decrementLikesCount(){
-        if (commentLikesCount <= 0){
+    public void decrementLikesCount() {
+        if (commentLikesCount <= 0) {
             throw new LikeCountUnderflowException();
         }
         commentLikesCount--;
     }
 
     // 댓글 수정 (작성자만 가능)
-    public void updateComment(String content){
+    public void updateComment(String content) {
         this.content = content;
     }
-
-
-
 }

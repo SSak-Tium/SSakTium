@@ -62,11 +62,6 @@ public class AuthService {
             throw new UnauthorizedPasswordException();
         }
 
-        // UserStatus 가 DELETED 면 로그인 불가능
-        if (user.getUserStatus().equals(UserStatus.DELETED)) {
-            throw new DeletedUserException();
-        }
-
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
 
         return new SigninResponseDto(bearerToken);

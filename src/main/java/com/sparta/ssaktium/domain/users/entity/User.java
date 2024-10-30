@@ -8,11 +8,15 @@ import com.sparta.ssaktium.domain.users.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 
 @Getter
 @Entity
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 @NoArgsConstructor
 @Table(name = "users")
 public class User extends Timestamped {
@@ -25,14 +29,13 @@ public class User extends Timestamped {
     private String email;
     private String password;
     private String userName;
-
     private String birthYear;
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    private boolean deleted = Boolean.FALSE;
 
     private Long kakaoId;
 
@@ -43,7 +46,6 @@ public class User extends Timestamped {
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
-        this.userStatus = UserStatus.ACTIVE;
     }
 
     public User(String email, String password, String userName, UserRole userRole) {
@@ -51,7 +53,6 @@ public class User extends Timestamped {
         this.password = password;
         this.userName = userName;
         this.userRole = userRole;
-        this.userStatus = UserStatus.ACTIVE;
     }
 
     // AuthUser -> User
@@ -68,7 +69,6 @@ public class User extends Timestamped {
         this.password = encodedPassword;
         this.birthYear = birthYear;
         this.userRole = userRole;
-        this.userStatus = UserStatus.ACTIVE;
         this.kakaoId = kakaoId;
     }
 
@@ -78,7 +78,7 @@ public class User extends Timestamped {
     }
 
     public static User addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
-        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), userRole);
+        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), null, userRole);
     }
 
     // 유저 비밀번호 변경
@@ -86,9 +86,10 @@ public class User extends Timestamped {
         this.password = password;
     }
 
-    // 유저 상태 삭제 처리
-    public void delete() {
-        this.userStatus = UserStatus.DELETED;
+    // 유저 정보 변경
+    public void updateUser(String profileImageUrl, String userName) {
+        this.profileImageUrl = profileImageUrl;
+        this.userName = userName;
     }
 
     public User kakaoIdUpdate(Long kakaoId) {

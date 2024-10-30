@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "friends")
 public class Friend extends Timestamped {
 
     @Id
@@ -18,33 +19,22 @@ public class Friend extends Timestamped {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "friend_id", nullable = false)
-    private User friendUserId;
+    private User friendUser;
 
+    @Enumerated(EnumType.STRING)
     private FriendStatus friendStatus;
 
-
-    public Friend(Long id, User userId, User friendUserId, FriendStatus friendStatus) {
-        this.id = id;
-        this.userId = userId;
-        this.friendUserId = friendUserId;
-        this.friendStatus = friendStatus;
-    }
-
-    public Friend(User userId, User friendUserId) {
-        this.userId = userId;
-        this.friendUserId = friendUserId;
+    public Friend(User user, User friendUser) {
+        this.user = user;
+        this.friendUser = friendUser;
         this.friendStatus = FriendStatus.PENDING;
     }
 
     public void acceptFriend() {
         this.friendStatus = FriendStatus.ACCEPTED;
-    }
-
-    public void rejectFriend() {
-        this.friendStatus = FriendStatus.REJECTED;
     }
 }

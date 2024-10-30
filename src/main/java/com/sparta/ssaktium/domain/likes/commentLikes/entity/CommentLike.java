@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "commentLikes")
 public class CommentLike {
 
     @Id
@@ -15,13 +16,13 @@ public class CommentLike {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id", nullable =false)
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
-    @Column(name = "user_id",nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public CommentLike(Comment comment, Long userId){
+    public CommentLike(Comment comment, Long userId) {
         this.comment = comment;
         this.userId = userId;
     }
