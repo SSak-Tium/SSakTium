@@ -96,7 +96,7 @@ class DictionaryServiceTest {
         given(dictionaryRepository.findById(anyLong())).willReturn(Optional.of(dictionary));
 
         // when
-        DictionaryResponseDto responseDto = dictionaryService.getDictionary(userId, dictionaryId);
+        DictionaryResponseDto responseDto = dictionaryService.getDictionary(dictionaryId);
 
         // then
         assertThat(responseDto.getTitle()).isEqualTo("title");
@@ -118,7 +118,7 @@ class DictionaryServiceTest {
         given(dictionaryRepository.findAll(any(Pageable.class))).willReturn(dictionaryPage);
 
         // when
-        Page<DictionaryListResponseDto> responsePage = dictionaryService.getDictionaryList(userId, page, size);
+        Page<DictionaryListResponseDto> responsePage = dictionaryService.getDictionaryList(page, size);
 
         // then
         assertThat(responsePage.getContent()).hasSize(2);
@@ -138,7 +138,7 @@ class DictionaryServiceTest {
         given(dictionaryRepository.save(any(Dictionary.class))).willReturn(dictionary);
 
         // when
-        DictionaryResponseDto responseDto = dictionaryService.updateDictionary(userId, requestDto, dictionaryId);
+        DictionaryResponseDto responseDto = dictionaryService.updateDictionary(requestDto, dictionaryId);
 
         assertThat(responseDto.getTitle()).isEqualTo("new title");
     }
