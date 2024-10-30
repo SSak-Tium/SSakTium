@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -230,6 +230,56 @@ public class BoardServiceTest {
         assertEquals("title", response.getContent().get(0).getTitle());
         assertEquals(2, response.getContent().get(0).getCommentCount());
         assertEquals(1, response.getContent().get(0).getImageUrls().size());
+    }
+
+    @Test
+    public void 게시글_삭제_성공 () {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
+        User user = new User("user@aa.com", "password", "name", UserRole.ROLE_USER);
+        Board board = new Board("Title", "Content", PublicStatus.ALL, user);
+        ReflectionTestUtils.setField(board, "id", boardId);
+
+        List<BoardImages> boardImages = List.of(new BoardImages("http://example.com/image1.jpg", board));
+        ReflectionTestUtils.setField(board, "imageUrls", boardImages);
+
+        // Mocking
+        when(userService.findUser(userId)).thenReturn(user);
+        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+
+        // when
+        boardService.deleteBoards(userId, boardId);
+
+        // then
+        assertEquals(StatusEnum.DELETED, board.getStatusEnum()); // 게시글 상태가 삭제 상태로 변경되었는지 확인
+        verify(boardRepository).save(board); // 게시글이 저장소에 저장되었는지 확인
+    }
+
+    @Test
+    public void 게시글_삭제_성공_어드민() {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
+        User adminUser = new User("admin@aa.com", "password", "admin", UserRole.ROLE_ADMIN);
+        Board board = new Board("Title", "Content", PublicStatus.ALL, new User("other@aa.com", "password", "other", UserRole.ROLE_USER));
+        ReflectionTestUtils.setField(board, "id", boardId);
+
+        List<BoardImages> boardImages = List.of(new BoardImages("http://example.com/image1.jpg", board));
+        ReflectionTestUtils.setField(board, "imageUrls", boardImages);
+
+        // Mocking
+        when(userService.findUser(userId)).thenReturn(adminUser);
+        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+
+        // when
+        boardService.deleteBoards(userId, boardId);
+
+        // then
+        assertEquals(StatusEnum.DELETED, board.getStatusEnum()); // 게시글 상태가 삭제 상태로 변경되었는지 확인
+        verify(boardRepository).save(board); // 게시글이 저장소에 저장되었는지 확인
     }
 }
 
