@@ -16,8 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
-@FilterDef(name = "deletedFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
-@Filter(name = "deletedFilter", condition = "is_deleted = :isDeleted")
+@SQLRestriction("deleted = false")
 @NoArgsConstructor
 @Table(name = "users")
 public class User extends Timestamped {
