@@ -104,21 +104,20 @@ public class CommentLikeServiceTest {
         assertEquals(0, comment.getCommentLikesCount()); // 좋아요 수 감소 검증
     }
 
-//    @Test
-//    public void 댓글_좋아요_취소_실패_댓글이_존재하지_않는_경우() {
-//        // given
-//        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
-//        Long commentId = 1L;
-//        Long likeId = 1L;
-//
-//        // Mock 설정: 해당 댓글이 존재하지 않는 경우
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
-//
-//        // when & then: 댓글이 존재하지 않는 경우 예외 발생
-//        assertThrows(NotFoundCommentException.class, () ->
-//                commentLikeService.deleteCommentLike(commentId, likeId, authUser));
-//    }
-//
+    @Test
+    public void 댓글_좋아요_취소_실패_댓글이_존재하지_않는_경우() {
+        // given
+        Long userId = 1L;
+        Long commentId = 1L;
+
+        // Mock 설정: 해당 댓글이 존재하지 않는 경우
+        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        // when & then: 댓글이 존재하지 않는 경우 예외 발생
+        assertThrows(NotFoundCommentException.class, () ->
+                commentLikeService.deleteCommentLike(userId, commentId));
+    }
+
 //    @Test
 //    public void 댓글_좋아요_취소_실패_좋아요가_존재하지_않는_경우() {
 //        // given
