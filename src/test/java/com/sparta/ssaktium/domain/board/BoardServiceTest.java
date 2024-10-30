@@ -41,6 +41,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -159,39 +160,30 @@ public class BoardServiceTest {
         assertEquals(responseDto.getTitle(), updateRequestDto.getTitle());
         assertEquals(responseDto.getContents(), updateRequestDto.getContents());
     }
-//    @Test
-//    public void 보드_단건조회_성공 () throws IOException {
-//        //given
-//        long boardId = 1L;
-//        User user = new User("aa@aa.com","Qq123456!","aa", "1990",UserRole.ROLE_USER);
-//        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
-//
-//        // S3 업로드 메서드 Mocking
-//        String mockImageUrl = "http://mock-s3-url/test-image.jpg";
-//
-//        Board board = new Board(requestDto,user,mockImageUrl);
-//        ReflectionTestUtils.setField(board,"id",1L);
-//
-//        List<Comment> mockComments = Arrays.asList(
-//                new Comment("aa", board,user /* 기타 필요한 필드들 */),
-//                new Comment("aa", board,user /* 기타 필요한 필드들 */)
-//        );
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-//        when(commentService.findAllByBoardId(boardId)).thenReturn(mockComments);
-//        //when
-//        BoardDetailResponseDto responseDto = boardService.getBoard(boardId);
-//        //then
-//        assertNotNull(responseDto);
-//        assertEquals(board.getId(), responseDto.getId());
-//        assertEquals(board.getTitle(), responseDto.getTitle());
-//        assertEquals(board.getContent(), responseDto.getContents());
-//
-//        // 댓글 검증
-//        assertNotNull(responseDto.getComments());
-//        assertEquals(mockComments.size(), responseDto.getComments().size());
-//        assertEquals(mockComments.get(0).getContent(), responseDto.getComments().get(0).getContent());
-//        assertEquals(mockComments.get(1).getContent(), responseDto.getComments().get(1).getContent());
-//    }
+
+    @Test
+    public void 보드_단건조회_성공 () {
+        //given
+        long boardId = 1L;
+        User user = new User("aa@aa.com","Qq123456!","aa", "1990",UserRole.ROLE_USER);
+        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
+
+        Board board = new Board(requestDto.getTitle(),requestDto.getContents(),requestDto.getPublicStatus(),user);
+        ReflectionTestUtils.setField(board,"id",1L);
+
+        List<BoardImages> imageUrls = List.of(new BoardImages("aaa", board));
+        ReflectionTestUtils.setField(board, "imageUrls", imageUrls);
+
+        when(boardRepository.findByIdAndStatusEnum(boardId,StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+        when(boardRepository.countCommentsByBoardId(boardId)).thenReturn(4);
+        //when
+        BoardDetailResponseDto responseDto = boardService.getBoard(boardId);
+        //then
+        assertNotNull(responseDto);
+        assertEquals(board.getId(), responseDto.getId());
+        assertEquals(board.getTitle(), responseDto.getTitle());
+        assertEquals(board.getContent(), responseDto.getContents());
+    }
 //
 //    @Test
 //    public void 내_게시글_찾기() {
