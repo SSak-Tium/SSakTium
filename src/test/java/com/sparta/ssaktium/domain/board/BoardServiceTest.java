@@ -11,8 +11,6 @@ import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
-import com.sparta.ssaktium.domain.comments.entity.Comment;
-import com.sparta.ssaktium.domain.comments.service.CommentService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
@@ -31,17 +29,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,8 +65,8 @@ public class BoardServiceTest {
     @Test
     public void 보드_생성_성공() {
         //given
-        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
-        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
+        AuthUser authUser = new AuthUser(1L, "aa@aa.com", UserRole.ROLE_USER);
+        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa", "aaa", PublicStatus.ALL);
         // 임시 이미지 파일 생성 (Mocking MultipartFile)
         MultipartFile image = new MockMultipartFile("image", "test-image.jpg", "image/jpeg", "test image content".getBytes());
         List<MultipartFile> imageList = List.of(image);
@@ -81,12 +75,12 @@ public class BoardServiceTest {
         when(s3Service.uploadImageListToS3(anyList(), any())).thenReturn(List.of(mockImageUrl));
 
         Board mockBoard = new Board("aa", "aaa", PublicStatus.ALL, new User());
-        ReflectionTestUtils.setField(mockBoard,"id",1L); // ID 설정
+        ReflectionTestUtils.setField(mockBoard, "id", 1L); // ID 설정
 
         when(boardRepository.save(any(Board.class))).thenReturn(mockBoard);
 
         //when
-        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser.getUserId(),requestDto,imageList);
+        BoardSaveResponseDto responseDto = boardService.saveBoards(authUser.getUserId(), requestDto, imageList);
         //then
         assertNotNull(responseDto);
         assertEquals(responseDto.getTitle(), requestDto.getTitle());
@@ -98,21 +92,21 @@ public class BoardServiceTest {
     @Test
     public void 보드_이미지_수정_성공() {
         //given
-        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
+        AuthUser authUser = new AuthUser(1L, "aa@aa.com", UserRole.ROLE_USER);
         long boardId = 1L;
         // 게시글 소유자 생성
         User ownerUser = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
 
-        Board tempBoard = new Board("aa","aaa",PublicStatus.ALL,ownerUser);
-        ReflectionTestUtils.setField(tempBoard,"id",1L);
+        Board tempBoard = new Board("aa", "aaa", PublicStatus.ALL, ownerUser);
+        ReflectionTestUtils.setField(tempBoard, "id", 1L);
 
         List<BoardImages> existingImages = new ArrayList<>();
         existingImages.add(new BoardImages("oldImageUrl1", tempBoard));
         existingImages.add(new BoardImages("oldImageUrl2", tempBoard));
-        ReflectionTestUtils.setField(tempBoard,"imageUrls",existingImages);
+        ReflectionTestUtils.setField(tempBoard, "imageUrls", existingImages);
 
         when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
-        when(boardRepository.findByIdAndStatusEnum(boardId,StatusEnum.ACTIVATED)).thenReturn(Optional.of(tempBoard));
+        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(tempBoard));
 
         List<String> remainingImages = List.of("oldImageUrl1");
         List<MultipartFile> imageList = new ArrayList<>();
@@ -124,7 +118,7 @@ public class BoardServiceTest {
         when(s3Service.uploadImageToS3(any(MultipartFile.class), any())).thenReturn(newImageUrl);
 
         // when
-        BoardUpdateImageDto responseDto = boardService.updateImages(authUser.getUserId(), boardId, imageList,remainingImages);
+        BoardUpdateImageDto responseDto = boardService.updateImages(authUser.getUserId(), boardId, imageList, remainingImages);
         //then
         assertNotNull(responseDto);
         assertEquals(2, responseDto.getImageUrls().size()); // 남은 이미지 + 새로 추가된 이미지 확인
@@ -135,23 +129,23 @@ public class BoardServiceTest {
     @Test
     public void 보드_본문_수정_성공() {
         //given
-        AuthUser authUser = new AuthUser(1L,"aa@aa.com", UserRole.ROLE_USER);
+        AuthUser authUser = new AuthUser(1L, "aa@aa.com", UserRole.ROLE_USER);
         long boardId = 1L;
-        BoardSaveRequestDto oldRequestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
-        BoardSaveRequestDto updateRequestDto = new BoardSaveRequestDto("aa2","aaa2", PublicStatus.ALL);
+        BoardSaveRequestDto oldRequestDto = new BoardSaveRequestDto("aa", "aaa", PublicStatus.ALL);
+        BoardSaveRequestDto updateRequestDto = new BoardSaveRequestDto("aa2", "aaa2", PublicStatus.ALL);
         // 게시글 소유자 생성
         User ownerUser = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
 
         // reflection을 사용하여 user 필드 설정
-        Board updateBoard = new Board(oldRequestDto.getTitle(),oldRequestDto.getContents(),oldRequestDto.getPublicStatus(),ownerUser); // 기본 생성자 호출
-        ReflectionTestUtils.setField(updateBoard,"id",1L);
+        Board updateBoard = new Board(oldRequestDto.getTitle(), oldRequestDto.getContents(), oldRequestDto.getPublicStatus(), ownerUser); // 기본 생성자 호출
+        ReflectionTestUtils.setField(updateBoard, "id", 1L);
 
         // BoardImages 객체 생성
         List<BoardImages> imageUrls = List.of(new BoardImages("aaa", updateBoard));
         ReflectionTestUtils.setField(updateBoard, "imageUrls", imageUrls);
 
         when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
-        when(boardRepository.findByIdAndStatusEnum(boardId,StatusEnum.ACTIVATED)).thenReturn(Optional.of(updateBoard));
+        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(updateBoard));
         when(boardRepository.save(any(Board.class))).thenReturn(updateBoard);
         // when
         BoardSaveResponseDto responseDto = boardService.updateBoardContent(authUser.getUserId(), boardId, updateRequestDto);
@@ -162,19 +156,19 @@ public class BoardServiceTest {
     }
 
     @Test
-    public void 보드_단건조회_성공 () {
+    public void 보드_단건조회_성공() {
         //given
         long boardId = 1L;
-        User user = new User("aa@aa.com","Qq123456!","aa", "1990",UserRole.ROLE_USER);
-        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
+        User user = new User("aa@aa.com", "Qq123456!", "aa", "1990", UserRole.ROLE_USER);
+        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa", "aaa", PublicStatus.ALL);
 
-        Board board = new Board(requestDto.getTitle(),requestDto.getContents(),requestDto.getPublicStatus(),user);
-        ReflectionTestUtils.setField(board,"id",1L);
+        Board board = new Board(requestDto.getTitle(), requestDto.getContents(), requestDto.getPublicStatus(), user);
+        ReflectionTestUtils.setField(board, "id", 1L);
 
         List<BoardImages> imageUrls = List.of(new BoardImages("aaa", board));
         ReflectionTestUtils.setField(board, "imageUrls", imageUrls);
 
-        when(boardRepository.findByIdAndStatusEnum(boardId,StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
         when(boardRepository.countCommentsByBoardId(boardId)).thenReturn(4);
         //when
         BoardDetailResponseDto responseDto = boardService.getBoard(boardId);
@@ -184,54 +178,59 @@ public class BoardServiceTest {
         assertEquals(board.getTitle(), responseDto.getTitle());
         assertEquals(board.getContent(), responseDto.getContents());
     }
-//
-//    @Test
-//    public void 내_게시글_찾기() {
-//        // given
-//        AuthUser authUser = new AuthUser(1L, "aa@aa.com", UserRole.ROLE_USER);
-//        User user = new User("aa@aa.com", "aa", "Qq123456!", "1990",  UserRole.ROLE_USER);
-//        BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa","aaa", PublicStatus.ALL);
-//        String mockImageUrl = "http://mock-s3-url/test-image.jpg";
-//        // Mocking
-//        when(userService.findUser(authUser.getUserId())).thenReturn(user);
-//
-//        Board board1 = new Board(requestDto, user, "http://mock-s3-url/test-image1.jpg");
-//        ReflectionTestUtils.setField(board1, "id", 1L);
-//
-//        Board board2 = new Board(requestDto,  user, "http://mock-s3-url/test-image2.jpg");
-//        ReflectionTestUtils.setField(board2, "id", 2L);
-//
-//        Board board3 = new Board(requestDto,  user, "http://mock-s3-url/test-image3.jpg");
-//        ReflectionTestUtils.setField(board3, "id", 3L);
-//
-//
-//        // Mock Page 객체
-//        List<Board> mockBoards = Arrays.asList(board1, board2, board3);
-//        Page<Board> mockPage = new PageImpl<>(mockBoards, PageRequest.of(0, 5), mockBoards.size());
-//
-//        when(boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, PageRequest.of(0, 5)))
-//                .thenReturn(mockPage);
-//
-//        // 댓글 2개를 board1에 추가
-//        Comment comment1 = new Comment("댓글 내용 1", board1,user);
-//        ReflectionTestUtils.setField(comment1, "id", 1L);
-//
-//        Comment comment2 = new Comment("댓글 내용 2",board1, user);
-//        ReflectionTestUtils.setField(comment2, "id", 2L);
-//
-//        when(commentService.findAllByBoardId(board1.getId())).thenReturn(Arrays.asList(comment1, comment2));
-//
-//        // when
-//        BoardPageResponseDto responseDto = boardService.getMyBoards(authUser.getUserId(), 1, 5);
-//
-//        // then
-//        assertNotNull(responseDto);
-//        assertEquals(5, responseDto.getSize());
-//        assertEquals(1, responseDto.getTotalPages()); // 총 페이지 수
-//        assertEquals(mockBoards.size(), responseDto.getTotalElements());
-//
-//    }
 
+    @Test
+    public void 사용자_게시글_조회_성공() {
+        // given
+        Long userId = 1L;
+        User user = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
+        Board board = new Board("title", "content", PublicStatus.ALL, user);
+        ReflectionTestUtils.setField(board, "id", 1L);
+
+        List<BoardImages> boardImages = List.of(new BoardImages("http://example.com/image1.jpg", board));
+        ReflectionTestUtils.setField(board, "imageUrls", boardImages);
+
+        when(userService.findUser(userId)).thenReturn(user);
+        when(boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, PageRequest.of(0, 10)))
+                .thenReturn(new PageImpl<>(List.of(board), PageRequest.of(0, 10), 1));
+        when(boardRepository.countCommentsByBoardId(board.getId())).thenReturn(2);
+
+        // when
+        Page<BoardDetailResponseDto> response = boardService.getBoards(userId, "me", 1, 10);
+
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.getTotalElements());
+        assertEquals("title", response.getContent().get(0).getTitle());
+        assertEquals(2, response.getContent().get(0).getCommentCount());
+        assertEquals(1, response.getContent().get(0).getImageUrls().size());
+    }
+
+    @Test
+    public void 전체_게시글_조회_성공() {
+        // given
+        Long userId = 1L;
+        User user = new User("aa@aa.com", "password", "name", UserRole.ROLE_USER);
+        Board board = new Board("title", "content", PublicStatus.ALL, user);
+        ReflectionTestUtils.setField(board, "id", 1L);
+
+        List<BoardImages> boardImages = List.of(new BoardImages("http://example.com/image1.jpg", board));
+        ReflectionTestUtils.setField(board, "imageUrls", boardImages);
+
+        when(boardRepository.findAllByPublicStatus(PublicStatus.ALL, PageRequest.of(0, 10)))
+                .thenReturn(new PageImpl<>(List.of(board), PageRequest.of(0, 10), 1));
+        when(boardRepository.countCommentsByBoardId(board.getId())).thenReturn(2);
+
+        // when
+        Page<BoardDetailResponseDto> response = boardService.getBoards(userId, "all", 1, 10);
+
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.getTotalElements());
+        assertEquals("title", response.getContent().get(0).getTitle());
+        assertEquals(2, response.getContent().get(0).getCommentCount());
+        assertEquals(1, response.getContent().get(0).getImageUrls().size());
+    }
 }
 
 
