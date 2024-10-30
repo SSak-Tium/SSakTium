@@ -61,13 +61,13 @@ public class BoardLikeServiceTest {
         Long userId = 1L;
         Long boardId = 1L;
 
-//        // Mock 설정: 해당 게시글에 이미 좋아요 누른 경우
-//        Board board = new Board();
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-//        when(boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)).thenReturn(true);
-//
-//        // when & then: 예외 발생 검증
-//        assertThrows(AlreadyLikedException.class, () -> boardLikeService.postBoardLikes(boardId, userId));
+        // Mock 설정: 해당 게시글에 이미 좋아요 누른 경우
+        Board board = new Board();
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)).thenReturn(true);
+
+        // when & then: 예외 발생 검증
+        assertThrows(AlreadyLikedException.class, () -> boardLikeService.postBoardLikes(boardId, userId));
     }
 
 //    @Test
