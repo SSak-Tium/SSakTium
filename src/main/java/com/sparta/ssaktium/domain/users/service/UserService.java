@@ -121,11 +121,6 @@ public class UserService {
         return "회원탈퇴가 정상적으로 완료되었습니다.";
     }
 
-    // 유저 조회 메서드 ( id )
-//    public User findUser(long userId) {
-//        return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-//    }
-
     @Transactional
     public User findUser(long userId) {
         // Hibernate Session에서 필터 활성화

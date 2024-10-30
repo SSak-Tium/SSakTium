@@ -45,67 +45,57 @@ public class DictionaryController {
     @GetMapping("/v1/dictionaries/{id}")
     @Operation(summary = "식물도감 단건 조회", description = "식물도감 단건 조회하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
-    public ResponseEntity<CommonResponse<DictionaryResponseDto>> getDictionary(@AuthenticationPrincipal
-                                                                               AuthUser authUser,
-                                                                               @PathVariable
+    public ResponseEntity<CommonResponse<DictionaryResponseDto>> getDictionary(@PathVariable
                                                                                @Parameter(description = "요청할 식물도감 Id", example = "1")
                                                                                long id) {
-        return ResponseEntity.ok(CommonResponse.success(dictionaryService.getDictionary(authUser.getUserId(), id)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.getDictionary(id)));
     }
 
     @GetMapping("/v1/dictionaries")
     @Operation(summary = "식물도감 리스트 조회", description = "식물도감 리스트 조회하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
-    public ResponseEntity<CommonResponse<Page<DictionaryListResponseDto>>> getDictionaryList(@AuthenticationPrincipal
-                                                                                             AuthUser authUser,
-                                                                                             @RequestParam(defaultValue = "1")
+    public ResponseEntity<CommonResponse<Page<DictionaryListResponseDto>>> getDictionaryList(@RequestParam(defaultValue = "1")
                                                                                              @Parameter(description = "page", example = "1")
                                                                                              int page,
                                                                                              @RequestParam(defaultValue = "10")
                                                                                              @Parameter(description = "size", example = "10")
                                                                                              int size) {
-        return ResponseEntity.ok(CommonResponse.success(dictionaryService.getDictionaryList(authUser.getUserId(), page, size)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.getDictionaryList(page, size)));
     }
 
     @Secured("ROLE_ADMIN")
     @PutMapping(value = "/v1/dictionaries/{id}")
     @Operation(summary = "식물도감 수정", description = "식물도감 수정하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
-    public ResponseEntity<CommonResponse<DictionaryResponseDto>> updateDictionary(@AuthenticationPrincipal
-                                                                                  AuthUser authUser,
-                                                                                  @RequestBody
+    public ResponseEntity<CommonResponse<DictionaryResponseDto>> updateDictionary(@RequestBody
                                                                                   @Parameter(description = "식물도감 정보 수정")
                                                                                   DictionaryUpdateRequestDto dictionaryUpdateRequestDto,
                                                                                   @PathVariable
                                                                                   @Parameter(description = "요청할 식물도감 Id", example = "1")
                                                                                   long id) {
-        return ResponseEntity.ok(CommonResponse.success(dictionaryService.updateDictionary(authUser.getUserId(), dictionaryUpdateRequestDto, id)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.updateDictionary(dictionaryUpdateRequestDto, id)));
     }
 
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/v1/dictionaries/{id}/update-image")
     @Operation(summary = "식물도감 이미지 수정", description = "식물도감의 프로필 이미지를 수정하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
-    public ResponseEntity<CommonResponse<DictionaryImageResponseDto>> updateDictionary(@AuthenticationPrincipal
-                                                                                       AuthUser authUser,
-                                                                                       @PathVariable
+    public ResponseEntity<CommonResponse<DictionaryImageResponseDto>> updateDictionary(@PathVariable
                                                                                        @Parameter(description = "요청할 식물도감 Id", example = "1")
                                                                                        long id,
                                                                                        @RequestPart
                                                                                        @Parameter(description = "식물도감 프로필 사진")
                                                                                        MultipartFile image) {
-        return ResponseEntity.ok(CommonResponse.success(dictionaryService.updateDictionaryImage(authUser.getUserId(), id, image)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.updateDictionaryImage(id, image)));
     }
 
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/v1/dictionaries/{id}")
     @Operation(summary = "식물도감 삭제", description = "식물도감을 삭제하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
-    public ResponseEntity<CommonResponse<String>> deleteDictionary(@AuthenticationPrincipal
-                                                                   AuthUser authUser,
-                                                                   @PathVariable
+    public ResponseEntity<CommonResponse<String>> deleteDictionary(@PathVariable
                                                                    @Parameter(description = "요청할 식물도감 Id", example = "1")
                                                                    long id) {
-        return ResponseEntity.ok(CommonResponse.success(dictionaryService.deleteDictionary(authUser.getUserId(), id)));
+        return ResponseEntity.ok(CommonResponse.success(dictionaryService.deleteDictionary(id)));
     }
 }
