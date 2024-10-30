@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,13 +38,12 @@ class UserServiceTest {
     private S3Service s3Service;
     @Mock
     private FavoriteDictionaryRepository favoriteDictionaryRepository;
-    @Mock
-    private EntityManager entityManager;
 
     private User user;
     private long userId;
     private User savedUser;
     private String encodedPassword;
+    private List<Long> favoriteDictionaries;
 
 
     @BeforeEach
@@ -50,14 +51,17 @@ class UserServiceTest {
         userId = 1L;
         user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER);
         ReflectionTestUtils.setField(user, "id", userId);
+        ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
         encodedPassword = "encodedPassword";
         savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
+        favoriteDictionaries = List.of(1L, 2L);
     }
 
     @Test
     void 사용자_조회_성공() {
         // given
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(favoriteDictionaryRepository.findFavoriteDictionaryIdsByUserId(anyLong())).willReturn(favoriteDictionaries);
 
         // when
         UserResponseDto responseDto = userService.getUser(userId);
