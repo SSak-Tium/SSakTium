@@ -45,7 +45,7 @@ public class FavoriteDictionaryService {
     }
 
     // 관심 식물도감 찾는 메서드
-    public List<Long> findFavoriteDictionary(long userId) {
-        return favoriteDictionaryRepository.findFavoriteDictionaryIdsByUserId(userId);
-    }
+//    public List<Long> findFavoriteDictionary(long userId) {
+//        return favoriteDictionaryRepository.findFavoriteDictionaryIdsByUserId(userId);
+//    }
 }
