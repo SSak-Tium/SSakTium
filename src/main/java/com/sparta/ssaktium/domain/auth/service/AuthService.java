@@ -57,6 +57,10 @@ public class AuthService {
         User user = userRepository.findByEmail(signinRequestDto.getEmail()).orElseThrow(
                 NotFoundUserException::new);
 
+        if (user.isDeleted()) {
+            throw new DeletedUserException();
+        }
+
         // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환
         if (!passwordEncoder.matches(signinRequestDto.getPassword(), user.getPassword())) {
             throw new UnauthorizedPasswordException();
