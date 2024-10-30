@@ -84,7 +84,6 @@ public class BoardController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-
     /**
      * 게시글 단건 조회
      *

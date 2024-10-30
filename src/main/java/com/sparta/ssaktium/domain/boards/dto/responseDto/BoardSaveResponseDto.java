@@ -12,12 +12,12 @@ public class BoardSaveResponseDto {
     public final Long id;
     public final String title;
     public final String contents;
-    private final List<BoardImages> imageUrls;
+    private final List<String> imageUrls;
 
-    public BoardSaveResponseDto(Board board) {
+    public BoardSaveResponseDto(Board board,List<String> imageUrls) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.contents = board.getContent();
-        this.imageUrls = board.getImageUrls();
+        this.imageUrls = imageUrls;
     }
 }

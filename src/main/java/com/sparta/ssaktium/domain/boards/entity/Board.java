@@ -38,7 +38,7 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<BoardImages> imageUrls;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)

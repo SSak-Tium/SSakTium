@@ -11,6 +11,7 @@ import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.InvalidBoardTypeException;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
+import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class BoardService {
     private final UserService userService;
     private final FriendService friendService;
     private final S3Service s3Service;
+    private final BoardImagesRepository boardImagesRepository;
 
 
     @Transactional
@@ -46,7 +49,6 @@ public class BoardService {
         //유저 확인
         User user = userService.findUser(userId);
 
-        //제공받은 정보로 새 보드 만들기
         Board board = new Board(requestDto.getTitle(),
                 requestDto.getContents(),
                 requestDto.getPublicStatus(),
@@ -55,16 +57,15 @@ public class BoardService {
         // 업로드한 파일의 S3 URL 주소
         List<String> imageUrls = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
 
-        List<BoardImages> boardImages = new ArrayList<>();
-        for (String imageUrl : imageUrls) {
-            BoardImages boardImage = new BoardImages(imageUrl, board);
-            boardImages.add(boardImage);
-        }
-
         //저장
         Board savedBoard = boardRepository.save(board);
+        //boardimages에 저장
+        for (String imageUrl : imageUrls) {
+            BoardImages boardImage = new BoardImages(imageUrl, savedBoard);// Board 설정
+            boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
+        }
         //responseDto 반환
-        return new BoardSaveResponseDto(savedBoard);
+        return new BoardSaveResponseDto(savedBoard, imageUrls);
     }
 
     @Transactional
@@ -80,32 +81,39 @@ public class BoardService {
         if (!board.getUser().equals(user)) {
             throw new NotUserOfBoardException();
         }
-        // 기존 등록된 URL로 리스트 생성하기
+        // 기존 BoardImages 삭제 (DB 및 S3에서)
         List<BoardImages> existingImages = board.getImageUrls();
-        List<String> imageUrls = existingImages.stream()
-                .map(BoardImages::getImageUrl)
-                .toList();
-
-        //가져온 이미지 리스트 삭제
-        for (String imageUrl : imageUrls) {
-            if (!remainingImages.contains(imageUrl)) {
-                s3Service.deleteObject(s3Service.bucket, imageUrl); //S3에서 삭제
+        for (BoardImages boardImage : existingImages) {
+            if (!remainingImages.contains(boardImage.getImageUrl())) {
+                s3Service.deleteObject(s3Service.bucket, boardImage.getImageUrl()); // S3에서 이미지 삭제
             }
         }
+        //boardImages에 해당 보드 id를 가진 항목 삭제
+        boardImagesRepository.deleteByBoardId(id);
 
         // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
         List<String> updatedImageList = new ArrayList<>(remainingImages);
-        for (MultipartFile image : imageList) {
-            String originalFileName = image.getOriginalFilename();
-            // 이미 존재하는 파일 이름을 유지
-            if (!updatedImageList.contains(originalFileName)) {
-                String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-                updatedImageList.add(newImageUrl);
+        //새로 추가하는 이미지가 비어있을 경우 작동 x
+        if (!imageList.isEmpty()) {
+            for (MultipartFile image : imageList) {
+                if (!image.isEmpty()) {//비어있지 않은 파일만  처리
+                    String originalFileName = image.getOriginalFilename();
+                    // 이미 존재하는 파일 이름을 유지
+                    if (!updatedImageList.contains(originalFileName)) {
+                        String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+                        updatedImageList.add(newImageUrl);
+                    }
+                }
             }
         }
 
+        // BoardImages로 변환 후 저장
+        List<BoardImages> newBoardImages = updatedImageList.stream()
+                .map(imageUrl -> new BoardImages(imageUrl, board)) // 필요한 경우 추가 필드 설정
+                .toList();
+
         //게시글 수정
-        boardRepository.save(board);
+        boardImagesRepository.saveAll(newBoardImages);
         //responseDto 반환
         return new BoardUpdateImageDto(updatedImageList);
     }
@@ -131,8 +139,12 @@ public class BoardService {
         // 게시글 수정
         board.updateBoards(title, content, publicStatus); // 이미지 리스트는 그대로 유지
         Board updatedBoard = boardRepository.save(board);
+        // 기존의 BoardImages에서 imageUrl만 추출하여 문자열 리스트로 변환
+        List<String> imageUrls = updatedBoard.getImageUrls().stream()
+                .map(BoardImages::getImageUrl) // 각 BoardImages의 imageUrl만 가져옴
+                .toList();
         // responseDto 반환
-        return new BoardSaveResponseDto(updatedBoard);
+        return new BoardSaveResponseDto(updatedBoard, imageUrls);
     }
 
     @Transactional
@@ -169,8 +181,11 @@ public class BoardService {
         Board board = boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED).orElseThrow(NotFoundBoardException::new);
         // 댓글 수 가져오기
         int commentCount = boardRepository.countCommentsByBoardId(board.getId());
-
-        return new BoardDetailResponseDto(board, commentCount);
+        //boardimage url만 가져오기
+        List<String> imageUrls = board.getImageUrls().stream()
+                .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
+                .toList();
+        return new BoardDetailResponseDto(board, imageUrls, commentCount);
     }
 
     public Page<BoardDetailResponseDto> getBoards(Long userId, String type, int page, int size) {
@@ -185,7 +200,10 @@ public class BoardService {
 
             for (Board board : boards) {
                 int commentCount = boardRepository.countCommentsByBoardId(board.getId());
-                boardDetails.add(new BoardDetailResponseDto(board, commentCount));
+                List<String> imageUrls = board.getImageUrls().stream()
+                        .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
+                        .toList();
+                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
             }
             return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
 
@@ -195,7 +213,10 @@ public class BoardService {
 
             for (Board board : boardsPage.getContent()) {
                 int commentCount = boardRepository.countCommentsByBoardId(board.getId());
-                boardDetails.add(new BoardDetailResponseDto(board, commentCount));
+                List<String> imageUrls = board.getImageUrls().stream()
+                        .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
+                        .toList();
+                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
             }
             return new PageImpl<>(boardDetails, pageable, boardsPage.getTotalElements());
         } else {
@@ -225,8 +246,12 @@ public class BoardService {
         for (Board board : boardsPage) {
             // 댓글 리스트 가져오기
             int commentCount = boardRepository.countCommentsByBoardId(board.getId());
+            //image url만 가져오기
+            List<String> imageUrls = board.getImageUrls().stream()
+                    .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
+                    .toList();
             // 댓글 리스트 대신 댓글 수만 포함하는 DTO 생성
-            dtoList.add(new BoardDetailResponseDto(board, commentCount));
+            dtoList.add(new BoardDetailResponseDto(board,imageUrls, commentCount));
         }
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }

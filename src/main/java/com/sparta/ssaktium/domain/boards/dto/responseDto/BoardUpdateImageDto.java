@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.boards.dto.responseDto;
 
+import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import lombok.Getter;
 
 import java.util.List;
