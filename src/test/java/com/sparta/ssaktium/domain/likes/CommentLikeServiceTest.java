@@ -9,6 +9,7 @@ import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
 import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
 import com.sparta.ssaktium.domain.likes.commentLikes.service.CommentLikeService;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
+import com.sparta.ssaktium.domain.likes.exception.NotFoundCommentLikeException;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,23 +119,21 @@ public class CommentLikeServiceTest {
                 commentLikeService.deleteCommentLike(userId, commentId));
     }
 
-//    @Test
-//    public void 댓글_좋아요_취소_실패_좋아요가_존재하지_않는_경우() {
-//        // given
-//        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
-//        Long commentId = 1L;
-//        Long likeId = 1L;
-//
-//        // Mock 설정: 댓글은 있는데 좋아요가 없는 경우
-//        Comment comment = new Comment();
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-//        when(commentLikeRepository.existsByCommentIdAndUserId(commentId, authUser.getUserId())).thenReturn(false);
-//
-//        // when & then: 좋아요가 존재하지 않는 경우 예외 발생
-//        assertThrows(NotFoundCommentLikeException.class, () ->
-//                commentLikeService.deleteCommentLike(commentId, likeId, authUser));
-//    }
-//
+    @Test
+    public void 댓글_좋아요_취소_실패_좋아요가_존재하지_않는_경우() {
+        // given
+        Long userId = 1L;
+        Long commentId = 1L;
+
+        // Mock 설정: 댓글은 있는데 좋아요가 없는 경우
+        Comment comment = new Comment();
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+        // when & then: 좋아요가 존재하지 않는 경우 예외 발생
+        assertThrows(NotFoundCommentLikeException.class, () ->
+                commentLikeService.deleteCommentLike(userId, commentId));
+    }
+
 //    @Test
 //    public void 댓글_좋아요_취소_좋아요_주인이_다른_경우() {
 //        // given
