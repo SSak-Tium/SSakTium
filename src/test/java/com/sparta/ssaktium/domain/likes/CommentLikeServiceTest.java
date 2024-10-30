@@ -70,21 +70,21 @@ public class CommentLikeServiceTest {
         assertThrows(NotFoundCommentException.class, () -> commentLikeService.postCommentLike(userId, commentId));
     }
 
-//    @Test
-//    public void 댓글_좋아요_등록_실패_이미_좋아요를_누른_경우() {
-//        // given
-//        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
-//        Long commentId = 1L;
-//
-//        // Mock 설정: 해당 댓글에 이미 좋아요 누른 경우
-//        Comment comment = new Comment();
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-//        when(commentLikeRepository.existsByCommentIdAndUserId(commentId, authUser.getUserId())).thenReturn(true);
-//
-//        // when & then: 이미 좋아요를 누른 경우 예외 발생
-//        assertThrows(AlreadyLikedException.class, () ->
-//                commentLikeService.postCommentLike(commentId, authUser));
-//    }
+    @Test
+    public void 댓글_좋아요_등록_실패_이미_좋아요를_누른_경우() {
+        // given
+        Long userId = 1L;
+        Long commentId = 1L;
+
+        // Mock 설정: 해당 댓글에 이미 좋아요 누른 경우
+        Comment comment = new Comment();
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)).thenReturn(true);
+
+        // when & then: 이미 좋아요를 누른 경우 예외 발생
+        assertThrows(AlreadyLikedException.class, () ->
+                commentLikeService.postCommentLike(commentId, userId));
+    }
 
 //    @Test
 //    public void 댓글_좋아요_취소_성공() {
