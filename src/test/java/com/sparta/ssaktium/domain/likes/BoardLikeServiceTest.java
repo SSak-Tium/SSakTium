@@ -1,7 +1,9 @@
 package com.sparta.ssaktium.domain.likes;
 
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
 import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLike;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
@@ -33,6 +35,9 @@ public class BoardLikeServiceTest {
     private BoardLikeRepository boardLikeRepository;
 
     @Mock
+    private BoardService boardService;
+
+    @Mock
     private BoardRepository boardRepository;
 
     @Test
@@ -53,6 +58,19 @@ public class BoardLikeServiceTest {
         assertNotNull(response); // 응답이 null이 아님
         assertEquals(boardId, response.getBoardId()); // 게시글 ID 검증
         assertEquals(1, response.getBoardLikesCount()); // 좋아요 수 증가 검증
+    }
+
+    @Test
+    void 게시글_좋아요_등록_실패_게시글이_존재하지_않음() {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
+        // Mock 설정
+        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NotFoundBoardException.class, () -> boardLikeService.postBoardLikes(userId, boardId));
     }
 
     @Test
