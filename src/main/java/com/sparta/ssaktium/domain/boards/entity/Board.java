@@ -9,7 +9,6 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -27,18 +26,11 @@ public class Board extends Timestamped {
 
     private String content;
 
-    @ElementCollection
-    private List<String> imageList;
-
     private int boardLikesCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
-    @BatchSize(size = 15)
-    private List<Comment> comments;
 
     @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
@@ -46,17 +38,18 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
 
-    public Board(String title, String content, PublicStatus publicStatus, User user, List<String> imageList) {
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<BoardImages> imageUrls;
+
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
+    public Board(String title, String content, PublicStatus publicStatus, User user) {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
         this.user = user;
-        this.imageList = imageList;
         this.statusEnum = StatusEnum.ACTIVATED;
-    }
-
-    public void updateImagesBoards(List<String> imageList) {
-        this.imageList = imageList;
     }
 
     public void updateBoards(String title, String content, PublicStatus publicStatus) {

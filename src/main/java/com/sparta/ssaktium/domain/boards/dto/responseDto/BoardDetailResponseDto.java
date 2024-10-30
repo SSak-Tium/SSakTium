@@ -1,7 +1,7 @@
 package com.sparta.ssaktium.domain.boards.dto.responseDto;
 
 import com.sparta.ssaktium.domain.boards.entity.Board;
-import com.sparta.ssaktium.domain.comments.dto.response.CommentSimpleResponseDto;
+import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import lombok.Getter;
 
 import java.util.List;
@@ -12,16 +12,16 @@ public class BoardDetailResponseDto {
     private final Long id;
     private final String title;
     private final String contents;
-    private final List<String> imageUrl;
     private final int boardLikesCount;
-    private final List<CommentSimpleResponseDto> comments;
+    private final List<String> imageUrls;
+    private final int commentCount;
 
-    public BoardDetailResponseDto(Board board, List<CommentSimpleResponseDto> comments) {
+    public BoardDetailResponseDto(Board board, List<String> imageUrls,int commentCount) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.contents = board.getContent();
-        this.imageUrl = board.getImageList();
         this.boardLikesCount = board.getBoardLikesCount();
-        this.comments = comments;
+        this.imageUrls = imageUrls;
+        this.commentCount = commentCount;
     }
 }

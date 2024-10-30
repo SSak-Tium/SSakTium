@@ -17,6 +17,7 @@ public enum GlobalExceptionConst {
     ERR_ALREADY_FRIEND(HttpStatus.BAD_REQUEST, "이미 수락했거나 거절된 친구 요청입니다."),
     LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, "좋아요 수는 0보다 작을 수 없습니다."),
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "이미지 업로드 중 오류가 발생했습니다."),
+    INVALID_BOARD_TYPE(HttpStatus.BAD_REQUEST,"게시판 타입이 잘못되었습니다.('me','all')"),
 
     // 상태코드 401
     UNAUTHORIZED_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호를 확인해주세요."),
