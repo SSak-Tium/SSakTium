@@ -69,7 +69,7 @@ class AuthServiceTest {
         signinRequestDto = new SigninRequestDto("email", "password");
         savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
         deletedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
-        ReflectionTestUtils.setField(deletedUser, "userStatus", UserStatus.DELETED);
+        ReflectionTestUtils.setField(deletedUser, "deleted", true);
     }
 
     @Test
@@ -136,7 +136,6 @@ class AuthServiceTest {
     void 로그인_실패_삭제된_유저() {
         // given
         given(userRepository.findByEmail(anyString())).willReturn(Optional.of(deletedUser));
-        given(passwordEncoder.matches(anyString(), anyString())).willReturn(true);
 
         // when
         DeletedUserException exception = assertThrows(
