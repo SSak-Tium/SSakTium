@@ -26,75 +26,62 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/v1/users/{Id}")
+    @GetMapping("/v1/users/{id}")
     @Operation(summary = "프로필 조회", description = "프로필 조회할 때 사용하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다")
-    @Parameters({
-            @Parameter(name = "id", description = "요청할 유저 ID값", example = "1")
-    })
-    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(
-            @PathVariable long Id
-    ) {
-        return ResponseEntity.ok(CommonResponse.success(userService.getUser(Id)));
+    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(@PathVariable
+                                                                   @Parameter(name = "id", description = "요청할 유저 ID값", example = "1")
+                                                                   long id) {
+        return ResponseEntity.ok(CommonResponse.success(userService.getUser(id)));
     }
 
-    /**
-     * 유저 비밀번호 수정
-     *
-     * @param authUser                     로그인 유저
-     * @param userChangePasswordRequestDto 비밀번호 확인 : 이전 비밀번호, 새 비밀번호
-     * @return
-     */
     @PostMapping("/v1/users/change-password")
-    public ResponseEntity<CommonResponse<String>> changePassword(
-            @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody UserChangePasswordRequestDto userChangePasswordRequestDto
-    ) {
+    @Operation(summary = "유저 비밀번호 수정", description = "내 비밀번호 수정하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<String>> changePassword(@AuthenticationPrincipal
+                                                                 AuthUser authUser,
+                                                                 @RequestBody
+                                                                 @Parameter(description = "이전 비밀번호와 새 비밀번호")
+                                                                 UserChangePasswordRequestDto userChangePasswordRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(userService.changePassword(authUser.getUserId(), userChangePasswordRequestDto)));
     }
 
-    /**
-     * 유저 회원정보 수정
-     *
-     * @param authUser             로그인 유저
-     * @param userChangeRequestDto 프로필 이미지, 이름
-     * @return
-     */
     @PutMapping("/v1/users/{id}")
-    public ResponseEntity<CommonResponse<UserResponseDto>> updateUser(
-            @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable long id,
-            @RequestBody UserChangeRequestDto userChangeRequestDto
+    @Operation(summary = "유저 회원정보 수정", description = "유저 회원정보 수정하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<UserResponseDto>> updateUser(@AuthenticationPrincipal
+                                                                      AuthUser authUser,
+                                                                      @PathVariable
+                                                                      @Parameter(description = "요청할 유저 ID값", example = "1")
+                                                                      long id,
+                                                                      @RequestBody
+                                                                      @Parameter(description = "회원정보")
+                                                                      UserChangeRequestDto userChangeRequestDto
     ) {
         return ResponseEntity.ok(CommonResponse.success(userService.updateUser(authUser.getUserId(), id, userChangeRequestDto)));
     }
 
-    /**
-     * 유저 이미지 수정
-     *
-     * @param image    프로필 이미지
-     * @return
-     */
     @PostMapping(value = "/v1/users/update-image")
-    public ResponseEntity<CommonResponse<UserImageResponseDto>> updateDictionary(
-            @RequestPart MultipartFile image
+    @Operation(summary = "유저 프로필 이미지 수정", description = "내 프로필 이미지 수정하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<UserImageResponseDto>> updateDictionary(@RequestPart
+                                                                                 @Parameter(description = "프로필 이미지")
+                                                                                 MultipartFile image
     ) {
         return ResponseEntity.ok(CommonResponse.success(userService.updateUserImage(image)));
     }
 
-    /**
-     * 유저 회원탈퇴
-     *
-     * @param authUser                    로그인 유저
-     * @param userCheckPasswordRequestDto 비밀번호 확인 : Password
-     * @param id                          변경 유저 id
-     * @return
-     */
     @DeleteMapping("/v1/users/{id}")
-    public ResponseEntity<CommonResponse<String>> deleteUser(
-            @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable long id,
-            @RequestBody UserCheckPasswordRequestDto userCheckPasswordRequestDto
+    @Operation(summary = "유저 회원탈퇴", description = "유저 회원탈퇴하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<String>> deleteUser(@AuthenticationPrincipal
+                                                             AuthUser authUser,
+                                                             @PathVariable
+                                                             @Parameter(description = "요청할 유저 ID값", example = "1")
+                                                             long id,
+                                                             @RequestBody
+                                                             @Parameter(description = "비밀번호 확인")
+                                                             UserCheckPasswordRequestDto userCheckPasswordRequestDto
 
     ) {
         return ResponseEntity.ok(CommonResponse.success(userService.deleteUser(authUser.getUserId(), id, userCheckPasswordRequestDto)));
