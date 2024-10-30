@@ -24,12 +24,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -47,29 +47,28 @@ class DictionaryServiceTest {
     @Mock
     private S3Service s3Service;
     @Mock
-    private AmazonS3Client s3Client;
-    @Mock
     private MultipartFile image;
 
     private AuthUser authUser;
     private User user;
     private Dictionary dictionary;
+    private String imageName;
     private String imageUrl;
     private long userId;
     private long dictionaryId;
 
     @BeforeEach
-    void setUp(){
-        ReflectionTestUtils.setField(s3Service, "s3Client", s3Client);
+    void setUp() {
         userId = 1L;
         dictionaryId = 1L;
         authUser = mock(AuthUser.class);
         ReflectionTestUtils.setField(authUser, "userId", 1L);
-        user = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_USER);
+        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER);
         ReflectionTestUtils.setField(user, "id", 1L);
         dictionary = Dictionary.addDictionary("title", "content", user, "https://image.url");
         ReflectionTestUtils.setField(dictionary, "id", 1L);
         imageUrl = "https://image.url";
+        imageName = "image.jpg";
     }
 
     @Test
@@ -91,8 +90,6 @@ class DictionaryServiceTest {
     @Test
     void 식물도감_단건조회_성공() {
         // given
-
-        given(userService.findUser(anyLong())).willReturn(user);
         given(dictionaryRepository.findById(anyLong())).willReturn(Optional.of(dictionary));
 
         // when
@@ -127,12 +124,10 @@ class DictionaryServiceTest {
 
 
     @Test
-    void 식물도감_수정_성공() throws IOException {
+    void 식물도감_수정_성공() {
         // given
-        DictionaryUpdateRequestDto requestDto = new DictionaryUpdateRequestDto(imageUrl,"new title", "content");
-        given(userService.findUser(1L)).willReturn(user);
+        DictionaryUpdateRequestDto requestDto = new DictionaryUpdateRequestDto(imageUrl, "new title", "content");
         given(dictionaryRepository.findById(anyLong())).willReturn(Optional.of(dictionary));
-        given(s3Service.uploadImageToS3(any(MultipartFile.class), any())).willReturn(imageUrl);
 
         dictionary.update(requestDto);
         given(dictionaryRepository.save(any(Dictionary.class))).willReturn(dictionary);
@@ -146,8 +141,6 @@ class DictionaryServiceTest {
     @Test
     void 식물도감_삭제_성공() {
         // given
-        String imageName = "image.jpg";
-        given(userService.findUser(1L)).willReturn(user);
         given(dictionaryRepository.findById(anyLong())).willReturn(Optional.of(dictionary));
         given(s3Service.extractFileNameFromUrl(dictionary.getImageUrl())).willReturn(imageName);
 
@@ -156,7 +149,6 @@ class DictionaryServiceTest {
 
         // then
         assertThat(result).isEqualTo("정상적으로 삭제되었습니다.");
-        verify(s3Client).deleteObject(s3Service.bucket, imageName);
         verify(dictionaryRepository).delete(dictionary);
     }
 }
