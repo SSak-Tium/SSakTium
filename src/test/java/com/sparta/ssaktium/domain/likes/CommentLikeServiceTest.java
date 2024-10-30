@@ -1,61 +1,61 @@
-//package com.sparta.ssaktium.domain.likes;
-//
-//import com.sparta.ssaktium.domain.comments.entity.Comment;
-//import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
-//import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
-//import com.sparta.ssaktium.domain.common.dto.AuthUser;
-//import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
-//import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
-//import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
-//import com.sparta.ssaktium.domain.likes.commentLikes.service.CommentLikeService;
-//import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
-//import com.sparta.ssaktium.domain.likes.exception.LikeOwnerMismatchException;
-//import com.sparta.ssaktium.domain.likes.exception.NotFoundCommentLikeException;
-//import com.sparta.ssaktium.domain.users.enums.UserRole;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.when;
-//
-//@ExtendWith(MockitoExtension.class)
-//public class CommentLikeServiceTest {
-//
-//    // 실제 테스트할 서비스 객체
-//    @InjectMocks
-//    private CommentLikeService commentLikeService;
-//
-//    @Mock
-//    private CommentRepository commentRepository;
-//
-//    @Mock
-//    private CommentLikeRepository commentLikeRepository;
-//
-//    @Test
-//    public void 댓글_좋아요_등록_성공() {
-//        // given
-//        AuthUser authUser = new AuthUser(1L, "user@example.com", UserRole.ROLE_USER);
-//        Long commentId = 1L;
-//
-//        // Mock 설정: 댓글은 있는데 좋아요를 아직 안누른 경우
-//        Comment comment = new Comment();
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-//        when(commentLikeRepository.existsByCommentIdAndUserId(commentId, authUser.getUserId())).thenReturn(false);
-//
-//        // when: 댓글 좋아요 등록
-//        CommentLikeReponseDto response = commentLikeService.postCommentLike(commentId, authUser);
-//
-//        // then
-//        assertNotNull(response); // 응답이 null이 아님
-//        assertEquals(commentId, response.getCommentId()); // 댓글 ID 검증
-//        assertEquals(1, response.getCommentLikesCount()); // 좋아요 수 증가 검증
-//    }
-//
+package com.sparta.ssaktium.domain.likes;
+
+import com.sparta.ssaktium.domain.comments.entity.Comment;
+import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
+import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
+import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
+import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
+import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
+import com.sparta.ssaktium.domain.likes.commentLikes.service.CommentLikeService;
+import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
+import com.sparta.ssaktium.domain.likes.exception.LikeOwnerMismatchException;
+import com.sparta.ssaktium.domain.likes.exception.NotFoundCommentLikeException;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class CommentLikeServiceTest {
+
+    // 실제 테스트할 서비스 객체
+    @InjectMocks
+    private CommentLikeService commentLikeService;
+
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private CommentLikeRepository commentLikeRepository;
+
+    @Test
+    public void 댓글_좋아요_등록_성공() {
+        // given
+        Long userId = 1L;
+        Long commentId = 1L;
+
+        // Mock 설정: 댓글은 있는데 좋아요를 아직 안누른 경우
+        Comment comment = new Comment();
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)).thenReturn(false);
+
+        // when: 댓글 좋아요 등록
+        CommentLikeReponseDto response = commentLikeService.postCommentLike(commentId, userId);
+
+        // then
+        assertNotNull(response); // 응답이 null이 아님
+        assertEquals(commentId, response.getCommentId()); // 댓글 ID 검증
+        assertEquals(1, response.getCommentLikesCount()); // 좋아요 수 증가 검증
+    }
+
 //    @Test
 //    public void 댓글_좋아요_등록_실패_이미_좋아요를_누른_경우() {
 //        // given
@@ -146,4 +146,4 @@
 //        assertThrows(LikeOwnerMismatchException.class, () ->
 //                commentLikeService.deleteCommentLike(commentId, likeId, authUser));
 //    }
-//}
+}
