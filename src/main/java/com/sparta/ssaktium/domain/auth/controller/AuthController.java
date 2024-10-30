@@ -30,8 +30,7 @@ public class AuthController {
     public ResponseEntity<CommonResponse<SignupResponseDto>> signup(@Valid
                                                                     @RequestBody
                                                                     @Parameter(description = "회원정보 입력")
-                                                                    SignupRequestDto signupRequestDto
-    ) {
+                                                                    SignupRequestDto signupRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(authService.signup(signupRequestDto)));
     }
 
@@ -41,8 +40,7 @@ public class AuthController {
     public ResponseEntity<CommonResponse<SigninResponseDto>> signin(@Valid
                                                                     @RequestBody
                                                                     @Parameter(description = "로그인정보 입력")
-                                                                    SigninRequestDto signinRequestDto
-    ) {
+                                                                    SigninRequestDto signinRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(authService.signin(signinRequestDto)));
     }
 }
