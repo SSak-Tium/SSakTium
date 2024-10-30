@@ -1,11 +1,16 @@
 package com.sparta.ssaktium.domain.plants.plantDiaries.controller;
 
-import com.sparta.ssaktium.config.ApiResponse;
+import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.requestDto.PlantDiaryUpdateRequestDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.dto.responseDto.PlantDiaryResponseDto;
 import com.sparta.ssaktium.domain.plants.plantDiaries.service.PlantDiaryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -13,104 +18,95 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/v1")
 @RequiredArgsConstructor
+@Tag(name = "내 식물 다이어리 관리기능", description = "내 식물의 다이어리(활동)을 등록하고 관리할 수 있는 기능")
 public class PlantDiaryController {
 
     private final PlantDiaryService plantDiaryService;
 
-    /**
-     * plantDiary 등록 API
-     * @param authUser
-     * @param id
-     * @param requestDto
-     * @param image
-     * @return
-     */
     @PostMapping("/plants/{id}/diaries")
-    public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> createDiary(@AuthenticationPrincipal AuthUser authUser,
-                                                                          @PathVariable Long id,
-                                                                          @RequestPart PlantDiaryRequestDto requestDto,
-                                                                          @RequestPart(required = false) MultipartFile image) {
+    @Operation(summary = "내 식물 등록", description = "내 식물 등록하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<PlantDiaryResponseDto>> createDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                                             @PathVariable
+                                                                             @Parameter(description = "식물아이디")
+                                                                             Long id,
+                                                                             @RequestPart
+                                                                             @Parameter(description = "식물정보")
+                                                                             PlantDiaryRequestDto requestDto,
+                                                                             @RequestPart(required = false)
+                                                                             @Parameter(description = "식물이미지파일 (선택)")
+                                                                             MultipartFile image) {
         PlantDiaryResponseDto responseDto = plantDiaryService.createDiary(authUser.getUserId(), id, requestDto, image);
-        return ResponseEntity.ok(ApiResponse.success(responseDto));
+        return ResponseEntity.ok(CommonResponse.success(responseDto));
     }
 
-    /**
-     * plantDiary 목록조회 API
-     * @param authUser
-     * @param id
-     * @param page
-     * @param size
-     * @return
-     */
     @GetMapping("/plants/{id}/diaries")
-    public ResponseEntity<ApiResponse<Page<PlantDiaryResponseDto>>> getAllDiaries(@AuthenticationPrincipal AuthUser authUser,
-                                                                                  @PathVariable Long id,
-                                                                                  @RequestParam(defaultValue = "1") int page,
-                                                                                  @RequestParam(defaultValue = "10") int size) {
+    @Operation(summary = "내 식물 다이어리 다건 조회", description = "내 식물 다이어리를 다건 조회하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<Page<PlantDiaryResponseDto>>> getAllDiaries(@AuthenticationPrincipal AuthUser authUser,
+                                                                                     @PathVariable
+                                                                                     @Parameter(description = "식물아이디")
+                                                                                     Long id,
+                                                                                     @RequestParam(defaultValue = "1") int page,
+                                                                                     @RequestParam(defaultValue = "10") int size) {
         Page<PlantDiaryResponseDto> responseDto = plantDiaryService.getAllDiaries(authUser.getUserId(), id, page, size);
-        return ResponseEntity.ok(ApiResponse.success(responseDto));
+        return ResponseEntity.ok(CommonResponse.success(responseDto));
     }
 
-    /**
-     * plantDiary 단일조회 API
-     * @param authUser
-     * @param id
-     * @param diaryId
-     * @return
-     */
-    @GetMapping("/plants/{id}/diaries/{diaryId}")
-    public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> getDiary(@AuthenticationPrincipal AuthUser authUser,
-                                                                       @PathVariable Long id,
-                                                                       @PathVariable Long diaryId) {
-        PlantDiaryResponseDto responseDto = plantDiaryService.getDiary(authUser.getUserId(), id, diaryId);
-        return ResponseEntity.ok(ApiResponse.success(responseDto));
-    }
-
-    /**
-     * plantDiary 수정 API
-     * @param authUser
-     * @param id
-     * @param diaryId
-     * @param requestDto
-     * @return
-     */
-    @PutMapping("/plants/{id}/diaries/{diaryId}")
-    public ResponseEntity<ApiResponse<PlantDiaryResponseDto>> updateDiary(@AuthenticationPrincipal AuthUser authUser,
-                                                                          @PathVariable Long id,
-                                                                          @PathVariable Long diaryId,
-                                                                          @RequestPart PlantDiaryUpdateRequestDto requestDto) {
-        PlantDiaryResponseDto responseDto = plantDiaryService.updateDiary(authUser.getUserId(), id, diaryId, requestDto);
-        return ResponseEntity.ok(ApiResponse.success(responseDto));
-    }
-
-    /**
-     * plantDiary 삭제 API
-     * @param authUser
-     * @param id
-     * @param diaryId
-     * @return
-     */
-    @DeleteMapping("/plants/{id}/diaries/{diaryId}")
-    public ResponseEntity<ApiResponse<String>> deleteDiary(@AuthenticationPrincipal AuthUser authUser,
-                                                                          @PathVariable Long id,
+    @GetMapping("/plants/{plantId}/diaries/{diaryId}")
+    @Operation(summary = "내 식물 다이어리 단건 조회", description = "내 식물 다이어리를 단건 조회하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    @Parameters({
+            @Parameter(description = "식물아이디"),
+            @Parameter(description = "식물다이어리 아이디")
+    })
+    public ResponseEntity<CommonResponse<PlantDiaryResponseDto>> getDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                                          @PathVariable Long plantId,
                                                                           @PathVariable Long diaryId) {
-        return ResponseEntity.ok(ApiResponse.success(plantDiaryService.deleteDiary(authUser.getUserId(), id, diaryId)));
+        PlantDiaryResponseDto responseDto = plantDiaryService.getDiary(authUser.getUserId(), plantId, diaryId);
+        return ResponseEntity.ok(CommonResponse.success(responseDto));
     }
 
-    /**
-     * 수정 이미지 등록 API
-     * @param authUser
-     * @param image
-     * @return
-     */
+    @PutMapping("/plants/{plantId}/diaries/{diaryId}")
+    @Operation(summary = "내 식물 다이어리 수정", description = "내 식물 다이어리를 다건 조회하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<PlantDiaryResponseDto>> updateDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                                             @PathVariable
+                                                                             @Parameter(description = "식물 아이디")
+                                                                             Long plantId,
+                                                                             @PathVariable
+                                                                             @Parameter(description = "식물 다이어리 아이디")
+                                                                             Long diaryId,
+                                                                             @RequestBody
+                                                                             @Parameter(description = "식물 다이어리 정보")
+                                                                             PlantDiaryUpdateRequestDto requestDto) {
+        PlantDiaryResponseDto responseDto = plantDiaryService.updateDiary(authUser.getUserId(), plantId, diaryId, requestDto);
+        return ResponseEntity.ok(CommonResponse.success(responseDto));
+    }
+
+    @DeleteMapping("/plants/{plantId}/diaries/{diaryId}")
+    @Operation(summary = "내 식물 다이어리 수정", description = "내 식물 다이어리를 다건 조회하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<Void>> deleteDiary(@AuthenticationPrincipal AuthUser authUser,
+                                                              @PathVariable
+                                                              @Parameter(description = "식물 아이디")
+                                                              Long id,
+                                                              @PathVariable
+                                                              @Parameter(description = "식물 다이어리 아이디")
+                                                              Long diaryId) {
+        plantDiaryService.deleteDiary(authUser.getUserId(), id, diaryId);
+        return ResponseEntity.ok(CommonResponse.success(null));
+    }
+
     @PostMapping("/diaries/image")
-    public ResponseEntity<ApiResponse<String>> uploadDiaryImage(@AuthenticationPrincipal AuthUser authUser,
-                                                                @RequestParam MultipartFile image) {
-        return ResponseEntity.ok(ApiResponse.success(plantDiaryService.uploadDiaryImage(authUser.getUserId(), image)));
+    @Operation(summary = "다이어리 수정 이미지 등록", description = "수정할 이미지 등록하는 API")
+    @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
+    public ResponseEntity<CommonResponse<String>> uploadDiaryImage(@RequestPart
+                                                                   @Parameter (description = "수정할 이미지")
+                                                                   MultipartFile image) {
+        return ResponseEntity.ok(CommonResponse.success(plantDiaryService.uploadDiaryImage(image)));
     }
 }

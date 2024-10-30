@@ -27,7 +27,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
 
     @Transactional
-    public FriendResponseDto requestOrAcceptFriend(Long userId, Long friendId) {
+    public FriendResponseDto requestFriend(Long userId, Long friendId) {
 
         if (Objects.equals(userId, friendId)) {
             throw new SelfRequestException();
@@ -36,32 +36,38 @@ public class FriendService {
         User user = userService.findUser(userId);
         User friendUser = userService.findUser(friendId);
 
-        Optional<Friend> friendRelationship = findFriendRelationship(user.getId(), friendUser.getId());
+        Optional<Friend> existingFriendRequest =
+                friendRepository.findFriendRelationshipBetweenUsers(user.getId(), friendUser.getId());
 
-        if (friendRelationship.isEmpty()) {
-            Friend newFriendRequest = new Friend(user, friendUser);
-            friendRepository.save(newFriendRequest);
-            return new FriendResponseDto(newFriendRequest, user, friendUser);
+        if (existingFriendRequest.isPresent()) {
+            throw new FriendRequestAlreadySentException();
         }
 
-        Friend existingFriendRequest = friendRelationship.get();
+        Friend newFriend = new Friend(user, friendUser);
+
+        friendRepository.save(newFriend);
+
+        return new FriendResponseDto(newFriend, newFriend.getUser(), newFriend.getFriendUser());
+    }
+
+    @Transactional
+    public FriendResponseDto acceptFriend(Long userId, Long friendId) {
+
+        User user = userService.findUser(userId);
+        User friendUser = userService.findUser(friendId);
+
+        Friend existingFriendRequest =
+                friendRepository.findFriendRelationshipBetweenUsers(userId, friendId)
+                        .orElseThrow(NotFoundFriendRequestException::new);
 
         if (existingFriendRequest.getFriendStatus() == FriendStatus.ACCEPTED) {
             throw new AlreadyFriendsException();
         }
-        else if (existingFriendRequest.getFriendStatus() == FriendStatus.PENDING) {
-            if (existingFriendRequest.getUser().getId().equals(userId)) {
-                throw new FriendRequestAlreadySentException();
-            } else {
-                existingFriendRequest.acceptFriend();
-                friendRepository.save(existingFriendRequest);
-                return new FriendResponseDto(existingFriendRequest, existingFriendRequest.getFriendUser(), existingFriendRequest.getUser());
-            }
-        }
 
         existingFriendRequest.acceptFriend();
         friendRepository.save(existingFriendRequest);
-        return new FriendResponseDto(existingFriendRequest, existingFriendRequest.getFriendUser(), existingFriendRequest.getUser());
+
+        return new FriendResponseDto(existingFriendRequest, user, friendUser);
     }
 
     public Page<FriendPageResponseDto> getFriends(Long userId, int page, int size) {
@@ -69,8 +75,7 @@ public class FriendService {
         User user = userService.findUser(userId);
 
         Page<Friend> friendsPage =
-                friendRepository.findByUserOrFriend(
-                        user.getId(),
+                friendRepository.findFriendsByUserWithStatusOrder(
                         user.getId(),
                         PageRequest.of(page - 1, size
                         )
@@ -85,36 +90,21 @@ public class FriendService {
     }
 
     @Transactional
-    public String cancelOrDeleteFriend(Long userId, Long id) {
+    public void deleteFriend(Long userId, Long id) {
 
         User user = userService.findUser(userId);
 
-        Optional<Friend> friendRelationship = friendRepository.findByUserAndFriend(user.getId(), id);
-
-        if (friendRelationship.isEmpty()) {
-            friendRelationship = friendRepository.findByUserAndFriend(id, user.getId());
-        }
+        Optional<Friend> friendRelationship = friendRepository.findFriendRelationshipBetweenUsers(user.getId(), id);
 
         if (friendRelationship.isEmpty()) {
             throw new NotFoundFriendException();
         }
 
         friendRepository.delete(friendRelationship.get());
-
-        return "친구 거절/삭제 요청 완료";
-    }
-
-    private Optional<Friend> findFriendRelationship(Long userId, Long friendId) {
-        Optional<Friend> friendRelationship = friendRepository.findByUserAndFriend(userId, friendId);
-        if (friendRelationship.isEmpty()) {
-            friendRelationship = friendRepository.findByUserAndFriend(friendId, userId);
-        }
-        return friendRelationship;
     }
 
 
     public List<User> findFriends(long userId) {
         return friendRepository.findFriendsByUser(userId, FriendStatus.ACCEPTED);
     }
-
 }

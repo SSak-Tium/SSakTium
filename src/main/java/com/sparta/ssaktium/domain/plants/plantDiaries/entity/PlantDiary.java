@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "plant_diaries")
 public class PlantDiary extends Timestamped {
 
     @Id

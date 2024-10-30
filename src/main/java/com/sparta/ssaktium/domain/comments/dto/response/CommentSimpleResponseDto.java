@@ -1,7 +1,6 @@
 package com.sparta.ssaktium.domain.comments.dto.response;
 
 import lombok.Getter;
-
 import java.time.LocalDateTime;
 
 @Getter

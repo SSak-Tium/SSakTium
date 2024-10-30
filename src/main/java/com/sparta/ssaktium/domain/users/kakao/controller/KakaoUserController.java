@@ -1,14 +1,11 @@
 package com.sparta.ssaktium.domain.users.kakao.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sparta.ssaktium.config.ApiResponse;
 import com.sparta.ssaktium.config.JwtUtil;
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.kakao.service.KakaoUserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

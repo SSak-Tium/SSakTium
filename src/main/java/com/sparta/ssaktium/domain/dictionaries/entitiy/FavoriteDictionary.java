@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Entity
 @RequiredArgsConstructor
+@Table(name = "favorite_dictionaries")
 public class FavoriteDictionary {
 
     @Id

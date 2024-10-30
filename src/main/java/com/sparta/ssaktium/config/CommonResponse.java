@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @RequiredArgsConstructor
-public class ApiResponse<T> {
+public class CommonResponse<T> {
 
     private enum Status {
         SUCCESS, FAIL
@@ -17,12 +17,12 @@ public class ApiResponse<T> {
     private final T data;
     private final String message;
 
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(Status.SUCCESS, data, "요청이 성공적으로 처리되었습니다");
+    public static <T> CommonResponse<T> success(T data) {
+        return new CommonResponse<>(Status.SUCCESS, data, "요청이 성공적으로 처리되었습니다");
     }
 
 
-    public static ApiResponse<?> error(String message) {
-        return new ApiResponse<>(Status.FAIL, "", message);
+    public static CommonResponse<?> error(String message) {
+        return new CommonResponse<>(Status.FAIL, "", message);
     }
 }

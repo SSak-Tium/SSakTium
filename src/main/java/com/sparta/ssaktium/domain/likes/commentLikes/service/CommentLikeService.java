@@ -7,7 +7,6 @@ import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
 import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
 import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
-import com.sparta.ssaktium.domain.likes.exception.LikeOwnerMismatchException;
 import com.sparta.ssaktium.domain.likes.exception.NotFoundCommentLikeException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class CommentLikeService {
 
     // 댓글에 좋아요 등록
     @Transactional
-    public CommentLikeReponseDto postCommentLike(Long userId,Long commentId) {
+    public CommentLikeReponseDto postCommentLike(Long userId, Long commentId) {
         // 댓글이 있는지 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundCommentException());
@@ -48,7 +47,7 @@ public class CommentLikeService {
 
     // 댓글에 좋아요 취소
     @Transactional
-    public void deleteCommentLike(Long userId,Long commentId) {
+    public void deleteCommentLike(Long userId, Long commentId) {
         // 댓글의 좋아요 수를 줄이기 위함
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundCommentException());
@@ -60,5 +59,9 @@ public class CommentLikeService {
         // 좋아요 취소
         commentLikeRepository.delete(commentLike);
         comment.decrementLikesCount();
+
+        // 댓글에 등록된 좋아요 수 감소
+        comment.decrementLikesCount();
+        commentRepository.save(comment);
     }
 }
