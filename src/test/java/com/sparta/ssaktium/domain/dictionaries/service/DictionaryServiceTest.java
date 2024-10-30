@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.domain.dictionaries.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.dictionaries.dto.request.DictionaryRequestDto;

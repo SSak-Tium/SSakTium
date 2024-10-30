@@ -34,9 +34,6 @@ public class UserService {
     private final S3Service s3Service;
     private final FavoriteDictionaryRepository favoriteDictionaryRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     // 유저 조회 ( id )
     public UserResponseDto getUser(long userId) {
         // 유저 조회
@@ -121,16 +118,8 @@ public class UserService {
         return "회원탈퇴가 정상적으로 완료되었습니다.";
     }
 
-    @Transactional
     public User findUser(long userId) {
-        // Hibernate Session에서 필터 활성화
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("deletedFilter").setParameter("isDeleted", false);
-
-        // 필터가 적용된 상태에서 사용자 조회
-        return userRepository.findById(userId)
-                .filter(user -> !user.isDeleted())  // 추가적인 안전장치
-                .orElseThrow(NotFoundUserException::new);
+        return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
     }
 
     // id 비교 메서드

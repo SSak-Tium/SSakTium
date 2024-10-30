@@ -1,13 +1,12 @@
 package com.sparta.ssaktium.domain.users.service;
 
-import com.sparta.ssaktium.domain.auth.dto.request.SigninRequestDto;
-import com.sparta.ssaktium.domain.auth.dto.request.SignupRequestDto;
-import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.common.service.S3Service;
+import com.sparta.ssaktium.domain.dictionaries.repository.FavoriteDictionaryRepository;
 import com.sparta.ssaktium.domain.users.dto.response.UserResponseDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
-import com.sparta.ssaktium.domain.users.enums.UserStatus;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -35,6 +32,12 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private S3Service s3Service;
+    @Mock
+    private FavoriteDictionaryRepository favoriteDictionaryRepository;
+    @Mock
+    private EntityManager entityManager;
 
     private User user;
     private long userId;
@@ -43,9 +46,9 @@ class UserServiceTest {
 
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         userId = 1L;
-        user = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_USER);
+        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER);
         ReflectionTestUtils.setField(user, "id", userId);
         encodedPassword = "encodedPassword";
         savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
