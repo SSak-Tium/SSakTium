@@ -56,8 +56,7 @@ public class UserController {
                                                                       long id,
                                                                       @RequestBody
                                                                       @Parameter(description = "회원정보")
-                                                                      UserChangeRequestDto userChangeRequestDto
-    ) {
+                                                                      UserChangeRequestDto userChangeRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(userService.updateUser(authUser.getUserId(), id, userChangeRequestDto)));
     }
 
@@ -66,8 +65,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<UserImageResponseDto>> updateDictionary(@RequestPart
                                                                                  @Parameter(description = "프로필 이미지")
-                                                                                 MultipartFile image
-    ) {
+                                                                                 MultipartFile image) {
         return ResponseEntity.ok(CommonResponse.success(userService.updateUserImage(image)));
     }
 
@@ -81,9 +79,7 @@ public class UserController {
                                                              long id,
                                                              @RequestBody
                                                              @Parameter(description = "비밀번호 확인")
-                                                             UserCheckPasswordRequestDto userCheckPasswordRequestDto
-
-    ) {
+                                                             UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(userService.deleteUser(authUser.getUserId(), id, userCheckPasswordRequestDto)));
     }
 }
