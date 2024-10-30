@@ -19,9 +19,9 @@ public class UserResponseDto {
     private final String birthYear;
     private final String profileImageUrl;
     private final UserRole userRole;
-    private final List<Long> favoriteDictionaryList;
+    private final List<Long> favoriteDictionaries;
 
-    public UserResponseDto(User user, List<Long> favoriteDictionaryList) {
+    public UserResponseDto(User user, List<Long> favoriteDictionaries) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.userName = user.getUserName();
@@ -29,6 +29,6 @@ public class UserResponseDto {
         this.birthYear = user.getBirthYear();
         this.profileImageUrl = user.getProfileImageUrl();
         this.userRole = user.getUserRole();
-        this.favoriteDictionaryList = favoriteDictionaryList;
+        this.favoriteDictionaries = favoriteDictionaries;
     }
 }

@@ -98,7 +98,7 @@ public class DictionaryController {
      * @return
      */
     @Secured("ROLE_ADMIN")
-    @PostMapping(value = "/v1/dictionaries/{id}/image")
+    @PostMapping(value = "/v1/dictionaries/{id}/update-image")
     public ResponseEntity<CommonResponse<DictionaryImageResponseDto>> updateDictionary(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable long id,
