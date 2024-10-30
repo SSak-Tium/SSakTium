@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화
                 .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/auth/*", "/v1/auth/admin/signup", "/v3/api-docs/**", "/v1/ssaktium/*","/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/v1/auth/**", "/v3/api-docs/**", "/ssaktium/*","/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();

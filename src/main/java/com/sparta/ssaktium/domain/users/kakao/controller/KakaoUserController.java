@@ -19,7 +19,7 @@ public class KakaoUserController {
      * 카카오 소셜 로그인 구현 홈화면
      * @return
      */
-    @GetMapping("/v1/ssaktium/home")
+    @GetMapping("/ssaktium/home")
     public String loginPage() {
         return "home";
     }
@@ -31,7 +31,7 @@ public class KakaoUserController {
      * @return
      * @throws JsonProcessingException
      */
-    @GetMapping("/v1/signin-kakao")
+    @GetMapping("/ssaktium/signin-kakao")
     public String kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드
         String token  = kakaoUserService.kakaoLogin(code, response);

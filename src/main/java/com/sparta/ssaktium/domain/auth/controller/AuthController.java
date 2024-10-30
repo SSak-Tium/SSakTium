@@ -21,6 +21,7 @@ public class AuthController {
 
     /**
      * 회원가입
+     *
      * @param signupRequestDto 사용자 등록 회원정보 : Email, Password, 이름, 출생년도
      * @return
      */
@@ -33,6 +34,7 @@ public class AuthController {
 
     /**
      * 로그인
+     *
      * @param signinRequestDto 로그인 : Email, Password
      * @return
      */
