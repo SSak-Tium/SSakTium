@@ -108,23 +108,21 @@ public class BoardLikeServiceTest {
         // then: 좋아요 수가 감소했는지 확인
         assertEquals(0, board.getBoardLikesCount()); // 좋아요 수 감소 검증
     }
-//
-//    @Test
-//    public void 게시글_좋아요_취소_실패_좋아요가_없는_경우() {
-//        // given
-//        Long userId = 1L;
-//        Long boardId = 1L;
-//        Long likeId = 1L;
-//
-//        // Mock 설정: 게시글은 있는데 좋아요가 없는 경우
-//        Board board = new Board();
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-//        when(boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)).thenReturn(false);
-//
-//        // when & then: 예외 발생 검증
-//        assertThrows(NotFoundBoardLikeException.class, () -> boardLikeService.deleteBoardLikes(boardId, likeId, userId));
-//    }
-//
+
+    @Test
+    public void 게시글_좋아요_취소_실패_좋아요가_없는_경우() {
+        // given
+        Long userId = 1L;
+        Long boardId = 1L;
+
+        // Mock 설정: 게시글은 있는데 좋아요가 없는 경우
+        Board board = new Board();
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        // when & then: 예외 발생 검증
+        assertThrows(NotFoundBoardLikeException.class, () -> boardLikeService.deleteBoardLikes(userId, boardId));
+    }
+
 //    @Test
 //    public void 게시글_좋아요_취소_실패_좋아요_소유자_불일치() {
 //        // given
