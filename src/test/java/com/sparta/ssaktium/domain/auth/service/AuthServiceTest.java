@@ -99,7 +99,7 @@ class AuthServiceTest {
         );
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("409 CONFLICT DUPLICATE_EMAIL 중복된 이메일입니다.");
+        assertThat(exception.getMessage()).isEqualTo("409 DUPLICATE_EMAIL 중복된 이메일입니다.");
     }
 
     @Test
@@ -129,7 +129,7 @@ class AuthServiceTest {
         );
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("401 UNAUTHORIZED UNAUTHORIZED_PASSWORD 비밀번호를 확인해주세요.");
+        assertThat(exception.getMessage()).isEqualTo("401 UNAUTHORIZED_PASSWORD 비밀번호를 확인해주세요.");
     }
 
     @Test
@@ -144,6 +144,6 @@ class AuthServiceTest {
         );
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("404 NOT_FOUND DELETED_USER 탈퇴된 회원입니다.");
+        assertThat(exception.getMessage()).isEqualTo("404 DELETED_USER 탈퇴된 회원입니다.");
     }
 }
