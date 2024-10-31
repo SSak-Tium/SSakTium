@@ -136,7 +136,7 @@ public class KakaoUserService {
 
         if (kakaoUser == null) {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
-            String kakaoEmail = kakaoUserInfo.getEmail();
+            String kakaoEmail = kakaoUserInfo.getEmail() + "_kakao";
 
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
             if (sameEmailUser != null) {
@@ -150,7 +150,7 @@ public class KakaoUserService {
                 String encodedPassword = passwordEncoder.encode(password);
 
                 // email: kakao email
-                String email = kakaoUserInfo.getEmail();
+                String email = kakaoUserInfo.getEmail() + "_kakao";
                 // birthYear
                 String birthYear = kakaoUserInfo.getBirthYear();
 
