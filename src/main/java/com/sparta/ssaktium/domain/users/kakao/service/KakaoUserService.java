@@ -12,6 +12,7 @@ import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class KakaoUserService {
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    public String kakaoClientId;
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -70,7 +74,7 @@ public class KakaoUserService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "42c4a40ba77620d04f9567f105705c44");
+        body.add("client_id", kakaoClientId);
         body.add("redirect_uri", "http://localhost:8080/ssaktium/signin-kakao");
         body.add("code", code);
 

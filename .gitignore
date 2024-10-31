@@ -45,3 +45,4 @@ application.yml
 # 여러 환경 설정 파일을 무시하고 싶을 때
 *.env
 *.yml
+*.properties
