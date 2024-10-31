@@ -94,18 +94,18 @@ public class BoardService {
         // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
         List<String> updatedImageList = new ArrayList<>(remainingImages);
         //새로 추가하는 이미지가 비어있을 경우 작동 x
-        if (!imageList.isEmpty()) {
-            for (MultipartFile image : imageList) {
-                if (!image.isEmpty()) {//비어있지 않은 파일만  처리
-                    String originalFileName = image.getOriginalFilename();
-                    // 이미 존재하는 파일 이름을 유지
-                    if (!updatedImageList.contains(originalFileName)) {
-                        String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-                        updatedImageList.add(newImageUrl);
-                    }
+
+        for (MultipartFile image : imageList) {
+            String originalFileName = image.getOriginalFilename();
+            if (!image.isEmpty()) {
+                // 이미 존재하는 파일 이름을 유지
+                if (!updatedImageList.contains(originalFileName)) {
+                    String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+                    updatedImageList.add(newImageUrl);
                 }
             }
         }
+
 
         // BoardImages로 변환 후 저장
         List<BoardImages> newBoardImages = updatedImageList.stream()
@@ -251,7 +251,7 @@ public class BoardService {
                     .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                     .toList();
             // 댓글 리스트 대신 댓글 수만 포함하는 DTO 생성
-            dtoList.add(new BoardDetailResponseDto(board,imageUrls, commentCount));
+            dtoList.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
         }
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
