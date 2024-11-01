@@ -1,23 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>싹틔움</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+<!--    <script src="@{/js/script.js}" defer></script>-->
+    <script>
+        async function signin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // 이메일과 비밀번호가 모두 입력되었는지 확인
+            if (!email || !password) {
+                alert("아이디와 비밀번호를 입력해주세요.");
+                return false; // 폼 제출을 방지
+            }
+
+            // 요청 본문 확인을 위한 로그 추가
+            console.log("로그인 요청 전송:", { email, password });
+
+            const response = await fetch('/v1/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            console.log(response)
+            console.log("response")
+            if (response.ok) {
+                console.log("ddddddd")
+                window.location.href = 'http://localhost:8080/ssaktium/main';
+            } else {
+                console.log("else")
+                const errorData = await response.json();
+                alert(errorData.message || '로그인 실패');
+            }
+            console.log("if else 끝남")
+
+            return false; // 폼 제출을 방지
+        }
+    </script>
+
+
 </head>
 <body>
-    <div style="width: 20%; margin:10% auto 0% auto">
-        <div style="margin: 0% auto 0% 5%">
-            <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FVbXC4%2FbtsKePF4r6K%2FHdV3AU33uDf8khBSMLMLU0%2Fimg.png">
-        </div>
-        <div style="margin: 0% auto 10% 16%; color: darkgreen; font-size: 500%">
-            싹틔움
-        </div>
-        <div style="margin: 10% auto 0% auto; cursor:pointer" onclick="window.location.href='https://kauth.kakao.com/oauth/authorize?client_id=42c4a40ba77620d04f9567f105705c44&redirect_uri=http://localhost:8080/ssaktium/signin/kakao&response_type=code'">
-            <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdqyqnM%2FbtsKjonVSLw%2FUmoCSKvPnmw6930opWJBP1%2Fimg.png">
-        </div>
-        <div style="margin: 10% auto 0% auto; cursor:pointer" onclick="window.location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=543793691260-fqf1im5a0innbreejobuo0jcrgohjjcg.apps.googleusercontent.com&redirect_uri=http://localhost:8080/ssaktium/signin/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email'">
-            <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Feln5xU%2FbtsKr69nBLI%2FkYwADV1Z0FjPVsnpANsBB1%2Fimg.jpg">
-        </div>
+<div class="login-container">
+    <div>
+        <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FVbXC4%2FbtsKePF4r6K%2FHdV3AU33uDf8khBSMLMLU0%2Fimg.png">
     </div>
+    <h2>싹틔움</h2>
+    <form class="login-form" onsubmit="signin(); return false;">
+        <input type="text" id="email" placeholder="아이디" required>
+        <input type="password" id="password" placeholder="비밀번호" required>
+        <button type="submit">로그인</button>
+    </form>
+    <div class="social-login">
+        <p>소셜 로그인</p>
+        <a href="https://kauth.kakao.com/oauth/authorize?client_id=42c4a40ba77620d04f9567f105705c44&redirect_uri=http://localhost:8080/ssaktium/signin/kakao&response_type=code" class="social-btn kakao">카카오 로그인</a>
+        <a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=543793691260-fqf1im5a0innbreejobuo0jcrgohjjcg.apps.googleusercontent.com&redirect_uri=http://localhost:8080/ssaktium/signin/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email" class="social-btn google">구글 로그인</a>
+        <a href="https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=IUKXUTHG0rXLuzXje9Ai&state=YOUR_GENERATED_STATE&redirect_uri=http://localhost:8080/ssaktium/signin/naver" class="social-btn naver">네이버 로그인</a>
+    </div>
+</div>
 </body>
 </html>

@@ -17,6 +17,16 @@ public class CustomOauthController {
 
     private final CustomOauthService customOauthService;
 
+    @GetMapping("/ssaktium/home")
+    public String home() {
+        return "home";
+    }
+
+    @GetMapping("/ssaktium/main")
+    public String home2() {
+        return "main";
+    }
+
     // 소셜로그인
     @GetMapping("/ssaktium/signin/{provider}")
     public String socialLogin(
@@ -28,6 +38,6 @@ public class CustomOauthController {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return "main";
+        return "redirect:/ssaktium/main";
     }
 }

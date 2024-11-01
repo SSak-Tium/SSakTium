@@ -8,7 +8,6 @@ import com.sparta.ssaktium.domain.users.customOauth.dto.CustomOauthInfoDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
-import com.sparta.ssaktium.domain.users.kakao.dto.KakaoUserInfoDto;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,6 +43,12 @@ public class CustomOauthService {
 
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String googleClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String naverClientSecret;
 
 
     // 소셜 로그인 서비스를 통해 인증을 수행하는 메서드
@@ -85,6 +89,11 @@ public class CustomOauthService {
                 url = "https://oauth2.googleapis.com/token";
                 clientId = googleClientId;
                 clientSecret = googleClientSecret;
+                break;
+            case "naver":
+                url = "https://nid.naver.com/oauth2.0/token";
+                clientId = naverClientId;
+                clientSecret = naverClientSecret;
                 break;
             default:
                 throw new NotFoundUserException();
@@ -165,6 +174,7 @@ public class CustomOauthService {
         return switch (provider) {
             case "kakao" -> fetchKakaoUserInfo(accessToken);
             case "google" -> fetchGoogleUserInfo(accessToken);
+            case "naver" -> fetchNaverUserInfo(accessToken);
             default -> throw new NotFoundUserException();
         };
     }
@@ -214,12 +224,36 @@ public class CustomOauthService {
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
         String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null; // null 체크
-        String userName = jsonNode.has("name") ? jsonNode.get("name").asText() : null; // null 체크
+        String givenName = jsonNode.has("given_name") ? jsonNode.get("given_name").asText() : "";
+        String familyName = jsonNode.has("family_name") ? jsonNode.get("family_name").asText() : "";
+        String userName = (givenName + " " + familyName).trim(); // Full name 생성
 
+        return new CustomOauthInfoDto(userName, email);
+    }
 
-            return new CustomOauthInfoDto(userName, email);
+    // 네이버 사용자 정보를 가져오는 메서드
+    private CustomOauthInfoDto fetchNaverUserInfo(String accessToken) throws JsonProcessingException {
+        String url = "https://openapi.naver.com/v1/nid/me";
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        String responseBody = restTemplate.exchange(url, HttpMethod.GET, request, String.class).getBody();
 
+        if (responseBody == null) {
+            log.error("Naver API response body is null.");
+            throw new NotFoundUserException();
+        }
+
+        JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
+        JsonNode responseNode = jsonNode.get("response");
+        String email = responseNode.has("email") ? responseNode.get("email").asText() : null; // null 체크
+        String userName = responseNode.has("name") ? responseNode.get("name").asText() : null; // null 체크
+        String birthyear = responseNode.has("birthyear") ? responseNode.get("birthyear").asText() : null; // null 체크
+
+        log.info("네이버 사용자 정보: " + ", " + userName + ", " + birthyear + ", " + email);
+        return new CustomOauthInfoDto(userName, email, birthyear);
     }
 }
