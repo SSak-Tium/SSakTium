@@ -31,7 +31,7 @@
             console.log("response")
             if (response.ok) {
                 console.log("ddddddd")
-                // window.location.href = 'http://localhost:8080/ssaktium/main';
+                window.location.href = 'http://localhost:8080/ssaktium/main';
             } else {
                 console.log("else")
                 const errorData = await response.json();
@@ -51,7 +51,7 @@
         <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FVbXC4%2FbtsKePF4r6K%2FHdV3AU33uDf8khBSMLMLU0%2Fimg.png">
     </div>
     <h2>싹틔움</h2>
-    <form class="login-form" onsubmit="return signin();">
+    <form class="login-form" onsubmit="signin(); return false;">
         <input type="text" id="email" placeholder="아이디" required>
         <input type="password" id="password" placeholder="비밀번호" required>
         <button type="submit">로그인</button>
