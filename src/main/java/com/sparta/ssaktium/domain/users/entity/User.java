@@ -39,9 +39,6 @@ public class User extends Timestamped {
 
     private boolean deleted = Boolean.FALSE;
 
-    private Long kakaoId;
-
-
     public User(String email, String password, String userName, String birthYear, UserRole userRole) {
         this.email = email;
         this.password = password;
@@ -64,24 +61,13 @@ public class User extends Timestamped {
         this.userRole = userRole;
     }
 
-    // 카카오 유저 생성
-    public User(String email, String nickname, String encodedPassword, String birthYear, UserRole userRole, Long kakaoId) {
-        this.email = email;
-        this.userName = nickname;
-        this.password = encodedPassword;
-        this.birthYear = birthYear;
-        this.userRole = userRole;
-        this.kakaoId = kakaoId;
-    }
-
-    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, Long kakaoId) {
+    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
-        this.kakaoId = kakaoId;
     }
 
     public static User fromAuthUser(AuthUser authUser) {
@@ -104,14 +90,9 @@ public class User extends Timestamped {
         this.userName = userName;
     }
 
-    public User kakaoIdUpdate(Long kakaoId) {
-        this.kakaoId = kakaoId;
-        return this;
-    }
-
     @Builder
-    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, Long kakaoId) {
-        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole, kakaoId);
+    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole) {
+        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole);
     }
 
     // 소셜 로그인 메서드

@@ -28,4 +28,10 @@ public class CustomOauthInfoDto {
         this.userName = userName;
         this.email = email;
     }
+
+    public CustomOauthInfoDto( String userName, String email, String birthYear) {
+        this.userName = userName;
+        this.email = email;
+        this.birthYear = birthYear;
+    }
 }
