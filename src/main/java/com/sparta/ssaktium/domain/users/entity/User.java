@@ -39,12 +39,15 @@ public class User extends Timestamped {
 
     private boolean deleted = Boolean.FALSE;
 
-    public User(String email, String password, String userName, String birthYear, UserRole userRole) {
+    private String socialAccountId;
+
+    public User(String email, String password, String userName, String birthYear, UserRole userRole, String socialAccountId) {
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
+        this.socialAccountId = socialAccountId;
     }
 
     public User(String email, String password, String userName, UserRole userRole) {
@@ -61,13 +64,14 @@ public class User extends Timestamped {
         this.userRole = userRole;
     }
 
-    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole) {
+    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, String socialAccountId) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
+        this.socialAccountId = socialAccountId;
     }
 
     public static User fromAuthUser(AuthUser authUser) {
@@ -76,7 +80,7 @@ public class User extends Timestamped {
     }
 
     public static User addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
-        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), null, userRole);
+        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), null, userRole, null);
     }
 
     // 유저 비밀번호 변경
@@ -91,8 +95,8 @@ public class User extends Timestamped {
     }
 
     @Builder
-    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole) {
-        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole);
+    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, String socialAccountId) {
+        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole, socialAccountId);
     }
 
     // 소셜 로그인 메서드

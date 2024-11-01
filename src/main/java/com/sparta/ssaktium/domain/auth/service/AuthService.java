@@ -45,7 +45,8 @@ public class AuthService {
                 encodedPassword,
                 signupRequestDto.getUserName(),
                 signupRequestDto.getBirthYear(),
-                userRole
+                userRole,
+                null
         );
         User savedUser = userRepository.save(newUser);
 

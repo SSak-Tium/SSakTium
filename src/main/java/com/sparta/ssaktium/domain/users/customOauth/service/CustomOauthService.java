@@ -138,6 +138,7 @@ public class CustomOauthService {
             String encodedPassword = passwordEncoder.encode(password);
             String email = userInfo.getEmail() + "_" + provider;
             String birthYear = userInfo.getBirthYear();
+            String socialAccountId = userInfo.getSocialId();
 
             existingUser = User.builder()
                     .email(email)
@@ -145,6 +146,7 @@ public class CustomOauthService {
                     .password(encodedPassword)
                     .birthYear(birthYear)
                     .userRole(UserRole.ROLE_USER)
+                    .socialAccountId(socialAccountId)
                     .build();
 
             userRepository.save(existingUser);
@@ -197,14 +199,14 @@ public class CustomOauthService {
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
-        Long id = jsonNode.get("id").asLong();
+        String socialId = jsonNode.get("id").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
         String birthYear = jsonNode.get("kakao_account")
                 .get("birthyear").asText();
         String userName = jsonNode.get("properties").get("nickname").asText();
 
-        log.info("카카오 사용자 정보: " + id + ", " + userName + ", " + birthYear + ", " + email);
-        return new CustomOauthInfoDto(id, userName, email, birthYear);
+        log.info("카카오 사용자 정보: " + socialId + ", " + userName + ", " + birthYear + ", " + email);
+        return new CustomOauthInfoDto(socialId, userName, email, birthYear);
     }
 
     //구글 사용자 정보를 가져오는 메서드
@@ -223,12 +225,12 @@ public class CustomOauthService {
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
+        log.info(responseBody);
+        String socialId = jsonNode.has("sub") ? jsonNode.get("sub").asText() : null;
+        String name = jsonNode.has("name") ? jsonNode.get("name").asText() : null; // null 체크
         String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null; // null 체크
-        String givenName = jsonNode.has("given_name") ? jsonNode.get("given_name").asText() : "";
-        String familyName = jsonNode.has("family_name") ? jsonNode.get("family_name").asText() : "";
-        String userName = (givenName + " " + familyName).trim(); // Full name 생성
 
-        return new CustomOauthInfoDto(userName, email);
+        return CustomOauthInfoDto.addGoogleId(socialId, name, email);
     }
 
     // 네이버 사용자 정보를 가져오는 메서드
@@ -249,11 +251,12 @@ public class CustomOauthService {
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
         JsonNode responseNode = jsonNode.get("response");
+        String socialId = responseNode.has("id") ? responseNode.get("id").asText() : null; // null 체크
         String email = responseNode.has("email") ? responseNode.get("email").asText() : null; // null 체크
         String userName = responseNode.has("name") ? responseNode.get("name").asText() : null; // null 체크
         String birthyear = responseNode.has("birthyear") ? responseNode.get("birthyear").asText() : null; // null 체크
 
         log.info("네이버 사용자 정보: " + ", " + userName + ", " + birthyear + ", " + email);
-        return new CustomOauthInfoDto(userName, email, birthyear);
+        return new CustomOauthInfoDto(socialId, userName, email, birthyear);
     }
 }
