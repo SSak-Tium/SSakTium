@@ -7,7 +7,6 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
@@ -34,7 +33,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -106,7 +106,7 @@ public class BoardServiceTest {
         ReflectionTestUtils.setField(tempBoard, "imageUrls", existingImages);
 
         when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
-        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(tempBoard));
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(tempBoard));
 
         List<String> remainingImages = List.of("oldImageUrl1");
         List<MultipartFile> imageList = new ArrayList<>();
@@ -145,7 +145,7 @@ public class BoardServiceTest {
         ReflectionTestUtils.setField(updateBoard, "imageUrls", imageUrls);
 
         when(userService.findUser(authUser.getUserId())).thenReturn(ownerUser);
-        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(updateBoard));
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(updateBoard));
         when(boardRepository.save(any(Board.class))).thenReturn(updateBoard);
         // when
         BoardSaveResponseDto responseDto = boardService.updateBoardContent(authUser.getUserId(), boardId, updateRequestDto);
@@ -168,7 +168,7 @@ public class BoardServiceTest {
         List<BoardImages> imageUrls = List.of(new BoardImages("aaa", board));
         ReflectionTestUtils.setField(board, "imageUrls", imageUrls);
 
-        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
         when(boardRepository.countCommentsByBoardId(boardId)).thenReturn(4);
         //when
         BoardDetailResponseDto responseDto = boardService.getBoard(boardId);
@@ -191,7 +191,7 @@ public class BoardServiceTest {
         ReflectionTestUtils.setField(board, "imageUrls", boardImages);
 
         when(userService.findUser(userId)).thenReturn(user);
-        when(boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, PageRequest.of(0, 10)))
+        when(boardRepository.findAllByUserId(user.getId(), PageRequest.of(0, 10)))
                 .thenReturn(new PageImpl<>(List.of(board), PageRequest.of(0, 10), 1));
         when(boardRepository.countCommentsByBoardId(board.getId())).thenReturn(2);
 
@@ -247,13 +247,13 @@ public class BoardServiceTest {
 
         // Mocking
         when(userService.findUser(userId)).thenReturn(user);
-        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
 
         // when
         boardService.deleteBoards(userId, boardId);
 
         // then
-        assertEquals(StatusEnum.DELETED, board.getStatusEnum()); // 게시글 상태가 삭제 상태로 변경되었는지 확인
+        assertTrue(board.isDeleted()); // 게시글 상태가 삭제 상태로 변경되었는지 확인
         verify(boardRepository).save(board); // 게시글이 저장소에 저장되었는지 확인
     }
 
@@ -272,13 +272,13 @@ public class BoardServiceTest {
 
         // Mocking
         when(userService.findUser(userId)).thenReturn(adminUser);
-        when(boardRepository.findByIdAndStatusEnum(boardId, StatusEnum.ACTIVATED)).thenReturn(Optional.of(board));
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
 
         // when
         boardService.deleteBoards(userId, boardId);
 
         // then
-        assertEquals(StatusEnum.DELETED, board.getStatusEnum()); // 게시글 상태가 삭제 상태로 변경되었는지 확인
+        assertTrue(board.isDeleted()); // 게시글 상태가 삭제 상태로 변경되었는지 확인
         verify(boardRepository).save(board); // 게시글이 저장소에 저장되었는지 확인
     }
 }

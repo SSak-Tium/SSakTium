@@ -1,7 +1,6 @@
 package com.sparta.ssaktium.domain.boards.entity;
 
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
@@ -9,12 +8,16 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE boards SET deleted = true WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "boards")
 public class Board extends Timestamped {
 
@@ -35,8 +38,7 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
 
-    @Enumerated(EnumType.STRING)
-    private StatusEnum statusEnum;
+    private boolean deleted = Boolean.FALSE;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<BoardImages> imageUrls;
@@ -49,7 +51,6 @@ public class Board extends Timestamped {
         this.content = content;
         this.publicStatus = publicStatus;
         this.user = user;
-        this.statusEnum = StatusEnum.ACTIVATED;
     }
 
     public void updateBoards(String title, String content, PublicStatus publicStatus) {
@@ -69,9 +70,5 @@ public class Board extends Timestamped {
             throw new LikeCountUnderflowException();
         }
         boardLikesCount--;
-    }
-
-    public void deleteBoards() {
-        this.statusEnum = StatusEnum.DELETED;
     }
 }

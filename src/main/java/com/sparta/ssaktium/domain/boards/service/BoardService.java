@@ -7,7 +7,6 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.InvalidBoardTypeException;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -171,14 +169,13 @@ public class BoardService {
             s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
         }
         //해당 보드 삭제 상태 변경
-        board.deleteBoards();
-        boardRepository.save(board);
+        boardRepository.delete(board);
     }
 
     //게시글 단건 조회
     public BoardDetailResponseDto getBoard(Long id) {
         //게시글 찾기
-        Board board = boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED).orElseThrow(NotFoundBoardException::new);
+        Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
         // 댓글 수 가져오기
         int commentCount = boardRepository.countCommentsByBoardId(board.getId());
         //boardimage url만 가져오기
@@ -196,7 +193,7 @@ public class BoardService {
         if ("me".equalsIgnoreCase(type)) {
             // 사용자가 쓴 게시글 조회
             User user = userService.findUser(userId);
-            Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, pageable);
+            Page<Board> boards = boardRepository.findAllByUserId(user.getId(), pageable);
 
             for (Board board : boards) {
                 int commentCount = boardRepository.countCommentsByBoardId(board.getId());
@@ -258,7 +255,7 @@ public class BoardService {
 
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
-        return boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED)
+        return boardRepository.findById(id)
                 .orElseThrow(NotFoundBoardException::new);
     }
 }
