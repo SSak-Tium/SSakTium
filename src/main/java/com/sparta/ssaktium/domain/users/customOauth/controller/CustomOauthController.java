@@ -23,8 +23,13 @@ public class CustomOauthController {
     }
 
     @GetMapping("/ssaktium/main")
-    public String home2() {
+    public String main() {
         return "main";
+    }
+
+    @GetMapping("/ssaktium/signup")
+    public String signupPage() {
+        return "signup"; // signup.html 페이지를 반환
     }
 
     // 소셜로그인
