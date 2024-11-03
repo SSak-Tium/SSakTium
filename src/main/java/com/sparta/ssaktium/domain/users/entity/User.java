@@ -7,9 +7,11 @@ import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+import org.hibernate.usertype.UserType;
 
 import java.time.LocalDate;
 
@@ -72,6 +74,16 @@ public class User extends Timestamped {
         this.kakaoId = kakaoId;
     }
 
+    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, Long kakaoId) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.userName = userName;
+        this.birthYear = birthYear;
+        this.userRole = userRole;
+        this.kakaoId = kakaoId;
+    }
+
     public static User fromAuthUser(AuthUser authUser) {
         String roleName = authUser.getAuthorities().iterator().next().getAuthority();
         return new User(authUser.getUserId(), authUser.getEmail(), UserRole.of(roleName));
@@ -95,5 +107,17 @@ public class User extends Timestamped {
     public User kakaoIdUpdate(Long kakaoId) {
         this.kakaoId = kakaoId;
         return this;
+    }
+
+    @Builder
+    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, Long kakaoId) {
+        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole, kakaoId);
+    }
+
+    // 소셜 로그인 메서드
+    public void socialLogin(String email, String userName) {
+        this.email = email;
+        this.userName= userName;
+        this.userRole = UserRole.ROLE_USER;
     }
 }
