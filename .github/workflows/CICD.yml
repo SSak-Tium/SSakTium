@@ -21,6 +21,8 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
+        env:
+          SPRING_PROFILES_ACTIVE: test
         run: |
           chmod +x ./gradlew
           ./gradlew clean build
