@@ -47,7 +47,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/css/**",       // CSS 파일 허용
                                 "/js/**",        // JavaScript 파일 허용
-                                "/images/**"     // 이미지 파일 허용
+                                "/images/**",     // 이미지 파일 허용
+                                "/hc",
+                                "/env"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

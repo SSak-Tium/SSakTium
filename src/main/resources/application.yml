@@ -1,17 +1,82 @@
+spring:
+  profiles:
+    active: local
+    group:
+      local: local, common, secret
+      blue: blue, common, secret
+      green: green, common, secret
+
+server:
+  env: blue
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            redirect-uri: "http://localhost:8080/ssaktium/signin/kakao"
+          google:
+            redirect-uri: "http://localhost:8080/ssaktium/signin/google"
+          naver:
+            redirect-uri: "http://localhost:8080/ssaktium/signin-naver"
 server:
   port: 8080
-  servlet:
-    context-path: /
-    encoding:
-      charset : UTF-8
-      enabled: true
-      force: true
+  serverAddress: localhost
+serverName: local_server
+
+---
+spring:
+  config:
+    activate:
+      on-profile: blue
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            redirect-uri: "http://13.124.138.199/ssaktium/signin/kakao"
+          google:
+            redirect-uri: "http://13.124.138.199/ssaktium/signin/google"
+          naver:
+            redirect-uri: "http://13.124.138.199/ssaktium/signin-naver"
+server:
+  port: 8080
+  serverAddress: 13.124.138.199
+serverName: blue_server
+
+---
+spring:
+  config:
+    activate:
+      on-profile: green
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            redirect-uri: "http://13.124.138.199/ssaktium/signin/kakao"
+          google:
+            redirect-uri: "http://13.124.138.199/ssaktium/signin/google"
+          naver:
+            redirect-uri: "http://13.124.138.199/ssaktium/signin-naver"
+server:
+  port: 8081
+  serverAddress: 13.124.138.199
+serverName: green_server
+---
 
 spring:
   web:
     resources:
       static-locations: classpath:/static/
   config:
+    activate:
+      on-profile: common
     import: optional:file:.env[.properties]
   datasource:
     url: ${DB_URL}
@@ -29,19 +94,16 @@ spring:
         registration:
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
-            redirect-uri: "http://localhost:8080/ssaktium/signin/kakao"
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email, birthyear
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: "http://localhost:8080/ssaktium/signin/google"
             authorization-grant-type: authorization_code
             scope: email, profile, https://www.googleapis.com/auth/user.birthday.read
-          naver: # 네이버에 대한 설정 추가
+          naver:
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: "http://localhost:8080/ssaktium/signin-naver"
             authorization-grant-type: authorization_code
             scope: name, email, birthyear
 
