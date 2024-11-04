@@ -31,10 +31,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker Image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ssak .
 
       - name: Push Docker Image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
 
   deploy:
     needs: build
@@ -49,16 +49,16 @@ jobs:
           script_stop: true
           script: |
             # Pull the latest image from DockerHub
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
             
             # Stop and remove the existing container if it exists
-            if [ "$(sudo docker ps -q -f name=ssaktium_server)" ]; then
-              sudo docker stop ssaktium_server
+            if [ "$(sudo docker ps -q -f name=ssak)" ]; then
+              sudo docker stop ssak
             fi
             
-            if [ "$(sudo docker ps -aq -f status=exited -f name=ssaktium_server)" ]; then
-              sudo docker rm ssaktium_server
+            if [ "$(sudo docker ps -aq -f status=exited -f name=ssak)" ]; then
+              sudo docker rm ssak
             fi
             
             # Run the new container
-            sudo docker run -d --name ssaktium_server -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server:latest
+            sudo docker run -d --name ssak -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
