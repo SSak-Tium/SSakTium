@@ -1,19 +1,18 @@
-name: CICD
+name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install JDK 17
         uses: actions/setup-java@v3
         with:
@@ -31,39 +30,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker
-        run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server .
-      - name: Push Docker
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server .
+
+      - name: Push Docker Image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server:latest
-  
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Set target IP
-        run: |
-          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.SSAKTIUM_SERVER_IP }}/env")
-          echo $STATUS
-          if [ $STATUS = 200 ]; then
-            CURRENT_UPSTREAM=$(curl -s "http://${{ secrets.SSAKTIUM_SERVER_IP }}/env")
-          else
-            CURRENT_UPSTREAM=green
-          fi
-          echo CURRENT_UPSTREAM=$CURRENT_UPSTREAM >> $GITHUB_ENV
-          if [ $CURRENT_UPSTREAM = blue ]; then
-            echo "CURRENT_PORT=8080" >> $GITHUB_ENV
-            echo "STOPPED_PORT=8081" >> $GITHUB_ENV
-            echo "TARGET_UPSTREAM=green" >> $GITHUB_ENV
-          elif [ $CURRENT_UPSTREAM = green ]; then
-            echo "CURRENT_PORT=8081" >> $GITHUB_ENV
-            echo "STOPPED_PORT=8080" >> $GITHUB_ENV
-            echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
-          else
-            echo "error"
-            exit 1
-          fi
-
-      - name: Docker compose
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           username: ubuntu
@@ -71,33 +48,17 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
           script: |
+            # Pull the latest image from DockerHub
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server:latest
-            sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
-
-      - name: Check deploy server URL
-        uses: jtalk/url-health-check-action@v3
-        with:
-          url: http://${{ secrets.SSAKTIUM_SERVER_IP }}:${{env.STOPPED_PORT}}/env
-          max-attempts: 3
-          retry-delay: 10s
-
-      - name: Change nginx upstream
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.SSAKTIUM_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload' 
-
-      - name: Stop current server
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.SSAKTIUM_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            sudo docker stop ${{env.CURRENT_UPSTREAM}}
-            sudo docker rm ${{env.CURRENT_UPSTREAM}}
+            
+            # Stop and remove the existing container if it exists
+            if [ "$(sudo docker ps -q -f name=ssaktium_server)" ]; then
+              sudo docker stop ssaktium_server
+            fi
+            
+            if [ "$(sudo docker ps -aq -f status=exited -f name=ssaktium_server)" ]; then
+              sudo docker rm ssaktium_server
+            fi
+            
+            # Run the new container
+            sudo docker run -d --name ssaktium_server -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/ssaktium_server:latest
