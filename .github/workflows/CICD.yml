@@ -74,4 +74,4 @@ jobs:
             --env KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
             --env NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
             --env NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/daegyuhan/ssak:v1
+            ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
