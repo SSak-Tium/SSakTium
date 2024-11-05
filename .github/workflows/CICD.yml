@@ -49,7 +49,7 @@ jobs:
           script_stop: true
           script: |
             # Pull the latest image from DockerHub
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/daegyuhan/ssak:v1
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
             
             # Stop and remove the existing container if it exists
             if [ "$(sudo docker ps -q -f name=daegyuhan/ssak)" ]; then
