@@ -52,12 +52,12 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
             
             # Stop and remove the existing container if it exists
-            if [ "$(sudo docker ps -q -f name=daegyuhan/ssak)" ]; then
-              sudo docker stop daegyuhan/ssak
+            if [ "$(sudo docker ps -q -f name=daegyuhan-ssak)" ]; then
+              sudo docker stop daegyuhan-ssak
             fi
             
-            if [ "$(sudo docker ps -aq -f status=exited -f name=daegyuhan/ssak)" ]; then
-              sudo docker rm daegyuhan/ssak
+            if [ "$(sudo docker ps -aq -f status=exited -f name=daegyuhan-ssak)" ]; then
+              sudo docker rm daegyuhan-ssak
             fi
             
             # Run the new container
@@ -67,7 +67,6 @@ jobs:
             --env DB_PASSWORD_DEV=${{ secrets.DB_PASSWORD_DEV }} \
             --env JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
             --env S3_BUCKET=${{ secrets.S3_BUCKET }} \
-            
             --env S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }} \
             --env S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }} \
             --env GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
