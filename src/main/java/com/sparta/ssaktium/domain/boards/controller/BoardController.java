@@ -5,6 +5,7 @@ import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSearchResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
@@ -124,4 +125,8 @@ public class BoardController {
                                                                                     int size) {
         return ResponseEntity.ok(CommonResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponse<Page<BoardSearchResponseDto>>> searchBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                                    @)
 }
