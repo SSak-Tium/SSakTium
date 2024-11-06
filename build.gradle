@@ -49,9 +49,6 @@ dependencies {
 
     //oauth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-    // h2
-    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
