@@ -73,6 +73,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 app:
+  domainUri: http://localhost:8080
   redirectUri: "http://localhost:8080/ssaktium/signin/"
 
 jwt:
