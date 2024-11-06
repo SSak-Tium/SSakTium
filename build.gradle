@@ -50,8 +50,9 @@ dependencies {
     //oauth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-    // h2
-    testImplementation 'com.h2database:h2'
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
 tasks.named('test') {
