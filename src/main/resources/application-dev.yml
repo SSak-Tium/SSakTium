@@ -14,10 +14,10 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
+    url: ${DB_URL_DEV}
+    username: ${DB_USERNAME_DEV}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: ${DB_PASSWORD}
+    password: ${DB_PASSWORD_DEV}
   servlet:
     multipart:
       enabled: true
