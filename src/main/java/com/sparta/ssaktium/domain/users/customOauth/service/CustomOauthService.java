@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.users.customOauth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWT;
 import com.sparta.ssaktium.config.JwtUtil;
 import com.sparta.ssaktium.domain.users.customOauth.dto.CustomOauthInfoDto;
 import com.sparta.ssaktium.domain.users.entity.User;
@@ -50,6 +51,9 @@ public class CustomOauthService {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String naverClientSecret;
 
+    @Value("${app.redirectUri}")
+    private String customRedirectUri;
+
 
     // 소셜 로그인 서비스를 통해 인증을 수행하는 메서드
     public String socialLogin(String provider, String code, HttpServletResponse response) throws JsonProcessingException {
@@ -74,7 +78,7 @@ public class CustomOauthService {
 
     // AccessToken을 발급받기 위한 공통 메서드
     private String getAccessToken(String provider, String code) {
-        String redirectUri = "http://localhost:8080/ssaktium/signin/" + provider;
+        String redirectUri = customRedirectUri + provider;
         String url;
         String clientId;
         String clientSecret = null;  // 필요한 경우에만 할당
@@ -158,12 +162,7 @@ public class CustomOauthService {
         return existingUser;
     }
 
-    /**
-     * JWT 토큰을 생성하고, 응답 헤더에 추가하는 메서드입니다.
-     *
-     * @param user     토큰을 생성할 사용자 정보
-     * @param response HTTP 응답 객체로, JWT 토큰을 포함하여 반환합니다.
-     */
+    // JWT 토큰을 생성하고, 응답 헤더에 추가하는 메서드
     private void addJwtToResponse(User user, HttpServletResponse response) {
         String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
 
