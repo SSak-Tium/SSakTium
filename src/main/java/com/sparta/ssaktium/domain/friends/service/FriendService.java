@@ -6,6 +6,8 @@ import com.sparta.ssaktium.domain.friends.entity.Friend;
 import com.sparta.ssaktium.domain.friends.entity.FriendStatus;
 import com.sparta.ssaktium.domain.friends.exception.*;
 import com.sparta.ssaktium.domain.friends.repository.FriendRepository;
+import com.sparta.ssaktium.domain.notification.notificationMessage.NotificationMessage;
+import com.sparta.ssaktium.domain.notification.producer.NotificationProducer;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class FriendService {
 
     private final UserService userService;
     private final FriendRepository friendRepository;
+    private final NotificationProducer notificationProducer;
 
     @Transactional
     public FriendResponseDto requestFriend(Long userId, Long friendId) {
@@ -47,6 +50,11 @@ public class FriendService {
 
         friendRepository.save(newFriend);
 
+        notificationProducer.sendNotification(
+                new NotificationMessage(userId,
+                        "FRIEND_REQUEST",
+                        user.getUserName() + "님이 친구 신청을 보냈습니다."));
+
         return new FriendResponseDto(newFriend, newFriend.getUser(), newFriend.getFriendUser());
     }
 
@@ -66,6 +74,11 @@ public class FriendService {
 
         existingFriendRequest.acceptFriend();
         friendRepository.save(existingFriendRequest);
+
+        notificationProducer.sendNotification(
+                new NotificationMessage(userId,
+                        "FRIEND_ACCEPT",
+                        user.getUserName() + "님이 친구 수락을 하셨습니다."));
 
         return new FriendResponseDto(existingFriendRequest, user, friendUser);
     }
