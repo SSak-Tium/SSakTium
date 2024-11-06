@@ -30,8 +30,7 @@
             console.log(response)
             console.log("response")
             if (response.ok) {
-                console.log("ddddddd")
-                window.location.href = 'http://localhost:8080/ssaktium/main';
+                window.location.href = `${window.location.origin}/ssaktium/main`;
             } else {
                 console.log("else")
                 const errorData = await response.json();
