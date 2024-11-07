@@ -18,7 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE boards SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
-@Table(name = "boards")
+@Table(name = "boards", indexes = {
+        @Index(name = "idx_board_title",columnList = "title"),
+        @Index(name = "idx_board_content",columnList = "content")
+})
 public class Board extends Timestamped {
 
     @Id
@@ -40,7 +43,7 @@ public class Board extends Timestamped {
 
     private boolean deleted = Boolean.FALSE;
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BoardImages> imageUrls;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
