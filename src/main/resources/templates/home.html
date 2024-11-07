@@ -27,8 +27,6 @@
                 },
                 body: JSON.stringify({ email, password })
             });
-            console.log(response)
-            console.log("response")
             if (response.ok) {
                 window.location.href = `${window.location.origin}/ssaktium/main`;
             } else {
