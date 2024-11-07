@@ -54,8 +54,13 @@ public enum GlobalExceptionConst {
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "중복된 이메일입니다."),
     ALREADY_REQUEST(HttpStatus.CONFLICT, "중복된 친구 요청입니다."),
     ERR_ALREADY_ACCEPTED_FRIEND(HttpStatus.CONFLICT, "이미 수락한 친구입니다."),
-    DUPLICATE_LIKE(HttpStatus.CONFLICT, "이미 좋아요가 눌려있습니다.");
+    DUPLICATE_LIKE(HttpStatus.CONFLICT, "이미 좋아요가 눌려있습니다."),
 
+    // 상태코드 424
+    UNABLE_TO_SEND_EMAIL(HttpStatus.FAILED_DEPENDENCY, "이메일 전송에 실패했습니다."),
+
+    // 상태코드 503
+    SOCIAL_LINK_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "연동에 실패했습니다.");
 
 
     private final HttpStatus httpStatus;

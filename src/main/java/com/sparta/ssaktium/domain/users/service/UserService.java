@@ -118,9 +118,16 @@ public class UserService {
         return "회원탈퇴가 정상적으로 완료되었습니다.";
     }
 
+    // Id 로 유저 조회
     public User findUser(long userId) {
         return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
     }
+
+    // Email 로 유저 유무 확인
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 
     // id 비교 메서드
     public void matchIds(long id1, long id2) {

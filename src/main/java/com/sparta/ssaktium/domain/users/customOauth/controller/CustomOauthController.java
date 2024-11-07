@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -52,4 +50,10 @@ public class CustomOauthController {
 
         return "redirect:/ssaktium/main";
     }
+
+    // 소셜로그인 연동
+//    @PutMapping("/ssaktium/users/link-social-account")
+//    public String linkSocialAccount() {
+//
+//    }
 }
