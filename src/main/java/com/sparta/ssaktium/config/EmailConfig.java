@@ -1,6 +1,5 @@
 package com.sparta.ssaktium.config;
 
-import com.sparta.ssaktium.domain.auth.exception.BusinessLogicException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +39,12 @@ public class EmailConfig {
         return true;
     }
 
-        private String getCertificationMessage (String certificationNumber) {
-            String certificationMessage = "";
-            certificationMessage += "<div style='text-align: center;'><img src=\"https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FVbXC4%2FbtsKePF4r6K%2FHdV3AU33uDf8khBSMLMLU0%2Fimg.png\"></div>";
-            certificationMessage += "<h1 style='text-align: center;'>[싹틔움] 인증메일</h1>";
-            certificationMessage += "<h3 style='text-align: center;'>인증코드: <string style='font-size:32px; letter-spacing: 8px;'>"
-                    + certificationNumber + "</strong></h3>";
-            return certificationMessage;
-        }
+    private String getCertificationMessage(String certificationNumber) {
+        String certificationMessage = "";
+        certificationMessage += "<div style='text-align: center;'><img src=\"https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FVbXC4%2FbtsKePF4r6K%2FHdV3AU33uDf8khBSMLMLU0%2Fimg.png\"></div>";
+        certificationMessage += "<h1 style='text-align: center;'>[싹틔움] 인증메일</h1>";
+        certificationMessage += "<h3 style='text-align: center;'>인증코드: <string style='font-size:32px; letter-spacing: 8px;'>"
+                + certificationNumber + "</strong></h3>";
+        return certificationMessage;
     }
+}

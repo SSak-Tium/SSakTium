@@ -18,9 +18,11 @@ public enum GlobalExceptionConst {
     LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, "좋아요 수는 0보다 작을 수 없습니다."),
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "이미지 업로드 중 오류가 발생했습니다."),
     INVALID_BOARD_TYPE(HttpStatus.BAD_REQUEST,"게시판 타입이 잘못되었습니다.('me','all')"),
+    ERROR_INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST,"인증번호가 일치하지 않습니다."),
 
     // 상태코드 401
     UNAUTHORIZED_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호를 확인해주세요."),
+    ERROR_EMAIL_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "이메일 인증을 진행해주세요."),
 
     // 상태코드 403
     NOT_USER_OF_COMMENT(HttpStatus.FORBIDDEN, "댓글 작성자가 아닙니다."),
