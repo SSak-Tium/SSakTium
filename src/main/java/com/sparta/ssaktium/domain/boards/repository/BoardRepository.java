@@ -36,4 +36,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT COUNT(c) FROM Board b JOIN b.comments c WHERE b.id = :boardId")
     int countCommentsByBoardId(@Param("boardId") Long boardId);
+
+    @Query("SELECT b FROM Board b WHERE b.title LIKE %:keyword% OR b.content LIKE %:keyword%")
+    List<Board> searchBoardByTitleOrContent(String keyword);
+
 }

@@ -127,6 +127,7 @@ public class BoardController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CommonResponse<Page<BoardSearchResponseDto>>> searchBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                                    @)
+    public ResponseEntity<CommonResponse<List<BoardSearchResponseDto>>> searchBoard(@RequestParam String keyword) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.searchBoard(keyword)));
+    }
 }

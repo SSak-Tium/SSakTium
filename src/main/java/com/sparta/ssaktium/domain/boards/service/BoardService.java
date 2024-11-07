@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.boards.service;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSearchResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.entity.BoardImages;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,18 +55,23 @@ public class BoardService {
                 user);
 
         // 업로드한 파일의 S3 URL 주소
-        List<String> imageUrls = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
+        List<String> imageUrls = (imageList != null && !imageList.isEmpty())
+                ? s3Service.uploadImageListToS3(imageList, s3Service.bucket) : new ArrayList<>();
+
 
         //저장
         Board savedBoard = boardRepository.save(board);
         //boardimages에 저장
-        for (String imageUrl : imageUrls) {
-            BoardImages boardImage = new BoardImages(imageUrl, savedBoard);// Board 설정
-            boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
+        if (!imageUrls.isEmpty()) {
+            for (String imageUrl : imageUrls) {
+                BoardImages boardImage = new BoardImages(imageUrl, savedBoard);// Board 설정
+                boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
+            }
         }
         //responseDto 반환
         return new BoardSaveResponseDto(savedBoard, imageUrls);
     }
+
 
     @Transactional
     public BoardUpdateImageDto updateImages(Long userId,
@@ -251,6 +258,14 @@ public class BoardService {
             dtoList.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
         }
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
+    }
+
+    public List<BoardSearchResponseDto> searchBoard(String keyword) {
+        List<Board> boardList = boardRepository.searchBoardByTitleOrContent(keyword);
+
+        return boardList.stream()
+                .map(BoardSearchResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     //Board 찾는 메서드
