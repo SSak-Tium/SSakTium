@@ -62,7 +62,7 @@ class DictionaryServiceTest {
         dictionaryId = 1L;
         authUser = mock(AuthUser.class);
         ReflectionTestUtils.setField(authUser, "userId", 1L);
-        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER);
+        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER, "socialId");
         ReflectionTestUtils.setField(user, "id", 1L);
         dictionary = Dictionary.addDictionary("title", "content", user, "https://image.url");
         ReflectionTestUtils.setField(dictionary, "id", 1L);

@@ -3,12 +3,12 @@ package com.sparta.ssaktium.domain.users.customOauth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWT;
 import com.sparta.ssaktium.config.JwtUtil;
 import com.sparta.ssaktium.domain.users.customOauth.dto.CustomOauthInfoDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
-import com.sparta.ssaktium.domain.users.kakao.dto.KakaoUserInfoDto;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,6 +44,15 @@ public class CustomOauthService {
 
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String googleClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String naverClientSecret;
+
+    @Value("${app.redirectUri}")
+    private String customRedirectUri;
 
 
     // 소셜 로그인 서비스를 통해 인증을 수행하는 메서드
@@ -70,7 +78,7 @@ public class CustomOauthService {
 
     // AccessToken을 발급받기 위한 공통 메서드
     private String getAccessToken(String provider, String code) {
-        String redirectUri = "http://localhost:8080/ssaktium/signin/" + provider;
+        String redirectUri = customRedirectUri + provider;
         String url;
         String clientId;
         String clientSecret = null;  // 필요한 경우에만 할당
@@ -85,6 +93,11 @@ public class CustomOauthService {
                 url = "https://oauth2.googleapis.com/token";
                 clientId = googleClientId;
                 clientSecret = googleClientSecret;
+                break;
+            case "naver":
+                url = "https://nid.naver.com/oauth2.0/token";
+                clientId = naverClientId;
+                clientSecret = naverClientSecret;
                 break;
             default:
                 throw new NotFoundUserException();
@@ -129,6 +142,7 @@ public class CustomOauthService {
             String encodedPassword = passwordEncoder.encode(password);
             String email = userInfo.getEmail() + "_" + provider;
             String birthYear = userInfo.getBirthYear();
+            String socialAccountId = userInfo.getSocialId();
 
             existingUser = User.builder()
                     .email(email)
@@ -136,6 +150,7 @@ public class CustomOauthService {
                     .password(encodedPassword)
                     .birthYear(birthYear)
                     .userRole(UserRole.ROLE_USER)
+                    .socialAccountId(socialAccountId)
                     .build();
 
             userRepository.save(existingUser);
@@ -147,12 +162,7 @@ public class CustomOauthService {
         return existingUser;
     }
 
-    /**
-     * JWT 토큰을 생성하고, 응답 헤더에 추가하는 메서드입니다.
-     *
-     * @param user     토큰을 생성할 사용자 정보
-     * @param response HTTP 응답 객체로, JWT 토큰을 포함하여 반환합니다.
-     */
+    // JWT 토큰을 생성하고, 응답 헤더에 추가하는 메서드
     private void addJwtToResponse(User user, HttpServletResponse response) {
         String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
 
@@ -165,6 +175,7 @@ public class CustomOauthService {
         return switch (provider) {
             case "kakao" -> fetchKakaoUserInfo(accessToken);
             case "google" -> fetchGoogleUserInfo(accessToken);
+            case "naver" -> fetchNaverUserInfo(accessToken);
             default -> throw new NotFoundUserException();
         };
     }
@@ -187,14 +198,14 @@ public class CustomOauthService {
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
-        Long id = jsonNode.get("id").asLong();
+        String socialId = jsonNode.get("id").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
         String birthYear = jsonNode.get("kakao_account")
                 .get("birthyear").asText();
         String userName = jsonNode.get("properties").get("nickname").asText();
 
-        log.info("카카오 사용자 정보: " + id + ", " + userName + ", " + birthYear + ", " + email);
-        return new CustomOauthInfoDto(id, userName, email, birthYear);
+        log.info("카카오 사용자 정보: " + socialId + ", " + userName + ", " + birthYear + ", " + email);
+        return new CustomOauthInfoDto(socialId, userName, email, birthYear);
     }
 
     //구글 사용자 정보를 가져오는 메서드
@@ -213,13 +224,38 @@ public class CustomOauthService {
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
+        log.info(responseBody);
+        String socialId = jsonNode.has("sub") ? jsonNode.get("sub").asText() : null;
+        String name = jsonNode.has("name") ? jsonNode.get("name").asText() : null; // null 체크
         String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null; // null 체크
-        String userName = jsonNode.has("name") ? jsonNode.get("name").asText() : null; // null 체크
 
+        return CustomOauthInfoDto.addGoogleId(socialId, name, email);
+    }
 
-            return new CustomOauthInfoDto(userName, email);
+    // 네이버 사용자 정보를 가져오는 메서드
+    private CustomOauthInfoDto fetchNaverUserInfo(String accessToken) throws JsonProcessingException {
+        String url = "https://openapi.naver.com/v1/nid/me";
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        String responseBody = restTemplate.exchange(url, HttpMethod.GET, request, String.class).getBody();
 
+        if (responseBody == null) {
+            log.error("Naver API response body is null.");
+            throw new NotFoundUserException();
+        }
+
+        JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
+        JsonNode responseNode = jsonNode.get("response");
+        String socialId = responseNode.has("id") ? responseNode.get("id").asText() : null; // null 체크
+        String email = responseNode.has("email") ? responseNode.get("email").asText() : null; // null 체크
+        String userName = responseNode.has("name") ? responseNode.get("name").asText() : null; // null 체크
+        String birthyear = responseNode.has("birthyear") ? responseNode.get("birthyear").asText() : null; // null 체크
+
+        log.info("네이버 사용자 정보: " + ", " + userName + ", " + birthyear + ", " + email);
+        return new CustomOauthInfoDto(socialId, userName, email, birthyear);
     }
 }

@@ -60,15 +60,15 @@ class AuthServiceTest {
         userId = 1L;
         authUser = mock(AuthUser.class);
         ReflectionTestUtils.setField(authUser, "userId", 1L);
-        user = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_USER);
+        user = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_USER, "socialId");
         ReflectionTestUtils.setField(user, "id", 1L);
         encodedPassword = "encodedPassword";
         token = "Bearer Token";
 
         signupRequestDto = new SignupRequestDto("email", "password", "name", "1997");
         signinRequestDto = new SigninRequestDto("email", "password");
-        savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
-        deletedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
+        savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER, "socialId");
+        deletedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER, "socialId");
         ReflectionTestUtils.setField(deletedUser, "deleted", true);
     }
 

@@ -14,10 +14,12 @@ import com.sparta.ssaktium.domain.users.enums.UserStatus;
 import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -43,7 +45,8 @@ public class AuthService {
                 encodedPassword,
                 signupRequestDto.getUserName(),
                 signupRequestDto.getBirthYear(),
-                userRole
+                userRole,
+                null
         );
         User savedUser = userRepository.save(newUser);
 
@@ -67,6 +70,8 @@ public class AuthService {
         }
 
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
+
+        log.info("로그인 성공");
 
         return new SigninResponseDto(bearerToken);
     }

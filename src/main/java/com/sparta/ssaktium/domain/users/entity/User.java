@@ -39,15 +39,15 @@ public class User extends Timestamped {
 
     private boolean deleted = Boolean.FALSE;
 
-    private Long kakaoId;
+    private String socialAccountId;
 
-
-    public User(String email, String password, String userName, String birthYear, UserRole userRole) {
+    public User(String email, String password, String userName, String birthYear, UserRole userRole, String socialAccountId) {
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
+        this.socialAccountId = socialAccountId;
     }
 
     public User(String email, String password, String userName, UserRole userRole) {
@@ -64,24 +64,14 @@ public class User extends Timestamped {
         this.userRole = userRole;
     }
 
-    // 카카오 유저 생성
-    public User(String email, String nickname, String encodedPassword, String birthYear, UserRole userRole, Long kakaoId) {
-        this.email = email;
-        this.userName = nickname;
-        this.password = encodedPassword;
-        this.birthYear = birthYear;
-        this.userRole = userRole;
-        this.kakaoId = kakaoId;
-    }
-
-    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, Long kakaoId) {
+    public User(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, String socialAccountId) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.birthYear = birthYear;
         this.userRole = userRole;
-        this.kakaoId = kakaoId;
+        this.socialAccountId = socialAccountId;
     }
 
     public static User fromAuthUser(AuthUser authUser) {
@@ -90,7 +80,7 @@ public class User extends Timestamped {
     }
 
     public static User addAdminUser(AdminSignupRequestDto adminSignupRequestDto, String encodedPassword, UserRole userRole) {
-        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), null, userRole);
+        return new User(adminSignupRequestDto.getEmail(), encodedPassword, adminSignupRequestDto.getUserName(), null, userRole, null);
     }
 
     // 유저 비밀번호 변경
@@ -104,14 +94,9 @@ public class User extends Timestamped {
         this.userName = userName;
     }
 
-    public User kakaoIdUpdate(Long kakaoId) {
-        this.kakaoId = kakaoId;
-        return this;
-    }
-
     @Builder
-    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, Long kakaoId) {
-        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole, kakaoId);
+    public static User createUser(Long id, String email, String password, String userName, String birthYear, String profileImageUrl, UserRole userRole, String socialAccountId) {
+        return new User(id, email, password, userName, birthYear, profileImageUrl, userRole, socialAccountId);
     }
 
     // 소셜 로그인 메서드

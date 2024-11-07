@@ -54,16 +54,16 @@ class AdminAuthServiceTest {
         userId = 1L;
         authUser = mock(AuthUser.class);
         ReflectionTestUtils.setField(authUser, "userId", 1L);
-        user = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_USER);
+        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER, "socialId");
         ReflectionTestUtils.setField(user, "id", 1L);
-        adminUser = new User("email@gmail.com", "password", "name","0000", UserRole.ROLE_ADMIN);
+        adminUser = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_ADMIN, "socialId");
         ReflectionTestUtils.setField(adminUser, "id", 2L);
         encodedPassword = "encodedPassword";
         token = "Bearer Token";
 
         adminSignupRequestDto = new AdminSignupRequestDto("email", "password", "name");
-        savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
-        deletedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
+        savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER, "socialId");
+        deletedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER, "socialId");
         ReflectionTestUtils.setField(deletedUser, "deleted", true);
     }
 

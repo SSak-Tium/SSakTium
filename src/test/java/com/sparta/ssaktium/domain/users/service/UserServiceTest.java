@@ -56,11 +56,11 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         userId = 1L;
-        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER);
+        user = new User("email@gmail.com", "password", "name", "0000", UserRole.ROLE_USER, "socialId");
         ReflectionTestUtils.setField(user, "id", userId);
         ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
         encodedPassword = "encodedPassword";
-        savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER);
+        savedUser = new User("email", "password", "name", "1997", UserRole.ROLE_USER, "socialId");
         favoriteDictionaries = List.of(1L, 2L);
         oldPassword = "oldPassword";
         newPassword = "newPassword";

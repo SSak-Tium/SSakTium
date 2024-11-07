@@ -159,7 +159,7 @@ public class BoardServiceTest {
     public void 보드_단건조회_성공() {
         //given
         long boardId = 1L;
-        User user = new User("aa@aa.com", "Qq123456!", "aa", "1990", UserRole.ROLE_USER);
+        User user = new User("aa@aa.com", "Qq123456!", "aa", "1990", UserRole.ROLE_USER, "socialId");
         BoardSaveRequestDto requestDto = new BoardSaveRequestDto("aa", "aaa", PublicStatus.ALL);
 
         Board board = new Board(requestDto.getTitle(), requestDto.getContents(), requestDto.getPublicStatus(), user);
