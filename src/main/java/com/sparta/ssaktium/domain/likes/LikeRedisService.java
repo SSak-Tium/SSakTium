@@ -14,17 +14,23 @@ public class LikeRedisService {
         this.jedis = new Jedis("localhost", 6379);
     }
 
-    public void incrementLike(String postId, String userId) {
-        jedis.incr("likes:" + postId);  // 좋아요 수 증가
-        jedis.sadd("post_likes:" + postId, userId);  // 사용자 좋아요 기록 추가
+    public void incrementLike(String boardId, String userId) {
+        jedis.incr("likes:" + boardId);  // 좋아요 수 증가
+        jedis.sadd("board_likes:" + boardId, userId);  // 사용자 좋아요 기록 추가
     }
 
-    public boolean isLiked(String postId, String userId) {
-        return jedis.sismember("post_likes:" + postId, userId);  // 중복 여부 확인
+    public void decrementLike(String boardId, String userId){
+        jedis.decr("likes:" + boardId); // 좋아요 수 감소
+        jedis.srem("board_likes:" + boardId, userId);
     }
 
-    public int getRedisLikeCount(String postId) {
-        String count = jedis.get("likes:" + postId);
+    public boolean isLiked(String boardId, String userId) {
+        return jedis.sismember("board_likes:" + boardId, userId);  // 중복 여부 확인
+    }
+
+    // 좋아요 수 조회
+    public int getRedisLikeCount(String boardId) {
+        String count = jedis.get("likes:" + boardId);
         return count != null ? Integer.parseInt(count) : 0;
     }
 }
