@@ -14,23 +14,34 @@ public class LikeRedisService {
         this.jedis = new Jedis("localhost", 6379);
     }
 
-    public void incrementLike(String boardId, String userId) {
-        jedis.incr("likes:" + boardId);  // 좋아요 수 증가
-        jedis.sadd("board_likes:" + boardId, userId);  // 사용자 좋아요 기록 추가
+    // 좋아요 수 증가
+    public void incrementLike(String targetType, String targetId, String userId) {
+        String likeKey = "likes:" + targetType + ":" + targetId;
+        String userLikeKey = targetType + "_likes:" + targetId;
+
+        jedis.incr(likeKey);  // 좋아요 수 증가
+        jedis.sadd(userLikeKey, userId);  // 사용자 좋아요 기록 추가
     }
 
-    public void decrementLike(String boardId, String userId){
-        jedis.decr("likes:" + boardId); // 좋아요 수 감소
-        jedis.srem("board_likes:" + boardId, userId);
+    // 좋아요 수 감소
+    public void decrementLike(String targetType, String targetId, String userId) {
+        String likeKey = "likes:" + targetType + ":" + targetId;
+        String userLikeKey = targetType + "_likes:" + targetId;
+
+        jedis.decr(likeKey);  // 좋아요 수 감소
+        jedis.srem(userLikeKey, userId);  // 사용자 좋아요 기록 제거
     }
 
-    public boolean isLiked(String boardId, String userId) {
-        return jedis.sismember("board_likes:" + boardId, userId);  // 중복 여부 확인
+    // 중복 좋아요 확인
+    public boolean isLiked(String targetType, String targetId, String userId) {
+        String userLikeKey = targetType + "_likes:" + targetId;
+        return jedis.sismember(userLikeKey, userId);
     }
 
     // 좋아요 수 조회
-    public int getRedisLikeCount(String boardId) {
-        String count = jedis.get("likes:" + boardId);
+    public int getRedisLikeCount(String targetType, String targetId) {
+        String likeKey = "likes:" + targetType + ":" + targetId;
+        String count = jedis.get(likeKey);
         return count != null ? Integer.parseInt(count) : 0;
     }
 }

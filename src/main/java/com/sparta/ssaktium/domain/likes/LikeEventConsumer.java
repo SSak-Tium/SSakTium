@@ -14,6 +14,9 @@ public class LikeEventConsumer {
         this.likeRedisService = likeRedisService;
     }
 
+    public static final String TARGET_TYPE_BOARD = "Board";
+    public static final String TARGET_TYPE_COMMENT = "Comment";
+
     @KafkaListener(topics = "board-like-events", groupId = "like-group")
     public void handleBoardLikeEvent(BoardLikeEvent event) {
         String eventType = event.getEventType();
@@ -22,10 +25,10 @@ public class LikeEventConsumer {
 
         switch (eventType) {
             case "LIKE":
-                likeRedisService.incrementLike(boardId, userId); // 게시글 좋아요 추가
+                likeRedisService.incrementLike(TARGET_TYPE_BOARD,boardId, userId); // 게시글 좋아요 추가
                 break;
             case "CANCEL":
-                likeRedisService.decrementLike(boardId, userId); // 게시글 좋아요 취소
+                likeRedisService.decrementLike(TARGET_TYPE_BOARD,boardId, userId); // 게시글 좋아요 취소
                 break;
             default:
                 System.out.println("알 수 없는 게시글 이벤트 타입입니다.: " + eventType);
@@ -41,10 +44,10 @@ public class LikeEventConsumer {
 
         switch (eventType) {
             case "LIKE":
-                likeRedisService.incrementLike(commentId, userId); // 댓글 좋아요 추가
+                likeRedisService.incrementLike(TARGET_TYPE_COMMENT,commentId, userId); // 댓글 좋아요 추가
                 break;
             case "CANCEL":
-                likeRedisService.decrementLike(commentId, userId); // 댓글 좋아요 취소
+                likeRedisService.decrementLike(TARGET_TYPE_COMMENT,commentId, userId); // 댓글 좋아요 취소
                 break;
             default:
                 System.out.println("알 수 없는 댓글 이벤트 타입입니다.: " + eventType);

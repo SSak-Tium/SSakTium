@@ -1,8 +1,10 @@
 package com.sparta.ssaktium.domain.likes.boardLikes;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 // 좋아요 데이터
+@Getter
 @NoArgsConstructor
 public class BoardLikeEvent {
 

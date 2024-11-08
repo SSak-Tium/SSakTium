@@ -15,6 +15,7 @@ import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
+import com.sparta.ssaktium.domain.likes.LikeRedisService;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
@@ -29,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +40,7 @@ public class BoardService {
     private final FriendService friendService;
     private final S3Service s3Service;
     private final BoardImagesRepository boardImagesRepository;
+    private final LikeRedisService likeRedisService; // 좋아요 수 반영을 위함
 
 
     @Transactional
@@ -185,7 +186,9 @@ public class BoardService {
         List<String> imageUrls = board.getImageUrls().stream()
                 .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                 .toList();
-        return new BoardDetailResponseDto(board, imageUrls, commentCount);
+        // 좋아요 수 레디스에서 반영
+        int redisLikeCount = getLikeCount(id.toString());
+        return new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount);
     }
 
     public Page<BoardDetailResponseDto> getBoards(Long userId, String type, int page, int size) {
@@ -203,7 +206,9 @@ public class BoardService {
                 List<String> imageUrls = board.getImageUrls().stream()
                         .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                         .toList();
-                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
+                // 좋아요 수 레디스에서 반영
+                int redisLikeCount = getLikeCount(board.getId().toString());
+                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount));
             }
             return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
 
@@ -216,7 +221,9 @@ public class BoardService {
                 List<String> imageUrls = board.getImageUrls().stream()
                         .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                         .toList();
-                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
+                // 좋아요 수 레디스에서 반영
+                int redisLikeCount = getLikeCount(board.getId().toString());
+                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount));
             }
             return new PageImpl<>(boardDetails, pageable, boardsPage.getTotalElements());
         } else {
@@ -250,8 +257,10 @@ public class BoardService {
             List<String> imageUrls = board.getImageUrls().stream()
                     .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                     .toList();
+            // 좋아요 수 레디스에서 반영
+            int redisLikeCount = getLikeCount(board.getId().toString());
             // 댓글 리스트 대신 댓글 수만 포함하는 DTO 생성
-            dtoList.add(new BoardDetailResponseDto(board,imageUrls, commentCount));
+            dtoList.add(new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount));
         }
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
@@ -260,5 +269,14 @@ public class BoardService {
     public Board getBoardById(Long id) {
         return boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED)
                 .orElseThrow(NotFoundBoardException::new);
+    }
+
+    // Redis 로 좋아요 수 조회하는 메서드
+    public int getLikeCount(String targetId) {
+        int redisCount = likeRedisService.getRedisLikeCount("Board", targetId);
+        if (redisCount == 0) {
+            return boardRepository.findBoardLikesCountById(Long.parseLong(targetId));
+        }
+        return redisCount;
     }
 }
