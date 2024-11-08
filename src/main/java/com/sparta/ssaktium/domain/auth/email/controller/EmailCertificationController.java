@@ -26,7 +26,7 @@ public class EmailCertificationController {
         return ResponseEntity.ok(CommonResponse.success(emailCertificationService.emailCertification(requestDto)));
     }
 
-    @PostMapping("/v2/auth/check-certification")
+    @PostMapping("/v2/auth/verify-certification")
     public ResponseEntity<CommonResponse<String>> verifyCertificationNumber(
             @RequestBody @Valid
             VerifyCertificationNumberRequestDto requestDto
