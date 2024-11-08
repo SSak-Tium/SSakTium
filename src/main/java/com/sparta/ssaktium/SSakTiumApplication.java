@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableJpaAuditing
 @EnableAsync
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
-@EnableKafka  // Kafka 리스너 활성화
 public class SSakTiumApplication {
 
     public static void main(String[] args) {
