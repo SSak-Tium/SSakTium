@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.likes.boardLikes.service;
 import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.likes.LikeEventProducer;
 import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
 import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLike;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
@@ -21,6 +22,7 @@ public class BoardLikeService {
 
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final LikeEventProducer likeProducer; // 카프카 이벤트 프로듀서 주입
 
     // 게시글에 좋아요 등록
     @Transactional
@@ -33,6 +35,8 @@ public class BoardLikeService {
         if (boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)) {
             throw new AlreadyLikedException();
         }
+        // 카프카 좋아요 등록 이벤트
+        likeProducer.sendBoardLikeEvent(userId.toString(), boardId.toString(), "LIKE");
 
         // 좋아요 등록
         BoardLike boardLike = new BoardLike(board, userId);
@@ -55,6 +59,9 @@ public class BoardLikeService {
         // 게시글에 해당 유저의 좋아요가 있는지 확인
         BoardLike boardLike = boardLikeRepository.findByBoardIdAndUserId(boardId, userId)
                 .orElseThrow(() -> new NotFoundBoardLikeException());
+
+        // 카프카 좋아요 취소 이벤트
+        likeProducer.sendBoardLikeEvent(userId.toString(), boardId.toString(), "CANCEL");
 
         // 좋아요 취소
         boardLikeRepository.delete(boardLike);

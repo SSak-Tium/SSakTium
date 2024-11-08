@@ -29,7 +29,7 @@ public class BoardLikeController {
                                                                                @PathVariable
                                                                                @Parameter(description = "게시글 아이디")
                                                                                Long boardId) {
-        return ResponseEntity.ok(CommonResponse.success(boardLikeService.postBoardLikes(boardId, authUser.getUserId())));
+        return ResponseEntity.ok(CommonResponse.success(boardLikeService.postBoardLikes(authUser.getUserId(), boardId)));
     }
 
     // 좋아요 취소
@@ -40,7 +40,7 @@ public class BoardLikeController {
                                  @PathVariable
                                  @Parameter(description = "게시글 아이디")
                                  Long boardId) {
-        boardLikeService.deleteBoardLikes(boardId, authUser.getUserId());
+        boardLikeService.deleteBoardLikes(authUser.getUserId(), boardId);
     }
 
 }

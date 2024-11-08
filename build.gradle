@@ -60,7 +60,8 @@ dependencies {
     // Google Email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-
+    // Jedis (Redis 클라이언트)
+    implementation 'redis.clients:jedis:4.3.1'
 }
 
 tasks.named('test') {

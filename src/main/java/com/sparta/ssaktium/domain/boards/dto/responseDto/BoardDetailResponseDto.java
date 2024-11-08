@@ -16,11 +16,11 @@ public class BoardDetailResponseDto {
     private final List<String> imageUrls;
     private final int commentCount;
 
-    public BoardDetailResponseDto(Board board, List<String> imageUrls,int commentCount) {
+    public BoardDetailResponseDto(Board board, List<String> imageUrls,int commentCount,int boardLikesCount) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.contents = board.getContent();
-        this.boardLikesCount = board.getBoardLikesCount();
+        this.boardLikesCount = boardLikesCount;
         this.imageUrls = imageUrls;
         this.commentCount = commentCount;
     }
