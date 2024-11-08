@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Configuration
@@ -16,7 +19,8 @@ public class EmailConfig {
 
     private final String SUBJECT = "[싹틔움] 인증메일 입니다.";
 
-    public boolean sendCertificationMain(String email, String certificationNumber) {
+    @Async("emailTaskExecutor")
+    public CompletableFuture<Boolean> sendCertificationEmail(String email, String certificationNumber) {
 
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -31,12 +35,12 @@ public class EmailConfig {
             javaMailSender.send(message);
 
             log.info("이메일 발신 성공 : {}", email);
+            return CompletableFuture.completedFuture(true);
 
         } catch (Exception e) {
             log.error("이메일 발신 실패 : {}", email, e);
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-        return true;
     }
 
     private String getCertificationMessage(String certificationNumber) {
