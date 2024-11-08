@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 public class EmailCertificationService {
 
     private final EmailConfig emailConfig;
-
     private final RedisTemplate<String, Object> redisTemplate;
     private final UserService userService;
 
