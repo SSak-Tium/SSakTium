@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.auth.email.controller;
 import com.amazonaws.Response;
 import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.auth.email.dto.EmailCertificationRequestDto;
+import com.sparta.ssaktium.domain.auth.email.dto.VerifyCertificationNumberRequestDto;
 import com.sparta.ssaktium.domain.auth.email.service.EmailCertificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,13 @@ public class EmailCertificationController {
             EmailCertificationRequestDto requestDto
     ) {
         return ResponseEntity.ok(CommonResponse.success(emailCertificationService.emailCertification(requestDto)));
+    }
+
+    @PostMapping("/v2/auth/check-certification")
+    public ResponseEntity<CommonResponse<String>> verifyCertificationNumber(
+            @RequestBody @Valid
+            VerifyCertificationNumberRequestDto requestDto
+    ) {
+        return ResponseEntity.ok(CommonResponse.success(emailCertificationService.verifyCertificationNumber(requestDto)));
     }
 }
