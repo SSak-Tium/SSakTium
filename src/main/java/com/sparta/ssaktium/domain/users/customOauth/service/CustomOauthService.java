@@ -69,7 +69,7 @@ public class CustomOauthService {
 
         User user = registerUserIfNeeded(UserInfo, response, provider);
 
-        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
+        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(),user.getUserName(), user.getUserRole());
 
         log.info(createToken);
 
@@ -165,7 +165,7 @@ public class CustomOauthService {
 
     // JWT 토큰을 생성하고, 응답 헤더에 추가하는 메서드
     private void addJwtToResponse(User user, HttpServletResponse response) {
-        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
+        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserName(), user.getUserRole());
 
         jwtUtil.addTokenToResponseHeader(createToken, response);
     }

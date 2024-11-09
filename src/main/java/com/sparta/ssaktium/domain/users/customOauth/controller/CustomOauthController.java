@@ -2,11 +2,15 @@ package com.sparta.ssaktium.domain.users.customOauth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.ssaktium.config.JwtUtil;
+import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.customOauth.service.CustomOauthService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,8 @@ public class CustomOauthController {
 
     @Value("${app.domainUri}")
     private String domainUri;
+
+    private JwtUtil jwtUtil;
 
 
     private final CustomOauthService customOauthService;
@@ -31,6 +37,7 @@ public class CustomOauthController {
     public String main() {
         return "main";
     }
+
 
     @GetMapping("/ssaktium/signup")
     public String signupPage() {
@@ -50,10 +57,4 @@ public class CustomOauthController {
 
         return "redirect:/ssaktium/main";
     }
-
-    // 소셜로그인 연동
-//    @PutMapping("/ssaktium/users/link-social-account")
-//    public String linkSocialAccount() {
-//
-//    }
 }
