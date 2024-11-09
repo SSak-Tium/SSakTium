@@ -1,4 +1,4 @@
-/* style.css */
+/* 기존 스타일 유지 */
 * {
     margin: 0;
     padding: 0;
@@ -8,25 +8,73 @@
 body {
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column; /* 메뉴바와 본문을 세로로 배치 */
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* 상단에서 시작하도록 설정 */
     height: 100vh;
     background-color: #e8f5e9; /* 밝은 초록 배경 */
     background-size: cover;
 }
 
-.login-container {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 30px;
+/* 메뉴바 스타일 */
+.navbar {
     width: 480px;
+    background-color: #4caf50; /* 상단 바의 배경색 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-menu {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.navbar-menu li {
+    margin: 0 20px;
+}
+
+.navbar-menu li a {
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.navbar-menu li a:hover {
+    background-color: #388e3c; /* hover 시 색상 변화 */
+}
+
+/* 본문 영역 */
+.main-container {
     text-align: center;
+    padding: 50px;
+    width: 100%;
 }
 
 h2 {
     color: #4caf50;
     margin-bottom: 20px;
+}
+
+.content {
+    margin-bottom: 20px;
+}
+
+.logout-button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.logout-button:hover {
+    background-color: #388e3c;
 }
 
 .login-form input[type="text"],

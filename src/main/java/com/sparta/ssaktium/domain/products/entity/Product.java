@@ -1,4 +1,4 @@
-package com.sparta.ssaktium.domain.product.entity;
+package com.sparta.ssaktium.domain.products.entity;
 
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
 import jakarta.persistence.*;
@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "products")
 public class Product extends Timestamped {
 
     @Id
