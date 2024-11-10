@@ -10,6 +10,9 @@ public class LikeRedisService {
 
     private final Jedis jedis;
 
+    public static final String TARGET_TYPE_BOARD = "board";
+    public static final String TARGET_TYPE_COMMENT = "comment";
+
     public LikeRedisService() {
         this.jedis = new Jedis("localhost", 6379);
     }

@@ -27,7 +27,7 @@ public class LikeEventProducer {
         kafkaTemplate.send("comment-like-events", commentLikeEvent);  // 토픽에 전송
     }
 
-    // 둘 다 합쳐서 하나로 전송하는 방법
+    // 둘 다 합쳐서 하나로 전송하는 방법 (확정성)
     public void sendLikeEvent(Object likeEvent) {
         String topic = likeEvent instanceof BoardLikeEvent ? "board-like-events" : "comment-like-events";
         kafkaTemplate.send(topic, likeEvent);
