@@ -52,6 +52,7 @@ public enum GlobalExceptionConst {
     NOT_FOUND_COMMENT_LIKE(HttpStatus.NOT_FOUND, " 댓글에 해당 좋아요가 존재하지 않습니다."),
     NOT_FOUND_PLANTDIARY(HttpStatus.NOT_FOUND, "식물다이어리가 존재하지 않습니다."),
     NOT_FOUND_PRODUCT(HttpStatus.NOT_FOUND, "상품이 존재하지 않습니다."),
+    NOT_FOUND_ORDER(HttpStatus.NOT_FOUND, "주문이 존재하지 않습니다."),
 
     // 상태코드 409
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "중복된 이메일입니다."),

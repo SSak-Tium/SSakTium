@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class ProductController {
         return "order"; // order.html 페이지로 이동
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping("/v2/products")
     @Operation(summary = "상품 등록", description = "상품 등록하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
