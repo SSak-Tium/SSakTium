@@ -82,7 +82,7 @@ class AdminAuthServiceTest {
         given(valueOperations.get(adminSignupRequestDto.getEmail() + ":verified")).willReturn(true);
         given(passwordEncoder.encode(anyString())).willReturn(encodedPassword);
         given(userRepository.save(any(User.class))).willReturn(adminUser);
-        given(jwtUtil.createToken(anyLong(), anyString(), any(UserRole.class))).willReturn(token);
+        given(jwtUtil.createToken(anyLong(), anyString(), anyString(), any(UserRole.class))).willReturn(token);
 
         // when
         SignupResponseDto responseDto = adminAuthService.adminSignup(adminSignupRequestDto);
