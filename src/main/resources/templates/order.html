@@ -56,14 +56,14 @@
             },
             body: JSON.stringify(orderRequest)
         });
-
-        if (response.ok) {
-            const data = await response.json();
-            alert("주문이 성공적으로 등록되었습니다!");
-            console.log(data);
-        } else {
-            alert("주문에 실패했습니다.");
-        }
+        console.log(response)
+        // if (response.ok) {
+        //     const data = await response.json();
+        //     alert("주문이 성공적으로 등록되었습니다!");
+        //     console.log(data);
+        // } else {
+        //     alert("주문에 실패했습니다.");
+        // }
     }
 </script>
 

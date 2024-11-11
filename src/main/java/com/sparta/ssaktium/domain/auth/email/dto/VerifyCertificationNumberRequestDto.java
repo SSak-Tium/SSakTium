@@ -13,9 +13,9 @@ public class VerifyCertificationNumberRequestDto {
     @Email
     @NotBlank
     @Schema(description = "이메일", example = "email@gmail.com")
-    private final String Email;
+    private final String email;
 
     @NotBlank
     @Schema(description = "인증번호", example = "1234")
-    private final String InputCertificationNumber;
+    private final String inputCertificationNumber;
 }

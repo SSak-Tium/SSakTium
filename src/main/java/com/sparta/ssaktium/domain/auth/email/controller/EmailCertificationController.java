@@ -1,6 +1,7 @@
 package com.sparta.ssaktium.domain.auth.email.controller;
 
 import com.sparta.ssaktium.config.CommonResponse;
+import com.sparta.ssaktium.config.EmailConfig;
 import com.sparta.ssaktium.domain.auth.email.dto.EmailCertificationRequestDto;
 import com.sparta.ssaktium.domain.auth.email.dto.VerifyCertificationNumberRequestDto;
 import com.sparta.ssaktium.domain.auth.email.service.EmailCertificationService;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmailCertificationController {
 
     private final EmailCertificationService emailCertificationService;
+    private final EmailConfig emailConfig;
 
     @PostMapping("/v2/auth/email-certification")
     @Operation(summary = "인증번호 전송", description = "이메일로 인증번호 전송하는 API")
@@ -41,5 +44,13 @@ public class EmailCertificationController {
                                                                             VerifyCertificationNumberRequestDto requestDto
     ) {
         return ResponseEntity.ok(CommonResponse.success(emailCertificationService.verifyCertificationNumber(requestDto)));
+    }
+
+    @GetMapping("/v2/testAsync")
+    public String testAsyncExecution() {
+        for (int i = 1; i <= 30; i++) {
+            emailConfig.sendEmailAsync(i);
+        }
+        return "10개의 비동기 작업이 시작되었습니다.";
     }
 }

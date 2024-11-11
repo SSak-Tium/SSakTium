@@ -68,7 +68,7 @@ public class EmailCertificationService {
         }
 
         // 인증 성공 시 인증 상태를 true 로 변경
-        redisTemplate.opsForValue().set(email + ":verified", true, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(email + ":verified", true, 10, TimeUnit.MINUTES);
         return "인증이 성공적으로 완료되었습니다.";
     }
 
