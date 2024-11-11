@@ -15,7 +15,6 @@ public class LikeEventConsumer {
     }
 
 
-
     @KafkaListener(topics = "board-like-events", groupId = "like-group")
     public void handleBoardLikeEvent(BoardLikeEvent event) {
         String eventType = event.getEventType();

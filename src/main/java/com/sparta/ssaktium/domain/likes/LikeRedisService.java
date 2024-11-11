@@ -1,5 +1,7 @@
 package com.sparta.ssaktium.domain.likes;
 
+import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
@@ -9,11 +11,13 @@ import redis.clients.jedis.Jedis;
 public class LikeRedisService {
 
     private final Jedis jedis;
+    private final BoardLikeRepository boardLikeRepository;
 
     public static final String TARGET_TYPE_BOARD = "board";
     public static final String TARGET_TYPE_COMMENT = "comment";
 
-    public LikeRedisService() {
+    public LikeRedisService(BoardLikeRepository boardLikeRepository) {
+        this.boardLikeRepository = boardLikeRepository;
         this.jedis = new Jedis("localhost", 6379);
     }
 
@@ -45,6 +49,13 @@ public class LikeRedisService {
     public int getRedisLikeCount(String targetType, String targetId) {
         String likeKey = "likes:" + targetType + ":" + targetId;
         String count = jedis.get(likeKey);
-        return count != null ? Integer.parseInt(count) : 0;
+
+        // 캐시가 없을 경우 DB에서 조회 후 저장
+        if (count == null){
+            int dbLikeCount = boardLikeRepository.countByBoardId(Long.parseLong(targetId));
+            jedis.set(likeKey,String.valueOf(dbLikeCount));
+            return dbLikeCount;
+        }
+        return Integer.parseInt(count);
     }
 }

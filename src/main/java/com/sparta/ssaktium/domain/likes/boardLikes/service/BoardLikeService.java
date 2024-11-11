@@ -33,7 +33,7 @@ public class BoardLikeService {
         boardRepository.findById(boardId).orElseThrow(() -> new NotFoundBoardException());
 
         // 좋아요를 이미 누른 게시글인지 확인
-        if(likeRedisService.isLiked("Board",boardId.toString(),userId.toString())){
+        if(likeRedisService.isLiked(likeRedisService.TARGET_TYPE_BOARD,boardId.toString(),userId.toString())){
             throw new AlreadyLikedException();
         }
 
@@ -41,7 +41,7 @@ public class BoardLikeService {
         likeProducer.sendBoardLikeEvent(userId.toString(), boardId.toString(), "LIKE");
 
         // 좋아요 수 레디스에서 반영
-        int redisLikeCount = likeRedisService.getRedisLikeCount("Board",boardId.toString());
+        int redisLikeCount = likeRedisService.getRedisLikeCount(likeRedisService.TARGET_TYPE_BOARD,boardId.toString());
         return new BoardLikeResponseDto(boardId, redisLikeCount);
     }
 
@@ -52,7 +52,7 @@ public class BoardLikeService {
         boardRepository.findById(boardId).orElseThrow(() -> new NotFoundBoardException());
 
         // 게시글에 해당 유저의 좋아요가 있는지 확인
-        if(likeRedisService.isLiked("Board",boardId.toString(),userId.toString())){
+        if(likeRedisService.isLiked(likeRedisService.TARGET_TYPE_BOARD,boardId.toString(),userId.toString())){
             throw new NotFoundBoardLikeException();
         }
 
