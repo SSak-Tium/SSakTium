@@ -40,8 +40,11 @@ public class DatabaseSyncService {
             exception.printStackTrace();
         }
     }
+
     // 핵심! type : 게시글이냐 댓글이냐 / jedis : redis 객체 / dbConnection : MySQL과 연결 담당 객체
-    private void syncLikes(String type, Jedis jedis, Connection dbConnection) throws SQLException {
+    private void syncLikes(String type,
+                           Jedis jedis,
+                           Connection dbConnection) throws SQLException {
         // Redis에서 사용자별 좋아요 데이터를 관리하는 키 패턴
         String redisUserLikePattern = type + "_likes:*";
 
@@ -59,22 +62,31 @@ public class DatabaseSyncService {
             Set<String> redisUserIds = jedis.smembers(key);  // 해당 항목에 좋아요를 누른 유저 ID 조회
             int likesCount = redisUserIds.size();  // Redis에 저장된 좋아요 수
 
-            System.out.println(type + " 좋아요 수 (ID: " + id + "): " + likesCount + ", 유저 목록: " + redisUserIds);
+            int currentLikesCountInDB = getCurrentLikesCountFromDB(dbConnection, id, type);
 
-            // 좋아요 수를 DB에 업데이트
-            incrementLikesCountInDB(dbConnection, id, likesCount, countUpdateQuery);
+            if (likesCount > currentLikesCountInDB) {
+                System.out.println(type + " 좋아요 수 (ID: " + id + "): " + likesCount + ", 유저 목록: " + redisUserIds);
 
-            // 새로운 좋아요 기록을 DB에 삽입
-            insertUserLikeRecords(
-                    dbConnection,
-                    id,
-                    redisUserIds,
-                    type.equals(likeRedisService.TARGET_TYPE_BOARD) ? "board_likes" : "comment_likes");
+                // 좋아요 수를 DB에 업데이트
+                incrementLikesCountInDB(dbConnection, id, likesCount, countUpdateQuery);
+
+                // 새로운 좋아요 기록을 DB에 삽입
+                insertUserLikeRecords(
+                        dbConnection,
+                        id,
+                        redisUserIds,
+                        type.equals(likeRedisService.TARGET_TYPE_BOARD) ? "board_likes" : "comment_likes");
+            } else {
+                System.out.println("동기화 필요 없음.");
+            }
         }
     }
 
     @Transactional
-    public void incrementLikesCountInDB(Connection dbConnection, String id, int likesCount, String query) throws SQLException {
+    public void incrementLikesCountInDB(Connection dbConnection,
+                                        String id,
+                                        int likesCount,
+                                        String query) throws SQLException {
         try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
             stmt.setInt(1, likesCount); // 증가시킬 좋아요 수
             stmt.setString(2, id);      // 게시글 또는 댓글 ID
@@ -84,7 +96,10 @@ public class DatabaseSyncService {
     }
 
     @Transactional
-    public void insertUserLikeRecords(Connection dbConnection, String id, Set<String> userIds, String table) throws SQLException {
+    public void insertUserLikeRecords(Connection dbConnection,
+                                      String id,
+                                      Set<String> userIds,
+                                      String table) throws SQLException {
         // 게시글인지 댓글인지에 따라 적절한 컬럼을 선택합니다.
         String query = "INSERT IGNORE INTO " + table + " (user_id, " +
                 (table.equals("board_likes") ? "board_id" : "comment_id") + ") " +
@@ -100,6 +115,25 @@ public class DatabaseSyncService {
             // 배치 실행
             int[] result = stmt.executeBatch();
             System.out.println("좋아요 기록 삽입 완료 (" + id + "), 삽입된 행 수: " + result.length);
+        }
+    }
+
+    // DB에서 현재 좋아요 수를 조회하는 메서드
+    private int getCurrentLikesCountFromDB(Connection dbConnection,
+                                           String id,
+                                           String type) throws SQLException {
+        String countQuery = type.equals(likeRedisService.TARGET_TYPE_BOARD) ?
+                "SELECT board_likes_count FROM boards WHERE id = ?" :
+                "SELECT comment_likes_count FROM comments WHERE id = ?";
+
+        try (PreparedStatement stmt = dbConnection.prepareStatement(countQuery)) {
+            stmt.setString(1, id);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            } else {
+                return 0; // 만약 DB에 레코드가 없다면 좋아요 수는 0으로 간주
+            }
         }
     }
 }

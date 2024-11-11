@@ -14,7 +14,6 @@ public class LikeEventConsumer {
         this.likeRedisService = likeRedisService;
     }
 
-
     @KafkaListener(topics = "board-like-events", groupId = "like-group")
     public void handleBoardLikeEvent(BoardLikeEvent event) {
         String eventType = event.getEventType();
@@ -23,10 +22,16 @@ public class LikeEventConsumer {
 
         switch (eventType) {
             case "LIKE":
-                likeRedisService.incrementLike(likeRedisService.TARGET_TYPE_BOARD,boardId, userId); // 게시글 좋아요 추가
+                likeRedisService.incrementLike(
+                        likeRedisService.TARGET_TYPE_BOARD,
+                        boardId,
+                        userId); // 게시글 좋아요 추가
                 break;
             case "CANCEL":
-                likeRedisService.decrementLike(likeRedisService.TARGET_TYPE_BOARD,boardId, userId); // 게시글 좋아요 취소
+                likeRedisService.decrementLike(
+                        likeRedisService.TARGET_TYPE_BOARD,
+                        boardId,
+                        userId); // 게시글 좋아요 취소
                 break;
             default:
                 System.out.println("알 수 없는 게시글 이벤트 타입입니다.: " + eventType);
@@ -42,10 +47,16 @@ public class LikeEventConsumer {
 
         switch (eventType) {
             case "LIKE":
-                likeRedisService.incrementLike(likeRedisService.TARGET_TYPE_COMMENT,commentId, userId); // 댓글 좋아요 추가
+                likeRedisService.incrementLike(
+                        likeRedisService.TARGET_TYPE_COMMENT,
+                        commentId,
+                        userId); // 댓글 좋아요 추가
                 break;
             case "CANCEL":
-                likeRedisService.decrementLike(likeRedisService.TARGET_TYPE_COMMENT,commentId, userId); // 댓글 좋아요 취소
+                likeRedisService.decrementLike(
+                        likeRedisService.TARGET_TYPE_COMMENT,
+                        commentId,
+                        userId); // 댓글 좋아요 취소
                 break;
             default:
                 System.out.println("알 수 없는 댓글 이벤트 타입입니다.: " + eventType);
