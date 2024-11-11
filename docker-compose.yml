@@ -63,3 +63,34 @@ services:
       - kafka1
       - kafka2
       - kafka3
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379" # Redis 기본 포트
+    volumes:
+      - redis_data:/data
+    networks:
+      - redis_network
+    command: [ "redis-server", "--appendonly", "yes" ]
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    ports:
+      - "5540:5540" # RedisInsight 웹 UI 포트
+    networks:
+      - redis_network
+    depends_on:
+      - redis
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  redis_data: # Redis 데이터 영구 저장
+    driver: local
+
+networks:
+  redis_network: # Redis와 RedisInsight 간 통신을 위한 네트워크
+    driver: bridge
