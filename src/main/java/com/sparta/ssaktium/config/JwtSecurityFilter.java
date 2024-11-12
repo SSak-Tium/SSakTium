@@ -73,7 +73,14 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
             } catch (ExpiredJwtException e) {
                 log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
+
+                Cookie expiredCookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, null);
+                expiredCookie.setMaxAge(0);
+                expiredCookie.setPath("/");
+                httpResponse.addCookie(expiredCookie);
+
+                httpResponse.sendRedirect("/ssaktium/signin");
+                return;
             } catch (UnsupportedJwtException e) {
                 log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
