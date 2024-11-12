@@ -56,7 +56,9 @@
             },
             body: JSON.stringify(orderRequest)
         });
-        console.log(response)
+        document.open();
+        document.write(await response.text());
+        document.close();
         // if (response.ok) {
         //     const data = await response.json();
         //     alert("주문이 성공적으로 등록되었습니다!");

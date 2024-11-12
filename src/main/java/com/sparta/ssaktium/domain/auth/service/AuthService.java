@@ -61,7 +61,7 @@ public class AuthService {
     }
 
     // 로그인
-    public SigninResponseDto signin(SigninRequestDto signinRequestDto) {
+    public String signin(SigninRequestDto signinRequestDto) {
         User user = userRepository.findByEmail(signinRequestDto.getEmail()).orElseThrow(
                 NotFoundUserException::new);
 
@@ -78,7 +78,8 @@ public class AuthService {
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserName(), user.getUserRole());
 
         log.info("로그인 성공");
+        log.info(bearerToken);
 
-        return new SigninResponseDto(bearerToken);
+        return bearerToken;
     }
 }

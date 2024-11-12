@@ -21,6 +21,9 @@ public class Order extends Timestamped {
     private Long id;
 
     @Column(nullable = false)
+    private String orderName;
+
+    @Column(nullable = false)
     private BigDecimal totalPrice;
 
     @Column(nullable = false)
@@ -41,7 +44,8 @@ public class Order extends Timestamped {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
-    private Order(BigDecimal totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
+    private Order(String orderName, BigDecimal totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
+        this.orderName = orderName;
         this.totalPrice = totalPrice;
         this.orderRequestId = orderRequestId;
         this.customerKey = customerKey;
@@ -49,8 +53,8 @@ public class Order extends Timestamped {
         this.address = address;
     }
 
-    public static Order createOrder(BigDecimal totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
-        return new Order(totalPrice, orderRequestId, customerKey, recipient, address);
+    public static Order createOrder(String orderName, BigDecimal totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
+        return new Order(orderName, totalPrice, orderRequestId, customerKey, recipient, address);
     }
 
     // 주문 상태 변경
