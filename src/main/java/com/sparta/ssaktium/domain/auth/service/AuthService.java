@@ -35,11 +35,11 @@ public class AuthService {
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         // 이메일 인증 여부 확인
-        Boolean isVerified = (Boolean) redisTemplate.opsForValue().get(signupRequestDto.getEmail() + ":verified");
-
-        if (isVerified == null || !isVerified) {
-            throw new EmailNotVerifiedException();
-        }
+//        Boolean isVerified = (Boolean) redisTemplate.opsForValue().get(signupRequestDto.getEmail() + ":verified");
+//
+//        if (isVerified == null || !isVerified) {
+//            throw new EmailNotVerifiedException();
+//        }
 
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
 
@@ -61,7 +61,7 @@ public class AuthService {
     }
 
     // 로그인
-    public SigninResponseDto signin(SigninRequestDto signinRequestDto) {
+    public String signin(SigninRequestDto signinRequestDto) {
         User user = userRepository.findByEmail(signinRequestDto.getEmail()).orElseThrow(
                 NotFoundUserException::new);
 
@@ -78,7 +78,8 @@ public class AuthService {
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserName(), user.getUserRole());
 
         log.info("로그인 성공");
+        log.info(bearerToken);
 
-        return new SigninResponseDto(bearerToken);
+        return bearerToken;
     }
 }

@@ -51,4 +51,16 @@ public class EmailConfig {
                 + certificationNumber + "</strong></h3>";
         return certificationMessage;
     }
+
+    @Async("emailTaskExecutor")
+    public void sendEmailAsync(int taskId) {
+        System.out.println("Task " + taskId + " 시작 - " + Thread.currentThread().getName());
+        try {
+            // 지연을 주어 비동기 실행을 확인
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("Task " + taskId + " 완료 - " + Thread.currentThread().getName());
+    }
 }

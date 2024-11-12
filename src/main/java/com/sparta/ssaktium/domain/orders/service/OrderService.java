@@ -34,9 +34,9 @@ public class OrderService {
 //        User user = userService.findUser(userId);
         Product product = productService.findProduct(productId);
         String customerKey = "customerKey" + getRandomNumber(8);
+        String orderName = "[" + product.getName() + "] 주문 건 ";
 
-
-        Order order = Order.createOrder(product.getPrice(), UUID.randomUUID().toString(), customerKey, orderRequestDto.getRecipient(), orderRequestDto.getAddress());
+        Order order = Order.createOrder(orderName, product.getPrice(), UUID.randomUUID().toString(), customerKey, orderRequestDto.getRecipient(), orderRequestDto.getAddress());
 
         return orderRepository.save(order);
     }
