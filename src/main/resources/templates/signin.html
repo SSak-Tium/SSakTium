@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>싹틔움</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-<!--    <script src="@{/js/script.js}" defer></script>-->
+    <!-- <script src="@{/js/script.js}" defer></script> -->
     <script>
         async function signin() {
             const email = document.getElementById('email').value;
@@ -30,17 +30,23 @@
             if (response.ok) {
                 window.location.href = `${window.location.origin}/ssaktium/main`;
             } else {
-                console.log("else")
+                console.log("else");
                 const errorData = await response.json();
                 alert(errorData.message || '로그인 실패');
             }
-            console.log("if else 끝남")
+            console.log("if else 끝남");
 
             return false; // 폼 제출을 방지
         }
+
+        // 페이지가 로드될 때 소셜 로그인 링크의 URL을 동적으로 설정
+        document.addEventListener("DOMContentLoaded", function() {
+            var domainUri = window.location.origin;
+            document.getElementById("kakao-login").href = `https://kauth.kakao.com/oauth/authorize?client_id=42c4a40ba77620d04f9567f105705c44&redirect_uri=${domainUri}/ssaktium/signin/kakao&response_type=code`;
+            document.getElementById("google-login").href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=543793691260-fqf1im5a0innbreejobuo0jcrgohjjcg.apps.googleusercontent.com&redirect_uri=${domainUri}/ssaktium/signin/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile`;
+            document.getElementById("naver-login").href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=IUKXUTHG0rXLuzXje9Ai&state=YOUR_GENERATED_STATE&redirect_uri=${domainUri}/ssaktium/signin/naver`;
+        });
     </script>
-
-
 </head>
 <body>
 <div class="login-container">
@@ -58,9 +64,9 @@
     </div>
     <div class="social-login">
         <p>소셜 로그인</p>
-        <a th:href="|https://kauth.kakao.com/oauth/authorize?client_id=42c4a40ba77620d04f9567f105705c44&redirect_uri=${domainUri}/ssaktium/signin/kakao&response_type=code|" class="social-btn kakao">카카오 로그인</a>
-        <a th:href="|https://accounts.google.com/o/oauth2/v2/auth?client_id=543793691260-fqf1im5a0innbreejobuo0jcrgohjjcg.apps.googleusercontent.com&redirect_uri=${domainUri}/ssaktium/signin/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile|" class="social-btn google">구글 로그인</a>
-        <a th:href="|https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=IUKXUTHG0rXLuzXje9Ai&state=YOUR_GENERATED_STATE&redirect_uri=${domainUri}/ssaktium/signin/naver|" class="social-btn naver">네이버 로그인</a>
+        <a id="kakao-login" class="social-btn kakao">카카오 로그인</a>
+        <a id="google-login" class="social-btn google">구글 로그인</a>
+        <a id="naver-login" class="social-btn naver">네이버 로그인</a>
     </div>
 </div>
 </body>

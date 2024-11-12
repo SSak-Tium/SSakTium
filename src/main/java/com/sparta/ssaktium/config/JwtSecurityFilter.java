@@ -8,6 +8,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -33,10 +34,26 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse httpResponse,
             @NonNull FilterChain chain
     ) throws ServletException, IOException {
-        String authorizationHeader = httpRequest.getHeader("Authorization");
+        String jwt = null;
 
+        // 헤더에서 Authorization 토큰 가져오기
+        String authorizationHeader = httpRequest.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String jwt = jwtUtil.substringToken(authorizationHeader);
+            jwt = jwtUtil.substringToken(authorizationHeader);
+        } else {
+            // 쿠키에서 JWT 토큰 가져오기
+            if (httpRequest.getCookies() != null) {
+                for (Cookie cookie : httpRequest.getCookies()) {
+                    if (JwtUtil.AUTHORIZATION_HEADER.equals(cookie.getName())) {
+                        jwt = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // JWT 토큰이 존재할 경우 검증 및 인증
+        if (jwt != null) {
             try {
                 Claims claims = jwtUtil.extractClaims(jwt);
                 long userId = Long.parseLong(claims.getSubject());
@@ -65,6 +82,8 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }
+
         chain.doFilter(httpRequest, httpResponse);
     }
+
 }

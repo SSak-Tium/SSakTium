@@ -32,6 +32,7 @@ public class PaymentController {
         // 모델에 필요한 속성 추가
         model.addAttribute("customerName", order.getRecipient());
         model.addAttribute("customerAddress", order.getAddress());
+        model.addAttribute("orderName", order.getOrderName());
         model.addAttribute("orderRequestId", order.getOrderRequestId());
         model.addAttribute("totalPrice", order.getTotalPrice());
         model.addAttribute("customerKey", order.getCustomerKey());
