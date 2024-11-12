@@ -64,16 +64,71 @@ services:
       - kafka2
       - kafka3
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379" # Redis 기본 포트
-    volumes:
-      - redis_data:/data
-    networks:
-      - redis_network
-    command: [ "redis-server", "--appendonly", "yes" ]
+  redis-node1:
+      image: redis:latest
+      command: [ "redis-server", "/redis/redis.conf" ]
+      volumes:
+        - redis_data_7000:/data
+        - ./redis/redis_7000.conf:/redis/redis.conf
+      ports:
+        - "7000:7000"
+      networks:
+        - redis_network
+
+  redis-node2:
+        image: redis:latest
+        command: [ "redis-server", "/redis/redis.conf" ]
+        volumes:
+          - redis_data_7001:/data
+          - ./redis/redis_7001.conf:/redis/redis.conf
+        ports:
+          - "7001:7001"
+        networks:
+          - redis_network
+
+  redis-node3:
+        image: redis:latest
+        command: [ "redis-server", "/redis/redis.conf" ]
+        volumes:
+          - redis_data_7002:/data
+          - ./redis/redis_7002.conf:/redis/redis.conf
+        ports:
+          - "7002:7002"
+        networks:
+          - redis_network
+
+  redis-node4:
+        image: redis:latest
+        command: [ "redis-server", "/redis/redis.conf" ]
+        volumes:
+          - redis_data_7003:/data
+          - ./redis/redis_7003.conf:/redis/redis.conf
+        ports:
+          - "7003:7003"
+        networks:
+          - redis_network
+
+  redis-node5:
+        image: redis:latest
+        command: [ "redis-server", "/redis/redis.conf" ]
+        volumes:
+          - redis_data_7004:/data
+          - ./redis/redis_7004.conf:/redis/redis.conf
+        ports:
+          - "7004:7004"
+        networks:
+          - redis_network
+
+  redis-node6:
+        image: redis:latest
+        command: [ "redis-server", "/redis/redis.conf" ]
+        volumes:
+          - redis_data_7005:/data
+          - ./redis/redis_7005.conf:/redis/redis.conf
+        ports:
+          - "7005:7005"
+        networks:
+          - redis_network
 
   redis-insight:
     image: redislabs/redisinsight:latest
@@ -83,12 +138,32 @@ services:
     networks:
       - redis_network
     depends_on:
-      - redis
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
+      - redis-node6
     environment:
       - NODE_ENV=production
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: >
+      "
+      sleep 10;
+      echo 'yes' |
+      redis-cli --cluster create
+      redis-node1:7000 redis-node2:7001 redis-node3:7002
+      redis-node4:7003 redis-node5:7004 redis-node6:7005
+      --cluster-replicas 1
+      "
 
 volumes:
-  redis_data: # Redis 데이터 영구 저장
+  redis_data_7000:
+  redis_data_7001:
+  redis_data_7002:
+  redis_data_7003:
+  redis_data_7004:
+  redis_data_7005:
     driver: local
 
 networks:
