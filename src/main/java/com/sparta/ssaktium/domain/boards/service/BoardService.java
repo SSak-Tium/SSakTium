@@ -6,6 +6,7 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSearchResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.entity.BoardDocument;
 import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.boards.exception.InvalidBoardTypeException;
@@ -13,12 +14,14 @@ import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.boards.repository.BoardSearchRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +43,7 @@ public class BoardService {
     private final FriendService friendService;
     private final S3Service s3Service;
     private final BoardImagesRepository boardImagesRepository;
+    private final BoardSearchRepository boardSearchRepository;
 
 
     @Transactional
@@ -58,7 +62,6 @@ public class BoardService {
         List<String> imageUrls = (imageList != null && !imageList.isEmpty())
                 ? s3Service.uploadImageListToS3(imageList, s3Service.bucket) : new ArrayList<>();
 
-
         //저장
         Board savedBoard = boardRepository.save(board);
         //boardimages에 저장
@@ -68,6 +71,14 @@ public class BoardService {
                 boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
             }
         }
+        //elastic에 저장할 document 생성
+        BoardDocument boardDocument = new BoardDocument(
+                savedBoard.getId(),
+                savedBoard.getTitle(),
+                savedBoard.getContent(),
+                String.join(",", imageUrls));
+        //elastic에 저장
+        boardSearchRepository.save(boardDocument);
         //responseDto 반환
         return new BoardSaveResponseDto(savedBoard, imageUrls);
     }
@@ -119,6 +130,15 @@ public class BoardService {
 
         //게시글 수정
         boardImagesRepository.saveAll(newBoardImages);
+
+        //elasticsearch에 이미지 변경값 저장
+        BoardDocument boardDocument = new BoardDocument(
+                board.getId(),
+                board.getTitle(),
+                board.getContent(),
+                String.join(",", updatedImageList));
+
+        boardSearchRepository.save(boardDocument);
         //responseDto 반환
         return new BoardUpdateImageDto(updatedImageList);
     }
@@ -144,10 +164,19 @@ public class BoardService {
         // 게시글 수정
         board.updateBoards(title, content, publicStatus); // 이미지 리스트는 그대로 유지
         Board updatedBoard = boardRepository.save(board);
+
+
         // 기존의 BoardImages에서 imageUrl만 추출하여 문자열 리스트로 변환
         List<String> imageUrls = updatedBoard.getImageUrls().stream()
                 .map(BoardImages::getImageUrl) // 각 BoardImages의 imageUrl만 가져옴
                 .toList();
+        //elasticsearch에 본문 변경값 저장
+        BoardDocument boardDocument = new BoardDocument(
+                updatedBoard.getId(),
+                updatedBoard.getTitle(),
+                updatedBoard.getContent(),
+                String.join(",", imageUrls));
+        boardSearchRepository.save(boardDocument);
         // responseDto 반환
         return new BoardSaveResponseDto(updatedBoard, imageUrls);
     }

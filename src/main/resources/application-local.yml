@@ -3,7 +3,7 @@ server:
   servlet:
     context-path: /
     encoding:
-      charset : UTF-8
+      charset: UTF-8
       enabled: true
       force: true
 
@@ -72,6 +72,12 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  elasticsearch:
+    cluster-nodes: http://localhost:9200
+    cluster-name: docker-cluster
+    username: ${ES_USERNAME}
+    password: ${ES_PASSWORD}
+
 app:
   domainUri: http://localhost:8080
   redirectUri: "http://localhost:8080/ssaktium/signin/"
@@ -91,3 +97,5 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+
