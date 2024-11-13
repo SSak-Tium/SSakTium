@@ -19,30 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CustomOauthController {
 
-    @Value("${app.domainUri}")
-    private String domainUri;
-
-    private JwtUtil jwtUtil;
-
-
     private final CustomOauthService customOauthService;
-
-    @GetMapping("/ssaktium/home")
-    public String home(Model model) {
-        model.addAttribute("domainUri", domainUri);
-        return "home";
-    }
-
-    @GetMapping("/ssaktium/main")
-    public String main() {
-        return "main";
-    }
-
-
-    @GetMapping("/ssaktium/signup")
-    public String signupPage() {
-        return "signup"; // signup.html 페이지를 반환
-    }
 
     // 소셜로그인
     @GetMapping("/ssaktium/signin/{provider}")
