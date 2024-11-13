@@ -2,7 +2,6 @@ package com.sparta.ssaktium.domain.payments.controller;
 
 import com.sparta.ssaktium.domain.orders.entity.Order;
 import com.sparta.ssaktium.domain.orders.service.OrderService;
-import com.sparta.ssaktium.domain.payments.entity.Payment;
 import com.sparta.ssaktium.domain.payments.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
