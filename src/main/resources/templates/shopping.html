@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/shopping.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 추가 -->
 </head>
 <body>
 <!-- 메뉴바 포함 -->
@@ -16,14 +17,16 @@
     <h2>쇼핑하기</h2>
 
     <div class="products">
-        <div th:each="product : ${products}" class="product-item">
+        <!-- 각 상품 항목 -->
+        <div th:each="product : ${products}"
+             class="product-item"
+             data-product-id="${product.id}"
+             th:onclick="|location.href='/v2/products/' + ${product.id} + '/order-detail'|">
             <p><strong th:text="${product.name}"></strong></p>
             <p>가격: <span th:text="${product.price}"></span> 원</p>
-            <a th:href="@{/ssaktium/order/{productId}(productId=${product.id})}" class="payment-button">주문하기</a>
         </div>
     </div>
 </div>
-
 
 </body>
 </html>

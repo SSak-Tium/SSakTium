@@ -20,5 +20,5 @@ public class ProductRequestDto {
 
     @NotNull
     @Schema(description = "가격", example = "3000")
-    private BigDecimal price;
+    private int price;
 }

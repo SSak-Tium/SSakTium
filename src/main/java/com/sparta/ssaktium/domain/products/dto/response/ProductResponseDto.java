@@ -23,7 +23,7 @@ public class ProductResponseDto {
 
     @NotNull
     @Schema(description = "가격", example = "3000")
-    private BigDecimal price;
+    private int price;
 
     public ProductResponseDto(Product savedProduct) {
         this.id = savedProduct.getId();
