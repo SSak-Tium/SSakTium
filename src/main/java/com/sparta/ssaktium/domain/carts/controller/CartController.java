@@ -47,6 +47,7 @@ public class CartController {
 
     // 장바구니 물건 삭제
     @DeleteMapping("/v2/carts")
+    @ResponseBody
     public void removeProductFromCart(@AuthenticationPrincipal
                                       AuthUser authUser,
                                       @RequestParam

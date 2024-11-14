@@ -1,5 +1,6 @@
 package com.sparta.ssaktium.domain.payments.service;
 
+import com.sparta.ssaktium.domain.carts.service.CartService;
 import com.sparta.ssaktium.domain.orders.entity.Order;
 import com.sparta.ssaktium.domain.orders.service.OrderService;
 import com.sparta.ssaktium.domain.payments.entity.Payment;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 public class PaymentService {
 
     private final OrderService orderService;
+    private final CartService cartService;
     private final PaymentRepository paymentRepository;
 
     @Transactional
@@ -27,20 +29,14 @@ public class PaymentService {
 
         // 주문 객체 가져오기
         Order order = orderService.findByOrderRequestId(jsonObject.get("orderId") != null ? jsonObject.get("orderId").toString() : null);
-        if (order == null) {
-            throw new IllegalArgumentException("Order not found for the given orderRequestId: " + jsonObject.get("orderId"));
-        }
 
         // totalAmount를 BigDecimal로 변환 (null 체크 추가)
         Object totalAmountObj = jsonObject.get("totalAmount");
-        if (totalAmountObj == null) {
-            throw new IllegalArgumentException("totalAmount is missing in the request");
-        }
         BigDecimal amount = new BigDecimal(totalAmountObj.toString());
 
-        // requestedAt과 approvedAt을 LocalDateTime으로 변환 (null 체크 추가)
-        LocalDateTime requestedAt = parseDate(jsonObject.get("requestedAt"));
-        LocalDateTime approvedAt = parseDate(jsonObject.get("approvedAt"));
+        // requestedAt과 approvedAt을 LocalDateTime으로 변환
+        LocalDateTime requestedAt = OffsetDateTime.parse(jsonObject.get("requestedAt").toString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDateTime();
+        LocalDateTime approvedAt = OffsetDateTime.parse(jsonObject.get("approvedAt").toString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDateTime();
 
         // Payment 객체 생성
         Payment payment = Payment.createPayment(
@@ -53,19 +49,11 @@ public class PaymentService {
                 approvedAt
         );
 
+        // 장바구니 전체 삭제
+        cartService.clearCart(order.getUser().getId());
+
         // 결제 정보 저장
         paymentRepository.save(payment);
     }
 
-    // 날짜 변환을 위한 별도 메서드
-    private LocalDateTime parseDate(Object dateObj) {
-        if (dateObj == null) {
-            throw new IllegalArgumentException("Date is missing in the request");
-        }
-        try {
-            return OffsetDateTime.parse(dateObj.toString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDateTime();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid date format: " + dateObj.toString());
-        }
-    }
 }

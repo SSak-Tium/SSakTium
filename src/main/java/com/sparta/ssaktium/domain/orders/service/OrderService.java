@@ -27,7 +27,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserService userService;
-    private final ProductService productService;
 
     @Transactional
     public Order createOrder(long userId, OrderRequestDto orderRequestDto) {
@@ -35,7 +34,7 @@ public class OrderService {
         String customerKey = "customerKey" + getRandomNumber(8);
         String orderName = "[" + user.getUserName() + "] 주문 건 ";
 
-        Order order = Order.createOrder(orderName, orderRequestDto.getTotalPrice(), UUID.randomUUID().toString(), customerKey, user.getUserName(), orderRequestDto.getAddress());
+        Order order = Order.createOrder(orderName, orderRequestDto.getTotalPrice(), UUID.randomUUID().toString(), customerKey, user, orderRequestDto.getAddress());
 
         return orderRepository.save(order);
     }
@@ -57,21 +56,22 @@ public class OrderService {
     // 주문 요청됨
     @Transactional
     public void orderRequested(String orderRequestId) {
-        // orderRequestId(UUID : orderId)로 Order 객체 찾기
+        // orderRequestId 로 Order 객체 찾기
         Order order = findByOrderRequestId(orderRequestId);
 
-        // 주문 상태 "REQUESTED("주문 요청됨")"으로 변경
+        // 주문 상태 REQUESTED 으로 변경
         order.updateStatus(OrderStatus.REQUEST);
     }
 
+    // orderRequestId 로 Order 객체 찾는 메서드
     public Order findByOrderRequestId(String orderRequestId) {
         return orderRepository.findByOrderRequestId(orderRequestId).orElseThrow(NotFoundOrderException::new);
     }
 
-    // 주문 실패됨(주문 취소)
+    // 주문 실패됨 (주문 취소)
     @Transactional
     public void orderFailed(String orderRequestId) {
-        // orderRequestId(UUID : orderId)로 Order 객체 찾기
+        // orderRequestId 로 Order 객체 찾기
         Order order = findByOrderRequestId(orderRequestId);
 
         // 주문 삭제
