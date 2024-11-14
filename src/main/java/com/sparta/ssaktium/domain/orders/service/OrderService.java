@@ -30,13 +30,12 @@ public class OrderService {
     private final ProductService productService;
 
     @Transactional
-    public Order createOrder(long productId, OrderRequestDto orderRequestDto) {
-//        User user = userService.findUser(userId);
-        Product product = productService.findProduct(productId);
+    public Order createOrder(long userId, OrderRequestDto orderRequestDto) {
+        User user = userService.findUser(userId);
         String customerKey = "customerKey" + getRandomNumber(8);
-        String orderName = "[" + product.getName() + "] 주문 건 ";
+        String orderName = "[" + user.getUserName() + "] 주문 건 ";
 
-        Order order = Order.createOrder(orderName, product.getPrice(), UUID.randomUUID().toString(), customerKey, orderRequestDto.getRecipient(), orderRequestDto.getAddress());
+        Order order = Order.createOrder(orderName, orderRequestDto.getTotalPrice(), UUID.randomUUID().toString(), customerKey, user.getUserName(), orderRequestDto.getAddress());
 
         return orderRepository.save(order);
     }

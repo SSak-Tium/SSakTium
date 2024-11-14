@@ -21,7 +21,7 @@
         <div th:each="product : ${products}"
              class="product-item"
              data-product-id="${product.id}"
-             th:onclick="|location.href='/v2/products/' + ${product.id} + '/order-detail'|">
+             th:onclick="|location.href='/v2/products/' + ${product.id} + '/order-count'|">
             <p><strong th:text="${product.name}"></strong></p>
             <p>가격: <span th:text="${product.price}"></span> 원</p>
         </div>

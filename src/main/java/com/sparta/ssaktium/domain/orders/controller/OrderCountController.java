@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequiredArgsConstructor
-public class OrderDetailController {
+public class OrderCountController {
 
     private final ProductService productService;
 
     // 주문 상세페이지 이동
-    @GetMapping("/v2/products/{productId}/order-detail")
+    @GetMapping("/v2/products/{productId}/order-count")
     public String orderDetail(@PathVariable
                               Long productId,
                               Model model) {
         Product product = productService.findProduct(productId);
         model.addAttribute("product", product);
-        return "order-detail"; // order-detail.html 페이지로 이동
+        return "order-count";
     }
 }

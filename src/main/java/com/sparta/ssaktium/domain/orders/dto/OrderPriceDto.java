@@ -1,14 +1,11 @@
 package com.sparta.ssaktium.domain.orders.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-public class OrderDetailDto {
+public class OrderPriceDto {
 
-    private int price;
-    private int amount;
+    private int totalPrice;
 }

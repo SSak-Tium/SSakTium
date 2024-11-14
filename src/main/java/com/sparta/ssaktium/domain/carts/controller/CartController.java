@@ -2,7 +2,7 @@ package com.sparta.ssaktium.domain.carts.controller;
 
 import com.sparta.ssaktium.domain.carts.service.CartService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
-import com.sparta.ssaktium.domain.orders.dto.OrderDetailDto;
+import com.sparta.ssaktium.domain.orders.dto.OrderCountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,15 +29,15 @@ public class CartController {
                           @PathVariable
                           long productId,
                           @RequestBody
-                          OrderDetailDto orderDetailDto) {
-        cartService.addCart(authUser.getUserId(), productId, orderDetailDto);
+                          OrderCountDto orderCountDto) {
+        cartService.addCart(authUser.getUserId(), productId, orderCountDto);
         return "redirect:/ssaktium/main";
     }
 
     // 장바구니 조회
     @GetMapping("/ssaktium/carts")
     public String getCart(@AuthenticationPrincipal AuthUser authUser, Model model) {
-        Map<String, OrderDetailDto> cartItems = cartService.getCart(authUser.getUserId());
+        Map<String, OrderCountDto> cartItems = cartService.getCart(authUser.getUserId());
 
         model.addAttribute("userName", authUser.getUserName());
         model.addAttribute("cartItems", cartItems);
