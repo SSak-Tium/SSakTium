@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 @Transactional(readOnly = true)
 public class CartService {
 
-    private final ProductService productService;
     private final RedisTemplate<String, Object> redisTemplate;
 
     // 장바구니 추가
@@ -49,9 +48,16 @@ public class CartService {
     }
 
     // 장바구니 항목 삭제
-    public void removeProductFromCart(long userId, Long productId) {
+    public void removeProductFromCart(long userId, long productId) {
         String cartKey = "cart:" + userId;
-        String productIdStr = String.valueOf(productId);
-        redisTemplate.opsForZSet().remove(cartKey, productIdStr);
+
+        redisTemplate.opsForHash().delete(cartKey, String.valueOf(productId));
+    }
+
+    // 전체 장바구니 비우는 메서드
+    public void clearCart(long userId) {
+        String cartKey = "cart:" + userId;
+
+        redisTemplate.delete(cartKey);
     }
 }

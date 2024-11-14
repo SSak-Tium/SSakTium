@@ -2,14 +2,11 @@ package com.sparta.ssaktium.domain.payments.controller;
 
 import com.sparta.ssaktium.domain.orders.entity.Order;
 import com.sparta.ssaktium.domain.orders.service.OrderService;
-import com.sparta.ssaktium.domain.payments.entity.Payment;
 import com.sparta.ssaktium.domain.payments.service.PaymentService;
 import lombok.RequiredArgsConstructor;
-
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -47,7 +44,7 @@ public class PaymentController {
         Order order = orderService.findOrder(orderId);
 
         // 모델에 필요한 속성 추가
-        model.addAttribute("customerName", order.getRecipient());
+        model.addAttribute("customerName", order.getUser().getUserName());
         model.addAttribute("customerAddress", order.getAddress());
         model.addAttribute("orderName", order.getOrderName());
         model.addAttribute("orderRequestId", order.getOrderRequestId());
