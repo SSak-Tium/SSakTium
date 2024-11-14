@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>주문 상세 - 싹틔움</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/order-detail.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<!-- 메뉴바 포함 -->
 <div th:replace="~{navbar}"></div>
 
 <div class="order-detail-container">
@@ -41,6 +39,7 @@
         let quantity = 1;
         const productId = [[${product.id}]];
         const price = [[${product.price}]];  // 서버에서 전달된 가격
+        const productName = '[[${product.name}]]';
 
         // 총 가격 초기화
         $("#total-price").text(price * quantity); // 페이지 로드시 1개 가격으로 초기화
@@ -73,6 +72,7 @@
                 url: `/v2/products/${productId}/add-cart`,
                 contentType: "application/json",
                 data: JSON.stringify({
+                    productName: productName,
                     amount: quantity,
                     price: price * quantity  // 총 가격과 수량을 서버로 전송
                 }),

@@ -35,7 +35,7 @@ public class ProductController {
     public String getOrderPage(@PathVariable Long productId, Model model) {
         Product product = productService.findProduct(productId);
         model.addAttribute("product", product);
-        return "order"; // order.html 페이지로 이동
+        return "order-place";
     }
 
     @Secured("ROLE_ADMIN")

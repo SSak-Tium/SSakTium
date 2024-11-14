@@ -15,41 +15,34 @@
 <div class="order-container">
     <h2>주문하기</h2>
 
-    <div th:if="${product != null}">
-        <p>상품: <strong th:text="${product.name}"></strong></p>
-        <p>가격: <span th:text="${product.price}"></span> 원</p>
+    <div th:if="${totalPrice != null}">
+        <p>총 결제 가격: <span id="total-price" class="total-price" th:text="${totalPrice}"></span> 원</p>
+
 
         <!-- 주문자 정보 입력 폼 -->
-        <h3>주문자 정보</h3>
+        <h3>배송지 입력</h3>
         <form id="order-form">
-            <input type="hidden" id="product-id" th:value="${product.id}">
-
-            <label for="order-recipient">이름:</label>
-            <input type="text" id="order-recipient" name="recipient" placeholder="수령인을 입력하세요" required>
-
+<!--            <input type="hidden" id="product-id" th:value="${product.id}">-->
             <label for="order-address">주소:</label>
             <input type="text" id="order-address" name="address" placeholder="주소를 입력하세요" required>
 
             <button type="button" onclick="submitOrder()">결제하기</button>
         </form>
     </div>
-    <div th:if="${product == null}">
-        <p>해당 상품을 찾을 수 없습니다.</p>
-    </div>
 </div>
 
 <script>
     async function submitOrder() {
-        const productId = document.getElementById("product-id").value;
-        const recipient = document.getElementById("order-recipient").value;
         const address = document.getElementById("order-address").value;
+        const totalPrice = parseFloat(document.querySelector("#total-price").textContent) || 0;
 
+        console.log(totalPrice)
         const orderRequest = {
-            recipient: recipient,
-            address: address
+            address: address,
+            totalPrice: totalPrice
         };
 
-        const response = await fetch(`/v2/products/${productId}/orders`, {
+        const response = await fetch(`/v2/orders`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

@@ -24,6 +24,6 @@ data:
     host: 127.0.0.1
 
 toss:
-  api-url: https://api.tosspayments.com/v1
-  secret-key: ${TOSS_SECRET_KEY}
-  client-key: ${TOSS_CLIENT_KEY}
+  payment:
+    secret:
+      key: ${TOSS_SECRET_KEY}
