@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문 상세 - 싹틔움</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/order-detail.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<!-- 메뉴바 포함 -->
+<div th:replace="~{navbar}"></div>
+
+<div class="order-detail-container">
+    <h2>주문 상세</h2>
+
+    <div class="product-details">
+        <p><strong>상품명: </strong><span th:text="${product.name}"></span></p>
+        <p><strong>가격: </strong><span th:text="${product.price}"></span> 원</p>
+    </div>
+
+    <div class="quantity-control">
+        <p><strong>수량: </strong></p>
+        <button id="decrease-quantity">-</button>
+        <input type="text" id="quantity" value="1" readonly>
+        <button id="increase-quantity">+</button>
+    </div>
+
+    <div class="total-price">
+        <p><strong>총 가격: </strong><span id="total-price"></span> 원</p>
+    </div>
+
+    <div class="add-to-cart">
+        <button id="add-to-cart">장바구니에 추가</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        let quantity = 1;
+        const productId = [[${product.id}]];
+        const price = [[${product.price}]];  // 서버에서 전달된 가격
+
+        // 총 가격 초기화
+        $("#total-price").text(price * quantity); // 페이지 로드시 1개 가격으로 초기화
+
+        // 수량 증가
+        $("#increase-quantity").click(function() {
+            quantity++;
+            updatePrice();
+        });
+
+        // 수량 감소
+        $("#decrease-quantity").click(function() {
+            if (quantity > 1) {
+                quantity--;
+                updatePrice();
+            }
+        });
+
+        // 가격과 총 가격을 업데이트
+        function updatePrice() {
+            const totalPrice = price * quantity;
+            $("#quantity").val(quantity);
+            $("#total-price").text(totalPrice);  // 총 가격 업데이트
+        }
+
+        // 장바구니에 추가 버튼 클릭
+        $("#add-to-cart").click(function() {
+            $.ajax({
+                type: "POST",
+                url: `/v2/products/${productId}/add-cart`,
+                contentType: "application/json",
+                data: JSON.stringify({
+                    amount: quantity,
+                    price: price * quantity  // 총 가격과 수량을 서버로 전송
+                }),
+                success: function(response) {
+                    alert("장바구니에 상품이 추가되었습니다.");
+                    window.location.href = "/ssaktium/shopping";
+                },
+                error: function() {
+                    alert("장바구니 추가에 실패했습니다.");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

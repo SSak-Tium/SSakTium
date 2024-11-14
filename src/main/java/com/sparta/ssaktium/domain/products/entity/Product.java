@@ -22,14 +22,14 @@ public class Product extends Timestamped {
     private String name;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private int price;
 
-    private Product(String name, BigDecimal price) {
+    private Product(String name, int price) {
         this.name = name;
         this.price = price;
     }
 
-    public static Product createProduct(String name, BigDecimal price) {
+    public static Product createProduct(String name, int price) {
         return new Product(name, price);
     }
 }

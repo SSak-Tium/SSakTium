@@ -24,7 +24,7 @@ public class Order extends Timestamped {
     private String orderName;
 
     @Column(nullable = false)
-    private BigDecimal totalPrice;
+    private int totalPrice;
 
     @Column(nullable = false)
     private String orderRequestId;
@@ -44,7 +44,7 @@ public class Order extends Timestamped {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
-    private Order(String orderName, BigDecimal totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
+    private Order(String orderName, int totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
         this.orderName = orderName;
         this.totalPrice = totalPrice;
         this.orderRequestId = orderRequestId;
@@ -53,7 +53,7 @@ public class Order extends Timestamped {
         this.address = address;
     }
 
-    public static Order createOrder(String orderName, BigDecimal totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
+    public static Order createOrder(String orderName, int totalPrice, String orderRequestId, String customerKey, String recipient, String address) {
         return new Order(orderName, totalPrice, orderRequestId, customerKey, recipient, address);
     }
 
