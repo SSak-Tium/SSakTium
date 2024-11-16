@@ -8,7 +8,6 @@ import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,7 @@ public class CouponService {
     public String createCoupons() {
         List<Coupon> coupons = new ArrayList<>();
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             // 16자리 랜덤 문자열 생성 ( 코드 )
             String couponCode = RandomStringUtils.randomAlphanumeric(16);
 
@@ -41,7 +40,7 @@ public class CouponService {
         // DB 저장
         couponRepository.saveAll(coupons);
 
-        return "20개의 쿠폰이 성공적으로 생성되었습니다.";
+        return "쿠폰이 성공적으로 생성되었습니다.";
     }
 
     // 쿠폰 발급 메서드
@@ -52,7 +51,7 @@ public class CouponService {
 
         // 이미 발급된 쿠폰이 있는지 확인
         if (couponRepository.existsByUserAndCouponStatus(user, CouponStatus.ISSUED)) {
-            log.warn("이미 발급된 쿠폰이 있습니다. userId: {}", userId);
+            log.info("이미 발급된 쿠폰이 있습니다. userId: {}", userId);
             return "이미 발급된 쿠폰이 있습니다.";
         }
 
@@ -61,7 +60,7 @@ public class CouponService {
 
         // 모든 쿠폰이 소진된 경우
         if (coupon == null) {
-            log.warn("선착순 이벤트가 종료되었습니다. userId: {}", userId);
+            log.info("선착순 이벤트가 종료되었습니다. userId: {}", userId);
             return "선착순 이벤트가 종료되었습니다.";
         }
 

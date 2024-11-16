@@ -18,6 +18,14 @@ spring:
   profiles:
     active: local
 
+  ######################################## 로그 테스트용
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false  # Hibernate SQL 로그 비활성화
+        format_sql: false
+        use_sql_comments: false
+
 data:
   redis:
     port: 6379
@@ -27,3 +35,21 @@ toss:
   payment:
     secret:
       key: ${TOSS_SECRET_KEY}
+
+######################################## 로그 테스트용
+logging:
+  level:
+    root: INFO
+    org.hibernate: ERROR  # Hibernate 관련 로그를 ERROR로 설정
+    org.hibernate.SQL: OFF  # Hibernate SQL 쿼리 로그 비활성화
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF  # Hibernate SQL 파라미터 바인딩 로그 비활성화
+    org.springframework.orm.jpa: ERROR  # Spring ORM 관련 로그를 ERROR로 설정
+    org.springframework.transaction: ERROR  # Spring 트랜잭션 관련 로그를 ERROR로 설정
+    org.springframework.jdbc.core: ERROR  # Spring JDBC 관련 로그를 ERROR로 설정
+    org.springframework.web: ERROR  # Spring Web 관련 로그를 ERROR로 설정
+
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"  # 콘솔 출력 형식 설정
+
+

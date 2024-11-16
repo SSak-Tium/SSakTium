@@ -7,6 +7,9 @@ import com.sparta.ssaktium.domain.users.dto.request.UserChangeRequestDto;
 import com.sparta.ssaktium.domain.users.dto.request.UserCheckPasswordRequestDto;
 import com.sparta.ssaktium.domain.users.dto.response.UserImageResponseDto;
 import com.sparta.ssaktium.domain.users.dto.response.UserResponseDto;
+import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
+import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,5 +87,11 @@ public class UserController {
                                                              @Parameter(description = "비밀번호 확인")
                                                              UserCheckPasswordRequestDto userCheckPasswordRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(userService.deleteUser(authUser.getUserId(), id, userCheckPasswordRequestDto)));
+    }
+
+    // 유저 십만 건 저장
+    @PostMapping("/v2/add-user")
+    public ResponseEntity<String> pushUsers() {
+        return ResponseEntity.ok(userService.pushUsers());
     }
 }
