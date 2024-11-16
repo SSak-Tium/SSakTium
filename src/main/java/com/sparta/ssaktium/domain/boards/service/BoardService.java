@@ -194,6 +194,8 @@ public class BoardService {
                 throw new NotUserOfBoardException();
             }
         }
+        // 엘라스틱서치에서 게시글 문서 삭제
+        boardSearchRepository.deleteById(id);
 
         List<String> imageUrls = board.getImageUrls().stream()
                 .map(BoardImages::getImageUrl)
@@ -289,12 +291,12 @@ public class BoardService {
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
 
-    public List<BoardSearchResponseDto> searchBoard(String keyword) {
-        List<Board> boardList = boardRepository.searchBoardByTitleOrContent(keyword);
+    public Page<BoardSearchResponseDto> searchBoard(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);  // 페이지 번호, 페이지 크기
+        Page<Board> boardPage = boardRepository.searchBoardByTitleOrContent(keyword, pageable);
 
-        return boardList.stream()
-                .map(BoardSearchResponseDto::new)
-                .collect(Collectors.toList());
+        // Page<Board>를 Page<BoardSearchResponseDto>로 변환
+        return boardPage.map(BoardSearchResponseDto::new);
     }
 
     //Board 찾는 메서드
