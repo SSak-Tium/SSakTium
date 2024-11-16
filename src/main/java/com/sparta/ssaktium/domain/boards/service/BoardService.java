@@ -16,6 +16,9 @@ import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.notifications.dto.EventType;
+import com.sparta.ssaktium.domain.notifications.dto.NotificationMessage;
+import com.sparta.ssaktium.domain.notifications.service.NotificationProducer;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
@@ -41,6 +44,7 @@ public class BoardService {
     private final S3Service s3Service;
     private final BoardImagesRepository boardImagesRepository;
     private final LikeRedisService likeRedisService; // 좋아요 수 반영을 위함
+    private final NotificationProducer notificationProducer;
 
 
     @Transactional
@@ -65,6 +69,15 @@ public class BoardService {
             BoardImages boardImage = new BoardImages(imageUrl, savedBoard);// Board 설정
             boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
         }
+
+        // 친구 관계인 모든 유저에게 알림 발송
+        List<User> friends = friendService.findFriends(userId);
+        friends.forEach(friend -> notificationProducer.sendNotification(
+                new NotificationMessage(friend.getId(),
+                        EventType.FRIEND_BOARD,
+                        user.getUserName() + "님이 게시글"+ requestDto.getTitle() + "을 등록했습니다."))
+        );
+
         //responseDto 반환
         return new BoardSaveResponseDto(savedBoard, imageUrls);
     }
