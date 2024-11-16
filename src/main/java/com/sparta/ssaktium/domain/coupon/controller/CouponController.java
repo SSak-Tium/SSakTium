@@ -32,9 +32,7 @@ public class CouponController {
 //    }
 
     @GetMapping("/v2/coupons")
-    public ResponseEntity<CommonResponse<String>> getCoupons(@RequestParam(value = "userId", defaultValue = "1") long userId) {
-        // 임시로 50명의 사용자 ID를 테스트할 수 있도록 랜덤으로 할당
-        long testUserId = (userId % 50) + 1; // 1~50 범위의 값으로 userId를 설정
-        return ResponseEntity.ok(CommonResponse.success(couponService.issueCoupon(testUserId)));
+    public ResponseEntity<CommonResponse<String>> getCoupons(@RequestParam long userId) {
+        return ResponseEntity.ok(CommonResponse.success(couponService.issueCoupon(userId)));
     }
 }
