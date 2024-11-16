@@ -7,6 +7,10 @@ import com.sparta.ssaktium.domain.auth.dto.request.SignupRequestDto;
 import com.sparta.ssaktium.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.ssaktium.domain.auth.service.AuthService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
+import com.sparta.ssaktium.domain.users.repository.UserRepository;
+import com.sparta.ssaktium.domain.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,12 +31,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Tag(name = "회원가입/로그인 관리기능", description = "회원가입과 로그인할 수 있는 기능")
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @GetMapping("/ssaktium/signin")
     public String signin() {
@@ -90,5 +98,22 @@ public class AuthController {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
         return "redirect:/ssaktium/signin";  // 로그아웃 후 로그인 페이지로 리디렉션
+    }
+
+    // 10000 명 유저 생성
+    @PostMapping("/v2/add-User")
+    public String createUsers() {
+        List<User> users = new ArrayList<>();
+
+        // 10,000명의 사용자 생성
+        for (int i = 1; i <= 10000; i++) {
+            User user = new User(i+"@gmail.com", "111111N@", "dummy", UserRole.ROLE_USER);
+            users.add(user);
+        }
+
+        // 데이터베이스에 유저 저장
+        userRepository.saveAll(users);
+
+        return "10,000 users have been created!";
     }
 }
