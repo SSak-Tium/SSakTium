@@ -24,13 +24,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1")
 @Tag(name = "게시판 기능", description = "게시판 생성,수정,삭제,조회 등")
 public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping("/boards")
+    @PostMapping("/v1/boards")
     @Operation(summary = "게시판 생성", description = "게시판 생성하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<BoardSaveResponseDto>> saveBoard(@AuthenticationPrincipal AuthUser authUser,
@@ -44,7 +43,7 @@ public class BoardController {
     }
 
 
-    @PostMapping("/boards/{id}/images")
+    @PostMapping("/v1/boards/{id}/images")
     @Operation(summary = "게시판 이미지 수정", description = "게시판 이미지 수정하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<BoardUpdateImageDto>> updateImages(@AuthenticationPrincipal AuthUser authUser,
@@ -60,7 +59,7 @@ public class BoardController {
         return ResponseEntity.ok(CommonResponse.success(boardService.updateImages(authUser.getUserId(), id, images, remainingImages)));
     }
 
-    @PutMapping("/boards/{id}")
+    @PutMapping("/v1/boards/{id}")
     @Operation(summary = "게시판 본문 수정", description = "게시판 본문 수정하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<BoardSaveResponseDto>> updateBoardContent(@AuthenticationPrincipal AuthUser authUser,
@@ -74,7 +73,7 @@ public class BoardController {
     }
 
 
-    @DeleteMapping("/boards/{id}")
+    @DeleteMapping("/v1/boards/{id}")
     @Operation(summary = "게시판 삭제 요청", description = "게시판 삭제 상태로 변경하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
@@ -85,7 +84,7 @@ public class BoardController {
         return ResponseEntity.ok(CommonResponse.success(null));
     }
 
-    @GetMapping("/boards/{id}")
+    @GetMapping("/v1/boards/{id}")
     @Operation(summary = "게시판 단건 조회", description = "게시판 단건 조회하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<BoardDetailResponseDto>> getBoard(@PathVariable
@@ -94,7 +93,7 @@ public class BoardController {
         return ResponseEntity.ok(CommonResponse.success(boardService.getBoard(id)));
     }
 
-    @GetMapping("/boards")
+    @GetMapping("/v1/boards")
     @Operation(summary = "나 또는 전체 게시판 조회", description = "게시판 전체 조회하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<Page<BoardDetailResponseDto>>> getBoards(@AuthenticationPrincipal AuthUser authUser,
@@ -113,7 +112,7 @@ public class BoardController {
     }
 
 
-    @GetMapping("/newsfeed")
+    @GetMapping("/v1/newsfeed")
     @Operation(summary = "뉴스피드 조회", description = "뉴스피드 조회하는 API")
     @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다.")
     public ResponseEntity<CommonResponse<Page<BoardDetailResponseDto>>> getNewsfeed(@AuthenticationPrincipal AuthUser authUser,
@@ -126,8 +125,13 @@ public class BoardController {
         return ResponseEntity.ok(CommonResponse.success(boardService.getNewsfeed(authUser.getUserId(), page, size)));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<CommonResponse<List<BoardSearchResponseDto>>> searchBoard(@RequestParam String keyword) {
-        return ResponseEntity.ok(CommonResponse.success(boardService.searchBoard(keyword)));
+    @GetMapping("/v1/search")
+    public ResponseEntity<CommonResponse<Page<BoardSearchResponseDto>>> searchBoard(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,   // 기본값: 첫 번째 페이지
+            @RequestParam(defaultValue = "10") int size) { // 기본값: 한 페이지당 10개
+
+        Page<BoardSearchResponseDto> boardSearchResponseDtoPage = boardService.searchBoard(keyword, page, size);
+        return ResponseEntity.ok(CommonResponse.success(boardSearchResponseDtoPage));
     }
 }
