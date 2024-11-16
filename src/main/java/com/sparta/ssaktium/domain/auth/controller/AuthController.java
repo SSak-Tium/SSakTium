@@ -40,7 +40,6 @@ import java.util.List;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserRepository userRepository;
 
     @GetMapping("/ssaktium/signin")
     public String signin() {
@@ -98,22 +97,5 @@ public class AuthController {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
         return "redirect:/ssaktium/signin";  // 로그아웃 후 로그인 페이지로 리디렉션
-    }
-
-    // 10000 명 유저 생성
-    @PostMapping("/v2/add-User")
-    public String createUsers() {
-        List<User> users = new ArrayList<>();
-
-        // 10,000명의 사용자 생성
-        for (int i = 1; i <= 10000; i++) {
-            User user = new User(i+"@gmail.com", "111111N@", "dummy", UserRole.ROLE_USER);
-            users.add(user);
-        }
-
-        // 데이터베이스에 유저 저장
-        userRepository.saveAll(users);
-
-        return "10,000 users have been created!";
     }
 }
