@@ -64,66 +64,72 @@ services:
       - kafka2
       - kafka3
 
-  redis-node1:
+  redis0:
       image: redis:latest
+      hostname: redis0
+      container_name: redis0
       command: [ "redis-server", "/redis/redis.conf" ]
       volumes:
-        - redis_data_7000:/data
         - ./redis/redis_7000.conf:/redis/redis.conf
       ports:
         - "6379:7000"
       networks:
         - redis_network
 
-  redis-node2:
+  redis1:
         image: redis:latest
+        hostname: redis1
+        container_name: redis1
         command: [ "redis-server", "/redis/redis.conf" ]
         volumes:
-          - redis_data_7001:/data
           - ./redis/redis_7001.conf:/redis/redis.conf
         ports:
           - "7001:7001"
         networks:
           - redis_network
 
-  redis-node3:
+  redis2:
         image: redis:latest
+        hostname: redis2
+        container_name: redis2
         command: [ "redis-server", "/redis/redis.conf" ]
         volumes:
-          - redis_data_7002:/data
           - ./redis/redis_7002.conf:/redis/redis.conf
         ports:
           - "7002:7002"
         networks:
           - redis_network
 
-  redis-node4:
+  redis3:
         image: redis:latest
+        hostname: redis3
+        container_name: redis3
         command: [ "redis-server", "/redis/redis.conf" ]
         volumes:
-          - redis_data_7003:/data
           - ./redis/redis_7003.conf:/redis/redis.conf
         ports:
           - "7003:7003"
         networks:
           - redis_network
 
-  redis-node5:
+  redis4:
         image: redis:latest
+        hostname: redis4
+        container_name: redis4
         command: [ "redis-server", "/redis/redis.conf" ]
         volumes:
-          - redis_data_7004:/data
           - ./redis/redis_7004.conf:/redis/redis.conf
         ports:
           - "7004:7004"
         networks:
           - redis_network
 
-  redis-node6:
+  redis5:
         image: redis:latest
+        hostname: redis5
+        container_name: redis5
         command: [ "redis-server", "/redis/redis.conf" ]
         volumes:
-          - redis_data_7005:/data
           - ./redis/redis_7005.conf:/redis/redis.conf
         ports:
           - "7005:7005"
@@ -138,12 +144,12 @@ services:
     networks:
       - redis_network
     depends_on:
-      - redis-node1
-      - redis-node2
-      - redis-node3
-      - redis-node4
-      - redis-node5
-      - redis-node6
+      - redis0
+      - redis1
+      - redis2
+      - redis3
+      - redis4
+      - redis5
     environment:
       - NODE_ENV=production
     entrypoint: [ "/bin/sh", "-c" ]
