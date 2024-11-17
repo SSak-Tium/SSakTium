@@ -15,21 +15,26 @@ public class LikeEventProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    // 게시글 좋아요 이벤트 전송
-    public void sendBoardLikeEvent(String userId, String boardId, String eventType) {
-        BoardLikeEvent boardLikeEvent = new BoardLikeEvent(userId, boardId, eventType);
-        kafkaTemplate.send("board-like-events", boardLikeEvent);
+    // 좋아요 이벤트 전송 (확장 가능)
+    public void sendLikeEvent(LikeEvent likeEvent) {
+        String topic = getTopicForEvent(likeEvent);
+
+        try {
+            kafkaTemplate.send(topic, likeEvent); // 비동기 전송 + 완료 확인
+        } catch (Exception e){
+            System.err.println("Kafka 메시지 전송 실패 :" + e.getMessage());
+        }
     }
 
-    // 댓글 좋아요 이벤트 전송
-    public void sendCommentLikeEvent(String userId, String commentId,String eventType) {
-        CommentLikeEvent commentLikeEvent = new CommentLikeEvent(userId, commentId, eventType);
-        kafkaTemplate.send("comment-like-events", commentLikeEvent);  // 토픽에 전송
-    }
-
-    // 둘 다 합쳐서 하나로 전송하는 방법 (확정성)
-    public void sendLikeEvent(Object likeEvent) {
-        String topic = likeEvent instanceof BoardLikeEvent ? "board-like-events" : "comment-like-events";
-        kafkaTemplate.send(topic, likeEvent);
+    // 이벤트 타입에 따라 토픽 결정
+    private String getTopicForEvent(LikeEvent likeEvent) {
+        if (likeEvent instanceof BoardLikeEvent) {
+            return "board-like-events";
+        } else if (likeEvent instanceof CommentLikeEvent) {
+            return "comment-like-events";
+        } else {
+            throw new IllegalArgumentException(
+                    "좋아요 기능을 제공하지 않는 이벤트입니다." + likeEvent.getClass().getSimpleName());
+        }
     }
 }

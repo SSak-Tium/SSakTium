@@ -10,4 +10,6 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
     boolean existsByCommentIdAndUserId(Long commentsId, long userId);
 
     Optional<CommentLike> findByCommentIdAndUserId(Long commentId, Long userId);
+
+    int countByCommentId(Long l);
 }

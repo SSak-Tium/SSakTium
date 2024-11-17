@@ -71,7 +71,7 @@ services:
         - redis_data_7000:/data
         - ./redis/redis_7000.conf:/redis/redis.conf
       ports:
-        - "7000:7000"
+        - "6379:7000"
       networks:
         - redis_network
 

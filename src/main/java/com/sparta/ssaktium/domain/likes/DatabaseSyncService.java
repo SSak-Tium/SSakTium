@@ -33,8 +33,8 @@ public class DatabaseSyncService {
             System.out.println("Redis와 MySQL 연결 성공");
 
             // 게시글과 댓글 각각 좋아요 데이터 동기화
-            syncLikes(likeRedisService.TARGET_TYPE_BOARD, dbConnection);
-            syncLikes(likeRedisService.TARGET_TYPE_COMMENT, dbConnection);
+            syncLikes(LikeRedisService.TARGET_TYPE_BOARD, dbConnection);
+            syncLikes(LikeRedisService.TARGET_TYPE_COMMENT, dbConnection);
 
             System.out.println("스케쥴링 완료");
         } catch (SQLException exception) {
@@ -50,7 +50,7 @@ public class DatabaseSyncService {
         String redisUserLikePattern = type + "_likes:*";
 
         // 좋아요 수를 업데이트할 DB 쿼리 설정
-        String countUpdateQuery = type.equals(likeRedisService.TARGET_TYPE_BOARD) ?
+        String countUpdateQuery = type.equals(LikeRedisService.TARGET_TYPE_BOARD) ?
                 "UPDATE boards SET board_likes_count = board_likes_count + ? WHERE id = ?" :
                 "UPDATE comments SET comment_likes_count = comment_likes_count + ? WHERE id = ?";
 
@@ -76,7 +76,7 @@ public class DatabaseSyncService {
                         dbConnection,
                         id,
                         redisUserIds,
-                        type.equals(likeRedisService.TARGET_TYPE_BOARD) ? "board_likes" : "comment_likes");
+                        type.equals(LikeRedisService.TARGET_TYPE_BOARD) ? "board_likes" : "comment_likes");
             } else {
                 System.out.println("동기화 필요 없음.");
             }
@@ -123,7 +123,7 @@ public class DatabaseSyncService {
     private int getCurrentLikesCountFromDB(Connection dbConnection,
                                            String id,
                                            String type) throws SQLException {
-        String countQuery = type.equals(likeRedisService.TARGET_TYPE_BOARD) ?
+        String countQuery = type.equals(LikeRedisService.TARGET_TYPE_BOARD) ?
                 "SELECT board_likes_count FROM boards WHERE id = ?" :
                 "SELECT comment_likes_count FROM comments WHERE id = ?";
 
