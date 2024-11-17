@@ -7,6 +7,7 @@ import com.sparta.ssaktium.domain.auth.dto.response.SigninResponseDto;
 import com.sparta.ssaktium.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.ssaktium.domain.auth.exception.DeletedUserException;
 import com.sparta.ssaktium.domain.auth.exception.DuplicateEmailException;
+import com.sparta.ssaktium.domain.auth.exception.EmailNotVerifiedException;
 import com.sparta.ssaktium.domain.auth.exception.UnauthorizedPasswordException;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
@@ -15,6 +16,7 @@ import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +27,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuthService {
 
+    private final RedisTemplate redisTemplate;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
-
-        if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
-            throw new DuplicateEmailException();
-        }
+        // 이메일 인증 여부 확인
+//        Boolean isVerified = (Boolean) redisTemplate.opsForValue().get(signupRequestDto.getEmail() + ":verified");
+//
+//        if (isVerified == null || !isVerified) {
+//            throw new EmailNotVerifiedException();
+//        }
 
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
 
@@ -50,29 +55,31 @@ public class AuthService {
         );
         User savedUser = userRepository.save(newUser);
 
-        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
+        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), savedUser.getUserName(), userRole);
 
         return new SignupResponseDto(bearerToken);
     }
 
     // 로그인
-    public SigninResponseDto signin(SigninRequestDto signinRequestDto) {
+    public String signin(SigninRequestDto signinRequestDto) {
         User user = userRepository.findByEmail(signinRequestDto.getEmail()).orElseThrow(
                 NotFoundUserException::new);
 
+        // 삭제된 사용자에 대한 예외 처리
         if (user.isDeleted()) {
             throw new DeletedUserException();
         }
 
-        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환
+        // 비밀번호 검증
         if (!passwordEncoder.matches(signinRequestDto.getPassword(), user.getPassword())) {
             throw new UnauthorizedPasswordException();
         }
 
-        String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
+        String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserName(), user.getUserRole());
 
         log.info("로그인 성공");
+        log.info(bearerToken);
 
-        return new SigninResponseDto(bearerToken);
+        return bearerToken;
     }
 }

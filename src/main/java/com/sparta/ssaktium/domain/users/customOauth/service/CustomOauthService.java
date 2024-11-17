@@ -9,6 +9,7 @@ import com.sparta.ssaktium.domain.users.customOauth.dto.CustomOauthInfoDto;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
+import com.sparta.ssaktium.domain.users.exception.SocialAccountNoResponseException;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,7 @@ public class CustomOauthService {
 
         User user = registerUserIfNeeded(UserInfo, response, provider);
 
-        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
+        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(),user.getUserName(), user.getUserRole());
 
         log.info(createToken);
 
@@ -164,7 +165,7 @@ public class CustomOauthService {
 
     // JWT 토큰을 생성하고, 응답 헤더에 추가하는 메서드
     private void addJwtToResponse(User user, HttpServletResponse response) {
-        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
+        String createToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserName(), user.getUserRole());
 
         jwtUtil.addTokenToResponseHeader(createToken, response);
     }
@@ -176,7 +177,7 @@ public class CustomOauthService {
             case "kakao" -> fetchKakaoUserInfo(accessToken);
             case "google" -> fetchGoogleUserInfo(accessToken);
             case "naver" -> fetchNaverUserInfo(accessToken);
-            default -> throw new NotFoundUserException();
+            default -> throw new SocialAccountNoResponseException();
         };
     }
 
@@ -194,7 +195,7 @@ public class CustomOauthService {
 
         if (responseBody == null) {
             log.error("Kakao API response body is null.");
-            throw new NotFoundUserException();
+            throw new SocialAccountNoResponseException();
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
@@ -220,7 +221,7 @@ public class CustomOauthService {
 
         if (responseBody == null) {
             log.error("Google API response body is null.");
-            throw new NotFoundUserException();
+            throw new SocialAccountNoResponseException();
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
@@ -245,7 +246,7 @@ public class CustomOauthService {
 
         if (responseBody == null) {
             log.error("Naver API response body is null.");
-            throw new NotFoundUserException();
+            throw new SocialAccountNoResponseException();
         }
 
         JsonNode jsonNode = new ObjectMapper().readTree(responseBody);

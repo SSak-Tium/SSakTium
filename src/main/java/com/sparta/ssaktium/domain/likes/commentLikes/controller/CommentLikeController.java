@@ -25,10 +25,10 @@ public class CommentLikeController {
     @PostMapping
     @Operation(summary = "댓글 좋아요 등록", description = "댓글에 좋아요를 등록하는 API")
     @ApiResponse(responseCode = "200", description = "댓글에 좋아요를 눌렀습니다.")
-    public ResponseEntity<CommonResponse<CommentLikeReponseDto>> postCommentLike (@AuthenticationPrincipal AuthUser authUser,
-                                                                               @PathVariable
-                                                                               @Parameter(description = "댓글 아이디")
-                                                                               Long commentId){
+    public ResponseEntity<CommonResponse<CommentLikeReponseDto>> postCommentLike(@AuthenticationPrincipal AuthUser authUser,
+                                                                                 @PathVariable
+                                                                                 @Parameter(description = "댓글 아이디")
+                                                                                 Long commentId) {
         return ResponseEntity.ok(CommonResponse.success(commentLikeService.postCommentLike(authUser.getUserId(), commentId)));
     }
 
@@ -39,7 +39,7 @@ public class CommentLikeController {
     public void deleteCommentLike(@AuthenticationPrincipal AuthUser authUser,
                                   @PathVariable
                                   @Parameter(description = "댓글 아이디")
-                                  Long commentId){
+                                  Long commentId) {
         commentLikeService.deleteCommentLike(authUser.getUserId(), commentId);
     }
 }

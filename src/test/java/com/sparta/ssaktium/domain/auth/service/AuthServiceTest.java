@@ -78,7 +78,7 @@ class AuthServiceTest {
         given(userRepository.existsByEmail(signupRequestDto.getEmail())).willReturn(false);
         given(passwordEncoder.encode(signupRequestDto.getPassword())).willReturn(encodedPassword);
         given(userRepository.save(any(User.class))).willReturn(savedUser);
-        given(jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), UserRole.ROLE_USER)).willReturn(token);
+        given(jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), savedUser.getUserName(), UserRole.ROLE_USER)).willReturn(token);
 
         // when
         SignupResponseDto responseDto = authService.signup(signupRequestDto);
@@ -107,7 +107,7 @@ class AuthServiceTest {
         // given
         given(userRepository.findByEmail(anyString())).willReturn(Optional.of(savedUser));
         given(passwordEncoder.matches(anyString(), anyString())).willReturn(true);
-        given(jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), UserRole.ROLE_USER)).willReturn(token);
+        given(jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), savedUser.getUserName(), UserRole.ROLE_USER)).willReturn(token);
 
         // when
         SigninResponseDto responseDto = authService.signin(signinRequestDto);

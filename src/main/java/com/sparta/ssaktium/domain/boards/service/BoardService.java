@@ -17,6 +17,10 @@ import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardSearchRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
+import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.notifications.dto.EventType;
+import com.sparta.ssaktium.domain.notifications.dto.NotificationMessage;
+import com.sparta.ssaktium.domain.notifications.service.NotificationProducer;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
@@ -31,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +47,8 @@ public class BoardService {
     private final S3Service s3Service;
     private final BoardImagesRepository boardImagesRepository;
     private final BoardSearchRepository boardSearchRepository;
+    private final LikeRedisService likeRedisService; // 좋아요 수 반영을 위함
+    private final NotificationProducer notificationProducer;
 
 
     @Transactional
@@ -77,6 +84,15 @@ public class BoardService {
                 String.join(",", imageUrls));
         //elastic에 저장
         boardSearchRepository.save(boardDocument);
+
+        // 친구 관계인 모든 유저에게 알림 발송
+        List<User> friends = friendService.findFriends(userId);
+        friends.forEach(friend -> notificationProducer.sendNotification(
+                new NotificationMessage(friend.getId(),
+                        EventType.FRIEND_BOARD,
+                        user.getUserName() + "님이 게시글"+ requestDto.getTitle() + "을 등록했습니다."))
+        );
+
         //responseDto 반환
         return new BoardSaveResponseDto(savedBoard, imageUrls);
     }
@@ -168,6 +184,7 @@ public class BoardService {
         List<String> imageUrls = updatedBoard.getImageUrls().stream()
                 .map(BoardImages::getImageUrl) // 각 BoardImages의 imageUrl만 가져옴
                 .toList();
+
         //elasticsearch에 본문 변경값 저장
         BoardDocument boardDocument = new BoardDocument(
                 updatedBoard.getId(),
@@ -218,7 +235,9 @@ public class BoardService {
         List<String> imageUrls = board.getImageUrls().stream()
                 .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                 .toList();
-        return new BoardDetailResponseDto(board, imageUrls, commentCount);
+        // 좋아요 수 레디스에서 반영
+        int redisLikeCount = getLikeCount(id.toString());
+        return new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount);
     }
 
     public Page<BoardDetailResponseDto> getBoards(Long userId, String type, int page, int size) {
@@ -236,7 +255,9 @@ public class BoardService {
                 List<String> imageUrls = board.getImageUrls().stream()
                         .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                         .toList();
-                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
+                // 좋아요 수 레디스에서 반영
+                int redisLikeCount = getLikeCount(board.getId().toString());
+                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount));
             }
             return new PageImpl<>(boardDetails, pageable, boards.getTotalElements());
 
@@ -249,7 +270,9 @@ public class BoardService {
                 List<String> imageUrls = board.getImageUrls().stream()
                         .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                         .toList();
-                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
+                // 좋아요 수 레디스에서 반영
+                int redisLikeCount = getLikeCount(board.getId().toString());
+                boardDetails.add(new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount));
             }
             return new PageImpl<>(boardDetails, pageable, boardsPage.getTotalElements());
         } else {
@@ -283,8 +306,10 @@ public class BoardService {
             List<String> imageUrls = board.getImageUrls().stream()
                     .map(BoardImages::getImageUrl) // BoardImages에서 URL 추출
                     .toList();
+            // 좋아요 수 레디스에서 반영
+            int redisLikeCount = getLikeCount(board.getId().toString());
             // 댓글 리스트 대신 댓글 수만 포함하는 DTO 생성
-            dtoList.add(new BoardDetailResponseDto(board, imageUrls, commentCount));
+            dtoList.add(new BoardDetailResponseDto(board, imageUrls, commentCount, redisLikeCount));
         }
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
@@ -308,5 +333,14 @@ public class BoardService {
     public Board getBoardById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(NotFoundBoardException::new);
+    }
+
+    // Redis 로 좋아요 수 조회하는 메서드
+    public int getLikeCount(String targetId) {
+        int redisCount = likeRedisService.getRedisLikeCount("Board", targetId);
+        if (redisCount == 0) {
+            return boardRepository.findBoardLikesCountById(Long.parseLong(targetId));
+        }
+        return redisCount;
     }
 }

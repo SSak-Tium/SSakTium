@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이 프로필</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="profile-container">
+    <h2>마이 프로필</h2>
+
+    <!-- 사용자 이름을 Thymleaf로 동적으로 표시 -->
+    <p>사용자 이름: <span th:text="${userName}">userName</span></p>
+
+    <!-- 로그아웃 폼 -->
+    <form action="/v2/auth/logout" method="POST">
+        <button type="submit">로그아웃</button>
+    </form>
+    <button onclick="window.location.href='/ssaktium/main'">돌아가기</button>
+</div>
+</body>
+</html>
