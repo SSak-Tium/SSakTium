@@ -135,4 +135,11 @@ public class BoardController {
         Page<BoardSearchResponseDto> boardSearchResponseDtoPage = boardService.searchBoard(keyword, page, size);
         return ResponseEntity.ok(CommonResponse.success(boardSearchResponseDtoPage));
     }
+
+    @GetMapping("/v2/elasticsearch")
+    public ResponseEntity<CommonResponse<Page<BoardDocument>>> elasticsearch(@RequestParam String keyword,
+                                                                             @RequestParam int page,
+                                                                             @RequestParam int size) {
+        return ResponseEntity.ok(CommonResponse.success(boardService.elasticsearch(keyword, page, size)));
+    }
 }

@@ -297,6 +297,13 @@ public class BoardService {
         return boardPage.map(BoardSearchResponseDto::new);
     }
 
+    public Page<BoardDocument> elasticsearch(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);  // page - 1 처리
+
+        // ElasticsearchRepository에서 제공하는 메서드를 사용하여 검색
+        return boardSearchRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+    }
+
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
         return boardRepository.findById(id)
