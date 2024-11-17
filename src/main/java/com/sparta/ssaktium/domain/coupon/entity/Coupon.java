@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "coupons")
+@Table(name = "coupon")
 public class Coupon {
 
     @Id
