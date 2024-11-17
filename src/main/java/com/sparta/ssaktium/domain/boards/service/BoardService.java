@@ -16,6 +16,7 @@ import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
 import com.sparta.ssaktium.domain.notifications.dto.EventType;
 import com.sparta.ssaktium.domain.notifications.dto.NotificationMessage;
 import com.sparta.ssaktium.domain.notifications.service.NotificationProducer;
@@ -45,6 +46,7 @@ public class BoardService {
     private final BoardImagesRepository boardImagesRepository;
     private final LikeRedisService likeRedisService; // 좋아요 수 반영을 위함
     private final NotificationProducer notificationProducer;
+    private final BoardLikeRepository boardLikeRepository;
 
 
     @Transactional
@@ -75,7 +77,7 @@ public class BoardService {
         friends.forEach(friend -> notificationProducer.sendNotification(
                 new NotificationMessage(friend.getId(),
                         EventType.FRIEND_BOARD,
-                        user.getUserName() + "님이 게시글"+ requestDto.getTitle() + "을 등록했습니다."))
+                        user.getUserName() + "님이 게시글" + requestDto.getTitle() + "을 등록했습니다."))
         );
 
         //responseDto 반환
@@ -285,10 +287,10 @@ public class BoardService {
     }
 
     // Redis 로 좋아요 수 조회하는 메서드
-    public int getLikeCount(String targetId) {
-        int redisCount = likeRedisService.getRedisLikeCount("Board", targetId);
+    public int getLikeCount(String boardId) {
+        int redisCount = likeRedisService.getRedisLikeCount(likeRedisService.TARGET_TYPE_BOARD, boardId);
         if (redisCount == 0) {
-            return boardRepository.findBoardLikesCountById(Long.parseLong(targetId));
+            return boardLikeRepository.countByBoardId(Long.valueOf(boardId));
         }
         return redisCount;
     }

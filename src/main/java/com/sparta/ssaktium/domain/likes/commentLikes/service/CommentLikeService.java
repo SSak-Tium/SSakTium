@@ -1,16 +1,17 @@
 package com.sparta.ssaktium.domain.likes.commentLikes.service;
 
-import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
+import com.sparta.ssaktium.domain.likes.LikeEventProducer;
+import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.likes.boardLikes.BoardLikeEvent;
 import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
-import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
 import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
-import com.sparta.ssaktium.domain.likes.exception.NotFoundCommentLikeException;
+import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
+import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardLikeException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,8 @@ public class CommentLikeService {
 
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
-    private final JdbcTemplate jdbcTemplate;
+    private final LikeEventProducer likeProducer; // 카프카 이벤트 프로듀서 주입
+    private final LikeRedisService likeRedisService; // 레디스 좋아요 수 조회용
 
     @Value("${db-lock-enabled:true}")
     private boolean dbLockEnabled;
@@ -30,53 +32,43 @@ public class CommentLikeService {
     // 댓글에 좋아요 등록
     @Transactional
     public CommentLikeReponseDto postCommentLike(Long userId, Long commentId) {
-        String lockKey = "comment_like_" + commentId;
+        // 댓글이 있는지 확인
+        commentRepository.findById(commentId).orElseThrow(() -> new NotFoundCommentException());
 
-        if (dbLockEnabled) {
-            // 잠금 획득 시도
-            Boolean acquired = jdbcTemplate.queryForObject("SELECT GET_LOCK(?, 10)", Boolean.class, lockKey);
-            if (Boolean.FALSE.equals(acquired)) {
-                throw new IllegalStateException("Failed to acquire lock for comment ID " + commentId);
-            }
+        // 좋아요를 이미 누른 댓글인지 확인
+        if (likeRedisService.isLiked(
+                LikeRedisService.TARGET_TYPE_COMMENT,
+                commentId.toString(),
+                userId.toString())) {
+            throw new AlreadyLikedException();
         }
 
-        try {
-            // 댓글이 있는지 확인
-            Comment comment = commentRepository.findById(commentId)
-                    .orElseThrow(() -> new NotFoundCommentException());
+        // 좋아요 등록(Kafka -> Redis)
+        likeProducer.sendLikeEvent(new BoardLikeEvent(
+                userId.toString(), commentId.toString(), "LIKE"));
 
-            // 좋아요 등록
-            CommentLike commentLike = new CommentLike(comment, userId);
-            commentLikeRepository.save(commentLike);
+        // 좋아요 수 레디스에서 반영
+        int redisLikeCount = likeRedisService.getRedisLikeCount(
+                LikeRedisService.TARGET_TYPE_COMMENT, commentId.toString());
 
-            // 댓글에 등록된 좋아요 수 증가
-            comment.incrementLikesCount();
-            commentRepository.save(comment);
-
-            return new CommentLikeReponseDto(commentId, comment.getCommentLikesCount());
-        } finally {
-            if (dbLockEnabled) {
-                jdbcTemplate.queryForObject("SELECT RELEASE_LOCK(?)", Boolean.class, lockKey);
-            }
-        }
+        return new CommentLikeReponseDto(commentId, redisLikeCount);
     }
 
     // 댓글에 좋아요 취소
     @Transactional
     public void deleteCommentLike(Long userId, Long commentId) {
-        // 댓글의 좋아요 수를 줄이기 위함
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundCommentException());
+        // 댓글이 있는지 확인
+        commentRepository.findById(commentId).
+                orElseThrow(() -> new NotFoundCommentException());
 
         // 댓글에 해당 유저의 좋아요가 있는지 확인
-        CommentLike commentLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
-                .orElseThrow(() -> new NotFoundCommentLikeException());
+        if (likeRedisService.isLiked(
+                LikeRedisService.TARGET_TYPE_COMMENT, commentId.toString(), userId.toString())) {
+            throw new NotFoundBoardLikeException();
+        }
 
-        // 좋아요 취소
-        commentLikeRepository.delete(commentLike);
-        comment.decrementLikesCount();
-
-        // 댓글에 등록된 좋아요 수 감소
-        commentRepository.save(comment);
+        // 카프카 좋아요 취소 이벤트
+        likeProducer.sendLikeEvent(new BoardLikeEvent(
+                userId.toString(), commentId.toString(), "CANCEL"));
     }
 }

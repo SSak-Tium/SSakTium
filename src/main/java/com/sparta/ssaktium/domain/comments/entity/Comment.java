@@ -26,23 +26,11 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    private int commentLikesCount = 0;
 
     public Comment(String content, Board board, User user) {
         this.content = content;
         this.board = board;
         this.user = user;
-    }
-
-    public void incrementLikesCount() {
-        commentLikesCount++;
-    }
-
-    public void decrementLikesCount() {
-        if (commentLikesCount <= 0) {
-            throw new LikeCountUnderflowException();
-        }
-        commentLikesCount--;
     }
 
     // 댓글 수정 (작성자만 가능)
