@@ -7,6 +7,7 @@ import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSearchResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
+import com.sparta.ssaktium.domain.boards.entity.BoardDocument;
 import com.sparta.ssaktium.domain.boards.service.BoardService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;

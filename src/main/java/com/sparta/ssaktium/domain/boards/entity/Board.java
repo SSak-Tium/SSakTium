@@ -19,8 +19,8 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE boards SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
 @Table(name = "boards", indexes = {
-        @Index(name = "idx_board_title",columnList = "title"),
-        @Index(name = "idx_board_content",columnList = "content")
+        @Index(name = "idx_board_title", columnList = "title"),
+        @Index(name = "idx_board_content", columnList = "content")
 })
 public class Board extends Timestamped {
 

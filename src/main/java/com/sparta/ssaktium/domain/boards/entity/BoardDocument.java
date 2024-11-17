@@ -19,12 +19,12 @@ public class BoardDocument {
     @Field(name = "boards_id", type = FieldType.Long)
     private Long id;
 
-    @Field(name = "title",type = FieldType.Text)
+    @Field(name = "title", type = FieldType.Text, analyzer = "custom_nori_analyzer")
     private String title;
 
-    @Field(name = "content" , type = FieldType.Text)
+    @Field(name = "content", type = FieldType.Text, analyzer = "custom_nori_analyzer")
     private String content;
 
-    @Field(name = "imageUrls" , type = FieldType.Text)
+    @Field(name = "imageUrls", type = FieldType.Text)
     private String imageUrls;
 }

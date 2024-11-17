@@ -21,7 +21,6 @@ import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
