@@ -54,7 +54,7 @@ public class FriendService {
         notificationProducer.sendNotification(
                 new NotificationMessage(friendId,
                         EventType.FRIEND_REQUESTED,
-                        user.getUserName() + "님이 친구 신청을 보냈습니다."));
+                        user.getUserName()));
 
         return new FriendResponseDto(newFriend, newFriend.getUser(), newFriend.getFriendUser());
     }
@@ -79,7 +79,7 @@ public class FriendService {
         notificationProducer.sendNotification(
                 new NotificationMessage(friendId,
                         EventType.FRIEND_ACCEPTED,
-                        user.getUserName() + "님이 친구 수락을 하셨습니다."));
+                        user.getUserName()));
 
         return new FriendResponseDto(existingFriendRequest, user, friendUser);
     }

@@ -90,7 +90,7 @@ public class BoardService {
         friends.forEach(friend -> notificationProducer.sendNotification(
                 new NotificationMessage(friend.getId(),
                         EventType.FRIEND_BOARD,
-                        user.getUserName() + "님이 게시글"+ requestDto.getTitle() + "을 등록했습니다."))
+                        "유저 이름 : " + user.getUserName() + "제목 : " + requestDto.getTitle()))
         );
 
         //responseDto 반환
