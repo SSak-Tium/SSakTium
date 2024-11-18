@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.likes.boardLikes.repository;
 import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
@@ -13,4 +14,6 @@ public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
     Optional<BoardLike> findByBoardIdAndUserId(Long boardId, Long userId);
 
     int countByBoardId(Long boardId);
+
+    List<String> findUserIdsByBoardId(long L);
 }

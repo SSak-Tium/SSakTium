@@ -7,6 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Getter
 @Component
 public class LikeRedisService {
@@ -54,21 +56,27 @@ public class LikeRedisService {
     // 좋아요 수 조회
     public int getRedisLikeCount(String targetType, String targetId) {
         String likeKey = "likes:" + targetType + ":" + targetId;
+        String userLikeKey = targetType + "_likes:" + targetId;
         Integer count = (Integer) redisTemplate.opsForValue().get(likeKey);
 
         // 캐시가 없을 경우 DB 에서 조회 후 저장
         if (count == null) {
             int dbLikeCount;
-
+            List<String> likedUsers;
             if (targetType.equals(TARGET_TYPE_BOARD)) {
                 dbLikeCount = boardLikeRepository.countByBoardId(Long.parseLong(targetId));
+                likedUsers = boardLikeRepository.findUserIdsByBoardId(Long.parseLong(targetId));
             } else if (targetType.equals(TARGET_TYPE_COMMENT)) {
                 dbLikeCount = commentLikeRepository.countByCommentId(Long.parseLong(targetId));
+                likedUsers = commentLikeRepository.findUserIdsByCommentId(Long.parseLong(targetId));
             } else {
                 throw new IllegalArgumentException("지원하지 않는 대상 타입: " + targetType);
             }
             // 좋아요 수 뿐만 아니라 중복 체크를 위한 데이터도 포함해야함.!! 자고 일어나서 할 것.
             redisTemplate.opsForValue().set(likeKey, dbLikeCount);
+            for (String userId : likedUsers){
+                redisTemplate.opsForSet().add(userLikeKey,userId);
+            }
             return dbLikeCount;
         }
         return count;
