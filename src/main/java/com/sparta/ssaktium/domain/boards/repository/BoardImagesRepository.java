@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface BoardImagesRepository extends JpaRepository<BoardImages,Long> {
+public interface BoardImagesRepository extends JpaRepository<BoardImages, Long> {
 
     @Modifying
     @Query("DELETE FROM BoardImages bi WHERE bi.board.id = :boardId")

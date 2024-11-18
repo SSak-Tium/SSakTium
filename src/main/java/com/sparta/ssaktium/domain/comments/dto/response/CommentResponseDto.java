@@ -32,14 +32,14 @@ public class CommentResponseDto {
     }
 
     // 객체 받아서 Dto 만들기
-    public CommentResponseDto(Comment comment) {
+    public CommentResponseDto(Comment comment, int commentLikesCount) {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
         this.boardId = comment.getBoard().getId();
         this.userId = comment.getUser().getId();
-        this.commentLikesCount = comment.getCommentLikesCount();
+        this.commentLikesCount = commentLikesCount;
     }
 }
 

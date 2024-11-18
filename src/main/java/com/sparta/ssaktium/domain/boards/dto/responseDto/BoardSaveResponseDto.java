@@ -12,7 +12,7 @@ public class BoardSaveResponseDto {
     public final Long id;
     public final String title;
     public final String contents;
-    private final List<String> imageUrls;
+    public final List<String> imageUrls;
 
     public BoardSaveResponseDto(Board board,List<String> imageUrls) {
         this.id = board.getId();

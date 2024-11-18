@@ -87,6 +87,45 @@ services:
     environment:
       - NODE_ENV=production
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch
+    environment:
+      - node.name=es01
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - ELASTIC_PASSWORD=${ES_PASSWORD}
+      - xpack.security.enabled=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    command: >
+      /bin/sh -c "if [ ! -d plugins/analysis-nori ]; then 
+      bin/elasticsearch-plugin install analysis-nori; 
+      fi; 
+      /usr/local/bin/docker-entrypoint.sh"
+
+  kibana:
+      image: docker.elastic.co/kibana/kibana:7.17.0
+      container_name: kibana
+      environment:
+        - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        - ELASTICSEARCH_USERNAME=${ES_USERNAME}
+        - ELASTICSEARCH_PASSWORD=${ES_PASSWORD}
+      ports:
+        - 5601:5601
+      depends_on:
+        - elasticsearch
+      volumes:
+        - kibana-data:/usr/share/kibana/data
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -111,6 +150,10 @@ volumes:
   redis_data: # Redis 데이터 영구 저장
     driver: local
   grafana-data:
+    driver: local
+  es-data:
+    driver: local
+  kibana-data:
     driver: local
 
 networks:

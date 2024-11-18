@@ -3,19 +3,22 @@ package com.sparta.ssaktium.domain.boards.service;
 import com.sparta.ssaktium.domain.boards.dto.requestDto.BoardSaveRequestDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardDetailResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSaveResponseDto;
+import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardSearchResponseDto;
 import com.sparta.ssaktium.domain.boards.dto.responseDto.BoardUpdateImageDto;
 import com.sparta.ssaktium.domain.boards.entity.Board;
+import com.sparta.ssaktium.domain.boards.entity.BoardDocument;
 import com.sparta.ssaktium.domain.boards.entity.BoardImages;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.boards.exception.InvalidBoardTypeException;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.exception.NotUserOfBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardImagesRepository;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
+import com.sparta.ssaktium.domain.boards.repository.BoardSearchRepository;
 import com.sparta.ssaktium.domain.common.service.S3Service;
 import com.sparta.ssaktium.domain.friends.service.FriendService;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
 import com.sparta.ssaktium.domain.notifications.dto.EventType;
 import com.sparta.ssaktium.domain.notifications.dto.NotificationMessage;
 import com.sparta.ssaktium.domain.notifications.service.NotificationProducer;
@@ -43,8 +46,10 @@ public class BoardService {
     private final FriendService friendService;
     private final S3Service s3Service;
     private final BoardImagesRepository boardImagesRepository;
+    private final BoardSearchRepository boardSearchRepository;
     private final LikeRedisService likeRedisService; // 좋아요 수 반영을 위함
     private final NotificationProducer notificationProducer;
+    private final BoardLikeRepository boardLikeRepository;
 
 
     @Transactional
@@ -60,27 +65,39 @@ public class BoardService {
                 user);
 
         // 업로드한 파일의 S3 URL 주소
-        List<String> imageUrls = s3Service.uploadImageListToS3(imageList, s3Service.bucket);
+        List<String> imageUrls = (imageList != null && !imageList.isEmpty())
+                ? s3Service.uploadImageListToS3(imageList, s3Service.bucket) : new ArrayList<>();
 
         //저장
         Board savedBoard = boardRepository.save(board);
         //boardimages에 저장
-        for (String imageUrl : imageUrls) {
-            BoardImages boardImage = new BoardImages(imageUrl, savedBoard);// Board 설정
-            boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
+        if (!imageUrls.isEmpty()) {
+            for (String imageUrl : imageUrls) {
+                BoardImages boardImage = new BoardImages(imageUrl, savedBoard);// Board 설정
+                boardImagesRepository.save(boardImage); // BoardImagesRepository에 저장
+            }
         }
+        //elastic에 저장할 document 생성
+        BoardDocument boardDocument = new BoardDocument(
+                savedBoard.getId(),
+                savedBoard.getTitle(),
+                savedBoard.getContent(),
+                String.join(",", imageUrls));
+        //elastic에 저장
+        boardSearchRepository.save(boardDocument);
 
         // 친구 관계인 모든 유저에게 알림 발송
         List<User> friends = friendService.findFriends(userId);
         friends.forEach(friend -> notificationProducer.sendNotification(
                 new NotificationMessage(friend.getId(),
                         EventType.FRIEND_BOARD,
-                        user.getUserName() + "님이 게시글"+ requestDto.getTitle() + "을 등록했습니다."))
+                        "유저 이름 : " + user.getUserName() + "제목 : " + requestDto.getTitle()))
         );
 
         //responseDto 반환
         return new BoardSaveResponseDto(savedBoard, imageUrls);
     }
+
 
     @Transactional
     public BoardUpdateImageDto updateImages(Long userId,
@@ -108,18 +125,18 @@ public class BoardService {
         // 기존 이미지 이름을 유지하고, 새 이미지만 업로드
         List<String> updatedImageList = new ArrayList<>(remainingImages);
         //새로 추가하는 이미지가 비어있을 경우 작동 x
-        if (!imageList.isEmpty()) {
-            for (MultipartFile image : imageList) {
-                if (!image.isEmpty()) {//비어있지 않은 파일만  처리
-                    String originalFileName = image.getOriginalFilename();
-                    // 이미 존재하는 파일 이름을 유지
-                    if (!updatedImageList.contains(originalFileName)) {
-                        String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
-                        updatedImageList.add(newImageUrl);
-                    }
+
+        for (MultipartFile image : imageList) {
+            String originalFileName = image.getOriginalFilename();
+            if (!image.isEmpty()) {
+                // 이미 존재하는 파일 이름을 유지
+                if (!updatedImageList.contains(originalFileName)) {
+                    String newImageUrl = s3Service.uploadImageToS3(image, s3Service.bucket);
+                    updatedImageList.add(newImageUrl);
                 }
             }
         }
+
 
         // BoardImages로 변환 후 저장
         List<BoardImages> newBoardImages = updatedImageList.stream()
@@ -128,6 +145,15 @@ public class BoardService {
 
         //게시글 수정
         boardImagesRepository.saveAll(newBoardImages);
+
+        //elasticsearch에 이미지 변경값 저장
+        BoardDocument boardDocument = new BoardDocument(
+                board.getId(),
+                board.getTitle(),
+                board.getContent(),
+                String.join(",", updatedImageList));
+
+        boardSearchRepository.save(boardDocument);
         //responseDto 반환
         return new BoardUpdateImageDto(updatedImageList);
     }
@@ -153,10 +179,20 @@ public class BoardService {
         // 게시글 수정
         board.updateBoards(title, content, publicStatus); // 이미지 리스트는 그대로 유지
         Board updatedBoard = boardRepository.save(board);
+
+
         // 기존의 BoardImages에서 imageUrl만 추출하여 문자열 리스트로 변환
         List<String> imageUrls = updatedBoard.getImageUrls().stream()
                 .map(BoardImages::getImageUrl) // 각 BoardImages의 imageUrl만 가져옴
                 .toList();
+
+        //elasticsearch에 본문 변경값 저장
+        BoardDocument boardDocument = new BoardDocument(
+                updatedBoard.getId(),
+                updatedBoard.getTitle(),
+                updatedBoard.getContent(),
+                String.join(",", imageUrls));
+        boardSearchRepository.save(boardDocument);
         // responseDto 반환
         return new BoardSaveResponseDto(updatedBoard, imageUrls);
     }
@@ -174,6 +210,8 @@ public class BoardService {
                 throw new NotUserOfBoardException();
             }
         }
+        // 엘라스틱서치에서 게시글 문서 삭제
+        boardSearchRepository.deleteById(id);
 
         List<String> imageUrls = board.getImageUrls().stream()
                 .map(BoardImages::getImageUrl)
@@ -185,14 +223,13 @@ public class BoardService {
             s3Service.deleteObject(s3Service.bucket, imageurl); // 반복적으로 삭제
         }
         //해당 보드 삭제 상태 변경
-        board.deleteBoards();
-        boardRepository.save(board);
+        boardRepository.delete(board);
     }
 
     //게시글 단건 조회
     public BoardDetailResponseDto getBoard(Long id) {
         //게시글 찾기
-        Board board = boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED).orElseThrow(NotFoundBoardException::new);
+        Board board = boardRepository.findById(id).orElseThrow(NotFoundBoardException::new);
         // 댓글 수 가져오기
         int commentCount = boardRepository.countCommentsByBoardId(board.getId());
         //boardimage url만 가져오기
@@ -212,7 +249,7 @@ public class BoardService {
         if ("me".equalsIgnoreCase(type)) {
             // 사용자가 쓴 게시글 조회
             User user = userService.findUser(userId);
-            Page<Board> boards = boardRepository.findAllByUserIdAndStatusEnum(user.getId(), StatusEnum.ACTIVATED, pageable);
+            Page<Board> boards = boardRepository.findAllByUserId(user.getId(), pageable);
 
             for (Board board : boards) {
                 int commentCount = boardRepository.countCommentsByBoardId(board.getId());
@@ -278,17 +315,32 @@ public class BoardService {
         return new PageImpl<>(dtoList, pageable, boardsPage.getTotalElements());
     }
 
+    public Page<BoardSearchResponseDto> searchBoard(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);  // 페이지 번호, 페이지 크기
+        Page<Board> boardPage = boardRepository.searchBoardByTitleOrContent(keyword, pageable);
+
+        // Page<Board>를 Page<BoardSearchResponseDto>로 변환
+        return boardPage.map(BoardSearchResponseDto::new);
+    }
+
+    public Page<BoardDocument> elasticsearch(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);  // page - 1 처리
+
+        // ElasticsearchRepository에서 제공하는 메서드를 사용하여 검색
+        return boardSearchRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+    }
+
     //Board 찾는 메서드
     public Board getBoardById(Long id) {
-        return boardRepository.findByIdAndStatusEnum(id, StatusEnum.ACTIVATED)
+        return boardRepository.findById(id)
                 .orElseThrow(NotFoundBoardException::new);
     }
 
     // Redis 로 좋아요 수 조회하는 메서드
-    public int getLikeCount(String targetId) {
-        int redisCount = likeRedisService.getRedisLikeCount("Board", targetId);
+    public int getLikeCount(String boardId) {
+        int redisCount = likeRedisService.getRedisLikeCount(likeRedisService.TARGET_TYPE_BOARD, boardId);
         if (redisCount == 0) {
-            return boardRepository.findBoardLikesCountById(Long.parseLong(targetId));
+            return boardLikeRepository.countByBoardId(Long.valueOf(boardId));
         }
         return redisCount;
     }
