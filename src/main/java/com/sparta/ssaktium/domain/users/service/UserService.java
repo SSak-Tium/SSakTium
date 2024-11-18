@@ -10,6 +10,7 @@ import com.sparta.ssaktium.domain.users.dto.request.UserCheckPasswordRequestDto;
 import com.sparta.ssaktium.domain.users.dto.response.UserImageResponseDto;
 import com.sparta.ssaktium.domain.users.dto.response.UserResponseDto;
 import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
 import com.sparta.ssaktium.domain.users.exception.DuplicatePasswordException;
 import com.sparta.ssaktium.domain.users.exception.NotFoundUserException;
 import com.sparta.ssaktium.domain.users.repository.UserRepository;
@@ -22,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -131,9 +135,32 @@ public class UserService {
 
     // id 비교 메서드
     public void matchIds(long id1, long id2) {
-        if(id1 == id2) {
+        if (id1 == id2) {
             return;
         }
         throw new ForbiddenException();
+    }
+
+    // 유저 십만 건 데이터베이스에 저장
+    @Transactional
+    public String pushUsers() {
+        int batchSize = 1000;
+        List<User> users = new ArrayList<>(batchSize);
+
+        for (int i = 1; i <= 100000; i++) {
+            User user = new User("email" + i + "@gmail.com", "password", "dummy", UserRole.ROLE_USER);
+            users.add(user);
+
+            // batchSize 가 채워질 때 마다 users List 저장하고 List 초기화
+            if (i % batchSize == 0) {
+                userRepository.saveAll(users);
+                users.clear();
+            }
+        }
+        // 남아있는 유저 저장
+        if (!users.isEmpty()) {
+            userRepository.saveAll(users);
+        }
+        return "랜덤 유저 백만 개 저장 성공";
     }
 }

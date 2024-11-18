@@ -18,7 +18,7 @@ body {
 
 /* 메뉴바 스타일 */
 .navbar {
-    width: 480px;
+    width: 580px;
     background-color: #4caf50; /* 상단 바의 배경색 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

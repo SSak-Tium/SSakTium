@@ -7,6 +7,10 @@ import com.sparta.ssaktium.domain.auth.dto.request.SignupRequestDto;
 import com.sparta.ssaktium.domain.auth.dto.response.SignupResponseDto;
 import com.sparta.ssaktium.domain.auth.service.AuthService;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.users.entity.User;
+import com.sparta.ssaktium.domain.users.enums.UserRole;
+import com.sparta.ssaktium.domain.users.repository.UserRepository;
+import com.sparta.ssaktium.domain.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +30,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor

@@ -70,9 +70,6 @@ public class SecurityConfig {
                         .requestMatchers("/ssaktium/main").authenticated() // 인증 필요 경로
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(customAuthenticationEntryPoint()) // 인증 예외 처리 설정
-                )
                 .build();
     }
 
@@ -84,5 +81,4 @@ public class SecurityConfig {
             );
         };
     }
-
 }

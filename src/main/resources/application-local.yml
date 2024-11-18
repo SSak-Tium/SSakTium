@@ -72,6 +72,12 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  elasticsearch:
+    cluster-nodes: http://localhost:9200
+    cluster-name: docker-cluster
+    username: ${ES_USERNAME}
+    password: ${ES_PASSWORD}
+
 app:
   redirectUri: "http://localhost:8080/ssaktium/signin/"
 
@@ -90,3 +96,13 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true

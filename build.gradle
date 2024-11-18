@@ -65,6 +65,16 @@ dependencies {
 
     // JSON 응답 처리
     implementation 'org.springframework.boot:spring-boot-starter-json'
+
+    // Prometheus
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // Redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 }
 
 tasks.named('test') {

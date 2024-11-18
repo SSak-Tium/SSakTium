@@ -55,7 +55,8 @@ public class BoardLikeService {
     @Transactional
     public void deleteBoardLikes(Long userId, Long boardId) {
         // 게시글이 있는지 확인
-        boardRepository.findById(boardId).orElseThrow(() -> new NotFoundBoardException());
+        boardRepository.findById(boardId).
+                orElseThrow(() -> new NotFoundBoardException());
 
         // 게시글에 해당 유저의 좋아요가 있는지 확인
         if (likeRedisService.isLiked(

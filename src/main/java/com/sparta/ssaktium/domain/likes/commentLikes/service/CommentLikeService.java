@@ -5,6 +5,7 @@ import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
 import com.sparta.ssaktium.domain.likes.LikeEventProducer;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
 import com.sparta.ssaktium.domain.likes.boardLikes.BoardLikeEvent;
+import com.sparta.ssaktium.domain.likes.commentLikes.CommentLikeEvent;
 import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
 import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
@@ -33,7 +34,8 @@ public class CommentLikeService {
     @Transactional
     public CommentLikeReponseDto postCommentLike(Long userId, Long commentId) {
         // 댓글이 있는지 확인
-        commentRepository.findById(commentId).orElseThrow(() -> new NotFoundCommentException());
+        commentRepository.findById(commentId).
+                orElseThrow(() -> new NotFoundCommentException());
 
         // 좋아요를 이미 누른 댓글인지 확인
         if (likeRedisService.isLiked(
@@ -44,7 +46,7 @@ public class CommentLikeService {
         }
 
         // 좋아요 등록(Kafka -> Redis)
-        likeProducer.sendLikeEvent(new BoardLikeEvent(
+        likeProducer.sendLikeEvent(new CommentLikeEvent(
                 userId.toString(), commentId.toString(), "LIKE"));
 
         // 좋아요 수 레디스에서 반영
@@ -68,7 +70,7 @@ public class CommentLikeService {
         }
 
         // 카프카 좋아요 취소 이벤트
-        likeProducer.sendLikeEvent(new BoardLikeEvent(
+        likeProducer.sendLikeEvent(new CommentLikeEvent(
                 userId.toString(), commentId.toString(), "CANCEL"));
     }
 }

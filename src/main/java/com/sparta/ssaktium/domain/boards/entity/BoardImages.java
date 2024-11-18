@@ -17,10 +17,10 @@ public class BoardImages extends Timestamped {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "boards_id",nullable = false)
+    @JoinColumn(name = "boards_id", nullable = false)
     private Board board;
 
-    public BoardImages(String imageUrl,Board board) {
+    public BoardImages(String imageUrl, Board board) {
         this.imageUrl = imageUrl;
         this.board = board;
     }
