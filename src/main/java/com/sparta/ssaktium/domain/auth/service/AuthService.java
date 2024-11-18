@@ -35,11 +35,11 @@ public class AuthService {
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         // 이메일 인증 여부 확인
-//        Boolean isVerified = (Boolean) redisTemplate.opsForValue().get(signupRequestDto.getEmail() + ":verified");
-//
-//        if (isVerified == null || !isVerified) {
-//            throw new EmailNotVerifiedException();
-//        }
+        Boolean isVerified = (Boolean) redisTemplate.opsForValue().get(signupRequestDto.getEmail() + ":verified");
+
+        if (isVerified == null || !isVerified) {
+            throw new EmailNotVerifiedException();
+        }
 
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
 

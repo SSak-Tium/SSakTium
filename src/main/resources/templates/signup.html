@@ -7,6 +7,91 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/signup.css}">
     <script>
+        let certificationCode = '';  // 인증번호를 저장할 변수
+        let countdownTimer;  // 타이머를 저장할 변수
+        let countdown = 600;  // 10분 (600초)
+
+        async function sendCertificationCode() {
+            const email = document.getElementById('email').value;
+
+            if (!email) {
+                alert('이메일을 입력해주세요.');
+                return;
+            }
+
+            // 이메일로 인증번호 요청
+            const response = await fetch('/v2/auth/email-certification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                certificationCode = responseData.data;  // 받은 인증번호 저장
+                alert('인증번호가 이메일로 전송되었습니다.');
+
+                // 인증번호 받기 버튼 비활성화
+                document.getElementById('sendCertificationButton').disabled = true;
+
+                // 카운트다운 시작
+                startCountdown();
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || '인증번호 전송 실패');
+            }
+        }
+
+        function startCountdown() {
+            countdownTimer = setInterval(() => {
+                const minutes = Math.floor(countdown / 60);
+                const seconds = countdown % 60;
+
+                // 버튼에 남은 시간 표시
+                document.getElementById('sendCertificationButton').innerText = `${minutes}분 ${seconds}초`;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    document.getElementById('sendCertificationButton').innerText = "인증번호 만료";
+                    document.getElementById('sendCertificationButton').disabled = false;
+                } else {
+                    countdown--;
+                }
+            }, 1000);  // 1초마다 업데이트
+        }
+
+        async function verifyCertificationCode() {
+            const enteredCode = document.getElementById('certificationCode').value;
+            const email = document.getElementById('email').value;  // 이메일도 함께 전송
+
+            if (!enteredCode) {
+                alert('인증번호를 입력해주세요.');
+                return;
+            }
+
+            // 인증번호 확인 요청
+            const response = await fetch('/v2/auth/verify-certification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    inputCertificationNumber: enteredCode
+                })
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                alert(responseData.message || '인증번호 확인 완료!');
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || '인증번호 확인 실패');
+            }
+        }
+
         async function signup() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -31,13 +116,21 @@
 
             return false; // 폼 제출 방지
         }
+
     </script>
 </head>
 <body>
 <div class="signup-container">
     <h2>회원가입</h2>
     <form class="signup-form" onsubmit="signup(); return false;">
-        <input type="text" id="email" placeholder="이메일" required>
+        <div class="email-group">
+            <input type="text" id="email" placeholder="이메일" required>
+            <button type="button" id="sendCertificationButton" onclick="sendCertificationCode()">인증번호 받기</button>
+        </div>
+        <div class="certification-group">
+            <input type="text" id="certificationCode" placeholder="인증번호" required>
+            <button type="button" onclick="verifyCertificationCode()">인증하기</button>
+        </div>
         <input type="password" id="password" placeholder="비밀번호 ( 최소 8자리 이상 숫자, 영문, 특수문자 포함 )" required>
         <input type="text" id="userName" placeholder="유저 이름" required>
         <input type="text" id="birthYear" placeholder="출생년도 ( 0000 )" required>

@@ -1,0 +1,117 @@
+/* 기본 장바구니 스타일 */
+#cart-items {
+    max-width: 500px; /* 최대 너비 설정 */
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#cart-items ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    background-color: #fafafa;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.cart-item:hover {
+    background-color: #f4f4f4;
+}
+
+.item-info {
+    display: flex;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.amount, .item-price {
+    font-size: 14px;
+    color: #555;
+}
+
+/* 삭제 버튼 */
+.remove-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.remove-btn:hover {
+    background-color: #ff3333;
+}
+
+/* 결제 정보 및 버튼 스타일 */
+.cart-summary {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.cart-summary p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+#checkout-btn, #back-btn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    width: 200px;
+}
+
+#checkout-btn:hover, #back-btn:hover {
+    background-color: #45a049;
+}
+
+/* 작은 화면에서 반응형 스타일 */
+@media (max-width: 768px) {
+    #cart-items {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .remove-btn {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    #checkout-btn, #back-btn {
+        width: 100%;
+        font-size: 18px;
+    }
+}

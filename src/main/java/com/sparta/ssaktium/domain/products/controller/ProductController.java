@@ -17,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Tag(name = "상품 관리기능", description = "상품 관리를 할 수 있는 기능")
@@ -48,5 +50,12 @@ public class ProductController {
                                                                  ProductRequestDto productRequestDto) {
         return ResponseEntity.ok(CommonResponse.success(productService.createProduct(productRequestDto)));
 
+    }
+
+    @GetMapping("/v2/products")
+    @Operation(summary = "상품 조회", description = "상품 조회하는 API")
+    @ApiResponse(responseCode = "302", description = "요청이 /ssaktium/shopping으로 리디렉션되었습니다.")
+    public String getProducts() {
+        return "redirect:/ssaktium/shopping";
     }
 }
