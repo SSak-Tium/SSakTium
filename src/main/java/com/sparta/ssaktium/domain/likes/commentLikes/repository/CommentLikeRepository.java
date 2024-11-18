@@ -3,6 +3,7 @@ package com.sparta.ssaktium.domain.likes.commentLikes.repository;
 import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
@@ -12,4 +13,6 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
     Optional<CommentLike> findByCommentIdAndUserId(Long commentId, Long userId);
 
     int countByCommentId(Long l);
+
+    List<String> findUserIdsByCommentId(long L);
 }
