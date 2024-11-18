@@ -68,7 +68,7 @@ public class CouponService {
         }
 
         // 쿠폰을 사용자에게 발급 완료 상태로 변경
-//        redisTemplate.opsForValue().set(COUPON_PREFIX + couponCode, CouponStatus.ISSUED.name());
+        redisTemplate.opsForValue().set(COUPON_PREFIX + couponCode, CouponStatus.ISSUED.name());
         redisTemplate.opsForValue().set(USER_COUPON_PREFIX + userId, couponCode);
 
         log.info("쿠폰 발급: userId: {}, couponCode: {}", userId, couponCode);

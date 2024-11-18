@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +29,15 @@ public class ProductService {
         return new ProductResponseDto(savedProduct);
     }
 
-    public List<Product> findAllProduct() {
-        return productRepository.findAll();
-    }
 
     public Product findProduct(long productId) {
         return productRepository.findById(productId).orElseThrow(NotFountProductException::new);
+    }
+
+    public List<ProductResponseDto> findAllProduct() {
+        // Product 엔티티 목록을 가져온 후 각 엔티티를 ProductResponseDto로 변환
+        return productRepository.findAll().stream()
+                .map(ProductResponseDto::new)
+                .collect(Collectors.toList());
     }
 }

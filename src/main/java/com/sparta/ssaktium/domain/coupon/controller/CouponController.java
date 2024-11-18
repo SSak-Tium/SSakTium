@@ -2,6 +2,7 @@ package com.sparta.ssaktium.domain.coupon.controller;
 
 import com.sparta.ssaktium.config.CommonResponse;
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
+import com.sparta.ssaktium.domain.coupon.service.CouponLockService;
 import com.sparta.ssaktium.domain.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CouponController {
 
     private final CouponService couponService;
+    private final CouponLockService couponLockService;
 
     // 쿠폰 N 개 생성
     @Secured("ROLE_ADMIN")
@@ -26,13 +28,13 @@ public class CouponController {
     }
 
     // 쿠폰 발급
-//    @GetMapping("/v2/coupons")
-//    public ResponseEntity<CommonResponse<String>> getCoupons(@AuthenticationPrincipal AuthUser authUser) {
-//        return ResponseEntity.ok(CommonResponse.success(couponService.issueCoupon(authUser.getUserId())));
-//    }
-
     @GetMapping("/v2/coupons")
-    public ResponseEntity<CommonResponse<String>> getCoupons(@RequestParam long userId) {
-        return ResponseEntity.ok(CommonResponse.success(couponService.issueCoupon(userId)));
+    public ResponseEntity<CommonResponse<String>> getCoupons(@AuthenticationPrincipal AuthUser authUser) {
+        return ResponseEntity.ok(CommonResponse.success(couponService.issueCoupon(authUser.getUserId())));
     }
+
+//    @GetMapping("/v2/coupons")
+//    public ResponseEntity<CommonResponse<String>> getCoupons(@RequestParam long userId) {
+//        return ResponseEntity.ok(CommonResponse.success(couponLockService.issueCoupon(userId)));
+//    }
 }
