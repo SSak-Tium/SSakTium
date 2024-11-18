@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>싹틔움</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/event.css}">
+</head>
+<body>
+<div th:replace="~{navbar}"></div>
+
+<div class="event-container">
+    <h2>🎉 특별 이벤트 - 쿠폰 발급 🎉</h2>
+    <div class="event-content">
+        <p>지금 바로 특별 쿠폰을 발급받아 할인 혜택을 즐겨보세요!</p>
+        <button id="issue-coupon-btn">쿠폰 발급하기</button>
+        <p id="message" class="message"></p> <!-- 메시지 출력 요소 -->
+    </div>
+</div>
+
+<script>
+    document.getElementById("issue-coupon-btn").addEventListener("click", function() {
+        // 쿠폰 발급 버튼 클릭 시 효과 추가
+        const btn = document.getElementById("issue-coupon-btn");
+        btn.disabled = true; // 버튼 중복 클릭 방지
+        btn.innerText = "쿠폰 발급 중...";
+
+        fetch("/v2/coupons", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const messageElement = document.getElementById("message");
+                messageElement.style.opacity = "1"; // 메시지 표시
+                messageElement.style.color = data.success === "true" ? "#4CAF50" : "#E57373"; // 성공/실패에 따른 색상
+
+                if (data.success === "true") {
+                    messageElement.innerText = "🎉 쿠폰 발급 성공! " + data.message + " 🎉";
+                } else {
+                    messageElement.innerText = "❌ 쿠폰 발급 실패: " + data.message;
+                }
+
+                // 3초 후 버튼 상태 복원
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerText = "쿠폰 발급하기";
+                    messageElement.style.opacity = "0"; // 메시지 사라짐
+                }, 3000);
+            })
+            .catch(error => {
+                document.getElementById("message").innerText = "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+                document.getElementById("message").style.color = "#E57373";
+                console.error("Error:", error);
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerText = "쿠폰 발급하기";
+                    messageElement.style.opacity = "0"; // 메시지 사라짐
+                }, 3000);
+            });
+    });
+</script>
+</body>
+</html>

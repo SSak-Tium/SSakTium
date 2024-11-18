@@ -15,4 +15,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     // 이미 발급 받은 유저인지 확인
     boolean existsByUserAndCouponStatus(User user, CouponStatus couponStatus);
+
+    Coupon findTopByCouponStatus(CouponStatus couponStatus);
 }
