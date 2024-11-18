@@ -72,10 +72,9 @@ public class LikeRedisService {
             } else {
                 throw new IllegalArgumentException("지원하지 않는 대상 타입: " + targetType);
             }
-            // 좋아요 수 뿐만 아니라 중복 체크를 위한 데이터도 포함해야함.!! 자고 일어나서 할 것.
             redisTemplate.opsForValue().set(likeKey, dbLikeCount);
-            for (String userId : likedUsers){
-                redisTemplate.opsForSet().add(userLikeKey,userId);
+            for (String userId : likedUsers) {
+                redisTemplate.opsForSet().add(userLikeKey, userId);
             }
             return dbLikeCount;
         }
