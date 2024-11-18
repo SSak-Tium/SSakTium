@@ -43,9 +43,8 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(logout -> logout
-                        .logoutUrl("/v2/auth/logout") // 로그아웃 URL 설정
+                        .logoutUrl("/v2/auth/logout") // 로그아웃 URL
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            // 로그아웃 성공 후 처리: JWT 토큰 제거, 리다이렉트 등
                             response.setHeader("Authorization", "");
                             response.addCookie(new Cookie("Authorization", "") {{
                                 setMaxAge(0);
@@ -66,6 +65,7 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/ssaktium/signin/**", // 로그인 접근 허용
+                                "/ssaktium/signup", // 회원가입 접근 허용
                                 "/api/v1/query",
                                 "/actuator/prometheus"
                         ).permitAll()
