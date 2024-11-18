@@ -57,11 +57,6 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // elasticsearch
-    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.0'
-
-
     // Google Email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
@@ -77,6 +72,9 @@ dependencies {
 
     // Redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 }
 
 tasks.named('test') {
