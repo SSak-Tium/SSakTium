@@ -3,7 +3,6 @@ package com.sparta.ssaktium.domain.boards.entity;
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
-import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -60,18 +59,5 @@ public class Board extends Timestamped {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
-    }
-
-    // 좋아요 등록
-    public void incrementLikesCount() {
-        boardLikesCount++;
-    }
-
-    // 좋아요 취소
-    public void decrementLikesCount() {
-        if (boardLikesCount <= 0) {
-            throw new LikeCountUnderflowException();
-        }
-        boardLikesCount--;
     }
 }

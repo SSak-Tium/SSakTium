@@ -1,12 +1,11 @@
 package com.sparta.ssaktium.domain.likes.boardLikes.service;
 
-import com.sparta.ssaktium.domain.boards.entity.Board;
 import com.sparta.ssaktium.domain.boards.exception.NotFoundBoardException;
 import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.likes.LikeEventProducer;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.likes.boardLikes.BoardLikeEvent;
 import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
-import com.sparta.ssaktium.domain.likes.boardLikes.entity.BoardLike;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
 import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardLikeException;
@@ -30,18 +29,25 @@ public class BoardLikeService {
     @Transactional
     public BoardLikeResponseDto postBoardLikes(Long userId, Long boardId) {
         // 게시글이 있는지 확인
-        boardRepository.findById(boardId).orElseThrow(() -> new NotFoundBoardException());
+        boardRepository.findById(boardId).
+                orElseThrow(() -> new NotFoundBoardException());
 
         // 좋아요를 이미 누른 게시글인지 확인
-        if(likeRedisService.isLiked("Board",boardId.toString(),userId.toString())){
+        if (likeRedisService.isLiked(
+                LikeRedisService.TARGET_TYPE_BOARD,
+                boardId.toString(),
+                userId.toString())) {
             throw new AlreadyLikedException();
         }
 
         // 좋아요 등록(Kafka -> Redis)
-        likeProducer.sendBoardLikeEvent(userId.toString(), boardId.toString(), "LIKE");
+        likeProducer.sendLikeEvent(new BoardLikeEvent(
+                userId.toString(), boardId.toString(), "LIKE"));
 
         // 좋아요 수 레디스에서 반영
-        int redisLikeCount = likeRedisService.getRedisLikeCount("Board",boardId.toString());
+        int redisLikeCount = likeRedisService.getRedisLikeCount(
+                LikeRedisService.TARGET_TYPE_BOARD, boardId.toString());
+
         return new BoardLikeResponseDto(boardId, redisLikeCount);
     }
 
@@ -49,14 +55,17 @@ public class BoardLikeService {
     @Transactional
     public void deleteBoardLikes(Long userId, Long boardId) {
         // 게시글이 있는지 확인
-        boardRepository.findById(boardId).orElseThrow(() -> new NotFoundBoardException());
+        boardRepository.findById(boardId).
+                orElseThrow(() -> new NotFoundBoardException());
 
         // 게시글에 해당 유저의 좋아요가 있는지 확인
-        if(likeRedisService.isLiked("Board",boardId.toString(),userId.toString())){
+        if (likeRedisService.isLiked(
+                LikeRedisService.TARGET_TYPE_BOARD, boardId.toString(), userId.toString())) {
             throw new NotFoundBoardLikeException();
         }
 
         // 카프카 좋아요 취소 이벤트
-        likeProducer.sendBoardLikeEvent(userId.toString(), boardId.toString(), "CANCEL");
+        likeProducer.sendLikeEvent(new BoardLikeEvent(
+                userId.toString(), boardId.toString(), "CANCEL"));
     }
 }

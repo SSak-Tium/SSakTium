@@ -1,10 +1,11 @@
 package com.sparta.ssaktium.domain.likes.commentLikes;
 
+import com.sparta.ssaktium.domain.likes.LikeEvent;
 import lombok.NoArgsConstructor;
 
 // 좋아요 데이터
 @NoArgsConstructor
-public class CommentLikeEvent {
+public class CommentLikeEvent implements LikeEvent {
 
     private String userId;
     private String commentId;
@@ -16,15 +17,17 @@ public class CommentLikeEvent {
         this.eventType = eventType;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
-    public String getCommentId() {
-        return commentId;
-    }
-
+    @Override
     public String getEventType() {
         return eventType;
+    }
+
+    public String getCommentId() {
+        return commentId;
     }
 }
