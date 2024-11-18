@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableJpaAuditing
 @EnableAsync
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@EnableElasticsearchRepositories(basePackages = "com.sparta.ssaktium.domain.boards.repository")
 public class SSakTiumApplication {
 
     public static void main(String[] args) {
