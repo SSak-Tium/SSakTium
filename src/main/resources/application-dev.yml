@@ -72,14 +72,17 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-  elasticsearch:
-    cluster-nodes: http://13.124.138.199:9200
-    cluster-name: docker-cluster
-    username: ${ES_USERNAME}
-    password: ${ES_PASSWORD}
   data:
+    elasticsearch:
+      client:
+        rest:
+          uris: http://13.124.138.199:9200
+      username: ${ES_USERNAME}
+      password: ${ES_PASSWORD}
+
     redis:
       host: 13.124.138.199
+      port: 6379
 
 app:
   redirectUri: "http://13.124.138.199:8080/ssaktium/signin/"
