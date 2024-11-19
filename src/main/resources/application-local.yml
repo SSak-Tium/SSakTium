@@ -18,6 +18,8 @@ spring:
     username: ${DB_USERNAME}
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: ${DB_PASSWORD}
+  redis:
+    port: 6379
   servlet:
     multipart:
       enabled: true
@@ -77,6 +79,9 @@ spring:
     cluster-name: docker-cluster
     username: ${ES_USERNAME}
     password: ${ES_PASSWORD}
+  data:
+    redis:
+      host: localhost
 
 app:
   redirectUri: "http://localhost:8080/ssaktium/signin/"

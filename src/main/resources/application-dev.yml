@@ -77,6 +77,9 @@ spring:
     cluster-name: docker-cluster
     username: ${ES_USERNAME}
     password: ${ES_PASSWORD}
+  data:
+    redis:
+      host: 13.124.138.199
 
 app:
   redirectUri: "http://13.124.138.199:8080/ssaktium/signin/"
