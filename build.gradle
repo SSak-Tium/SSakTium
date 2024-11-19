@@ -53,6 +53,29 @@ dependencies {
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Google Email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Jedis (Redis 클라이언트)
+    implementation 'redis.clients:jedis:4.3.1'
+
+    // JSON 응답 처리
+    implementation 'org.springframework.boot:spring-boot-starter-json'
+
+    // Prometheus
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // Redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.0'
 }
 
 tasks.named('test') {

@@ -3,35 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메인 화면 - 싹틔움</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <title>싹틔움</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
-    <script>
-        async function logout() {
-            const response = await fetch('/v1/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                alert('로그아웃 되었습니다.');
-                window.location.href = '/ssaktium/login'; // 로그인 화면으로 리디렉션
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || '로그아웃 실패');
-            }
-        }
-    </script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
 </head>
 <body>
+<div th:replace="~{navbar}"></div>
 <div class="main-container">
-    <h2>싹틔움에 오신 것을 환영합니다!</h2>
+    <h2>싹틔움에 오신 것을 환영합니다,</h2>
     <div class="content">
         <p>준비 중 입니다.</p>
     </div>
-    <button class="logout-button" onclick="logout()">로그아웃</button>
 </div>
 </body>
 </html>

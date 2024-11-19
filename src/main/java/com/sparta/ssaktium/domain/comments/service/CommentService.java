@@ -8,6 +8,8 @@ import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.comments.exception.CommentOwnerMismatchException;
 import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
+import com.sparta.ssaktium.domain.likes.LikeRedisService;
+import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;
 import com.sparta.ssaktium.domain.users.entity.User;
 import com.sparta.ssaktium.domain.users.service.UserService;
 import lombok.Getter;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    private final LikeRedisService likeRedisService;
     private final UserService userService;
     private final BoardService boardService;
 
@@ -39,7 +43,7 @@ public class CommentService {
         Page<Comment> comments = commentRepository.findByBoard(board, pageable);
 
         // 댓글 리스트를 Dto 로 반환
-        return comments.map(comment -> new CommentResponseDto(comment));
+        return comments.map(comment -> new CommentResponseDto(comment, getLikeCount(comment.getId().toString())));
     }
 
     // 댓글 등록
@@ -55,7 +59,10 @@ public class CommentService {
         Comment comment = new Comment(commentRequestDto.getContent(), board, user);
         commentRepository.save(comment);
 
-        return new CommentResponseDto(comment);
+        // 좋아요 수 레디스에서 반영
+        int redisLikeCount = getLikeCount(comment.getId().toString());
+
+        return new CommentResponseDto(comment, redisLikeCount);
     }
 
     // 댓글 수정
@@ -76,7 +83,10 @@ public class CommentService {
         comment.updateComment(commentRequestDto.getContent());
         commentRepository.save(comment);
 
-        return new CommentResponseDto(comment);
+        // 좋아요 수 레디스에서 반영
+        int redisLikeCount = getLikeCount(comment.getId().toString());
+
+        return new CommentResponseDto(comment, redisLikeCount);
     }
 
     // 댓글 삭제
@@ -95,7 +105,16 @@ public class CommentService {
     }
 
     // 아이디로 댓글 찾기 메서드
-    public Comment findComment(long id) {
+    public Comment findComment(Long id) {
         return commentRepository.findById(id).orElseThrow(NotFoundCommentException::new);
+    }
+
+    // Redis 로 좋아요 수 조회하는 메서드
+    public int getLikeCount(String commentId) {
+        int redisCount = likeRedisService.getRedisLikeCount(likeRedisService.TARGET_TYPE_COMMENT, commentId);
+        if (redisCount == 0) {
+            return commentLikeRepository.countByCommentId(Long.valueOf(commentId));
+        }
+        return redisCount;
     }
 }

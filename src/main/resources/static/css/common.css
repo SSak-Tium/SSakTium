@@ -1,0 +1,51 @@
+/* 네비게이션 바 스타일 */
+.navbar {
+    background-color: #66bb6a; /* 연두색 포인트 */
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* 홈 버튼 스타일 */
+.navbar-home {
+    margin-right: auto; /* 왼쪽으로 고정 */
+}
+
+.navbar-home a {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.navbar-home a:hover {
+    color: #eaf3e2;
+}
+
+.navbar-menu li {
+    margin: 0 15px;
+}
+
+.navbar-menu a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar-menu a:hover {
+    color: #eaf3e2; /* 더 밝은 연두색으로 강조 효과 */
+}

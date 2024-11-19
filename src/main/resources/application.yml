@@ -1,5 +1,32 @@
 spring:
   application:
     name: ssaktium
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME} # 이메일을 전송할 주체의 이메일 주소
+    password: ${APP_PASSWORD} # 해당 계정으로 발급받은 App password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
   profiles:
-    active: dev
+    active: local
+
+data:
+  redis:
+    cluster:
+      nodes:
+        - localhost:7000
+        - localhost:7001
+        - localhost:7002
+
+toss:
+  payment:
+    secret:
+      key: ${TOSS_SECRET_KEY}

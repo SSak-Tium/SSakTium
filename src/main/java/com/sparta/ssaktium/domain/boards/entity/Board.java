@@ -1,21 +1,26 @@
 package com.sparta.ssaktium.domain.boards.entity;
 
 import com.sparta.ssaktium.domain.boards.enums.PublicStatus;
-import com.sparta.ssaktium.domain.boards.enums.StatusEnum;
 import com.sparta.ssaktium.domain.comments.entity.Comment;
 import com.sparta.ssaktium.domain.common.entity.Timestamped;
-import com.sparta.ssaktium.domain.likes.exception.LikeCountUnderflowException;
 import com.sparta.ssaktium.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "boards")
+@SQLDelete(sql = "UPDATE boards SET deleted = true WHERE id = ?")
+@SQLRestriction("deleted = false")
+@Table(name = "boards", indexes = {
+        @Index(name = "idx_board_title", columnList = "title"),
+        @Index(name = "idx_board_content", columnList = "content")
+})
 public class Board extends Timestamped {
 
     @Id
@@ -35,10 +40,9 @@ public class Board extends Timestamped {
     @Enumerated(EnumType.STRING)
     private PublicStatus publicStatus;
 
-    @Enumerated(EnumType.STRING)
-    private StatusEnum statusEnum;
+    private boolean deleted = Boolean.FALSE;
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BoardImages> imageUrls;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
@@ -49,29 +53,11 @@ public class Board extends Timestamped {
         this.content = content;
         this.publicStatus = publicStatus;
         this.user = user;
-        this.statusEnum = StatusEnum.ACTIVATED;
     }
 
     public void updateBoards(String title, String content, PublicStatus publicStatus) {
         this.title = title;
         this.content = content;
         this.publicStatus = publicStatus;
-    }
-
-    // 좋아요 등록
-    public void incrementLikesCount() {
-        boardLikesCount++;
-    }
-
-    // 좋아요 취소
-    public void decrementLikesCount() {
-        if (boardLikesCount <= 0) {
-            throw new LikeCountUnderflowException();
-        }
-        boardLikesCount--;
-    }
-
-    public void deleteBoards() {
-        this.statusEnum = StatusEnum.DELETED;
     }
 }

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>싹틔움 - 장바구니</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/cart.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div th:replace="~{navbar}"></div>
+
+<div id="cart-items">
+    <ul>
+        <!-- 장바구니 아이템 목록이 여기에 동적으로 추가됩니다. -->
+        <th:block th:each="cartItem : ${cartItems}">
+            <li class="cart-item">
+                <div class="item-info">
+                    <div class="product-name" th:text="${cartItem.value.productName}"></div>
+                    <div class="amount" th:text="${cartItem.value.amount}"></div>개
+                    <div class="item-price" th:text="${cartItem.value.price}"></div> 원
+                </div>
+                <button class="remove-btn" th:attr="data-product-id=${cartItem.key}" onclick="removeItem(this)">삭제</button>
+            </li>
+        </th:block>
+    </ul>
+</div>
+
+
+<div class="cart-summary">
+    <p>총 결제 금액: <span class="total-price" id="total-price">0</span> 원</p>
+    <button id="checkout-btn" onclick="checkout()">주문하기</button>
+    <button id="back-btn" onclick="window.location.href='/ssaktium/shopping'">돌아가기</button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        calculateTotalPrice();
+    });
+
+    function calculateTotalPrice() {
+        let totalPrice = 0;
+
+        $("#cart-items li").each(function() {
+            const price = parseFloat($(this).find(".item-price").text()) || 0;
+            const amount = parseInt($(this).find(".amount").text()) || 0;
+            totalPrice += price; // 수량을 고려하여 총 가격 계산
+        });
+
+        $("#total-price").text(totalPrice);
+    }
+
+    function removeItem(buttonElement) {
+        const productId = $(buttonElement).data("product-id");
+
+        $.ajax({
+            url: "/v2/carts?productId=" + productId,
+            method: "DELETE",
+            success: function() {
+                window.location.reload();
+            },
+            error: function() {
+                alert("삭제에 실패했습니다.");
+            }
+        });
+    }
+
+    function checkout() {
+        const totalPrice = parseFloat($("#total-price").text()) || 0;
+
+        $.ajax({
+            url: "/ssaktium/order-place",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ totalPrice: totalPrice }),
+            success: function(response) {
+                $("body").html(response);
+            },
+            error: function() {
+                alert("주문 처리에 실패했습니다. 다시 시도해주세요.");
+            }
+        });
+    }
+</script>
+</body>
+</html>

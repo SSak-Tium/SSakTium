@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>싹틔움</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/my-profile.css">
+</head>
+<body>
+<div th:replace="~{navbar}"></div>
+<div class="profile-container">
+    <h2>내 프로필</h2>
+
+    <!-- 사용자 이름을 Thymleaf로 동적으로 표시 -->
+    <p>사용자 이름: <span th:text="${userName}">userName</span></p>
+
+    <!-- 로그아웃 폼 -->
+    <form action="/v2/auth/logout" method="POST">
+        <button type="submit">로그아웃</button>
+    </form>
+</div>
+</body>
+</html>
