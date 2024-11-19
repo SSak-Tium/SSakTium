@@ -58,6 +58,5 @@ jobs:
               sudo docker rm daegyuhan-ssak
             fi
             
-            # Run the new container
-            sudo docker run -d --name daegyuhan-ssak -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
-
+            # Run the new container with the .env file for environment variables
+            sudo docker run -d --name daegyuhan-ssak --env-file /home/ubuntu/.env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/ssak:v1
