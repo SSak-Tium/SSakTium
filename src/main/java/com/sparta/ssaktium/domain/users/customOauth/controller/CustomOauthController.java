@@ -22,7 +22,7 @@ public class CustomOauthController {
     private final CustomOauthService customOauthService;
 
     // 소셜로그인
-    @GetMapping("/ssaktium/signin/{provider}")
+    @GetMapping("/signin/{provider}")
     public String socialLogin(
             @PathVariable("provider") String provider,
             @RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
