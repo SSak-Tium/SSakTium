@@ -24,7 +24,7 @@ import java.util.Map;
 public class CouponController {
 
     private final CouponService couponService;
-    private final CouponLockService couponLockService;
+//    private final CouponLockService couponLockService;
 
     @GetMapping("/ssaktium/event")
     public String event() {

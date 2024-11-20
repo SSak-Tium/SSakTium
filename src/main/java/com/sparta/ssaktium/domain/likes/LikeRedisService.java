@@ -30,8 +30,8 @@ public class LikeRedisService {
     // 좋아요 수 증가
     @Transactional
     public void incrementLike(String targetType, String targetId, String userId) {
-        String likeKey = "likes:" + targetType + ":" + targetId;
-        String userLikeKey = targetType + "_likes:" + targetId;
+        String likeKey = "likes:" + targetType + ":" + targetId; // 좋아요 카운트 용
+        String userLikeKey = targetType + "_likes:" + targetId; // 중복 체크를 위한 set 용
 
         redisTemplate.opsForValue().increment(likeKey, 1);  // 좋아요 수 증가
         redisTemplate.opsForSet().add(userLikeKey, userId);  // 사용자 좋아요 기록 추가
@@ -49,8 +49,17 @@ public class LikeRedisService {
 
     // 중복 좋아요 확인
     public boolean isLiked(String targetType, String targetId, String userId) {
-        String userLikeKey = targetType + "_likes:" + targetId;
-        return redisTemplate.opsForSet().isMember(userLikeKey, userId);
+        try {
+            String userLikeKey = targetType + "_likes:" + targetId;
+            return redisTemplate.opsForSet().isMember(userLikeKey, userId);
+        } catch (Exception e) {
+            if (targetType.equals(TARGET_TYPE_BOARD)) {
+                return boardLikeRepository.existsByBoardIdAndUserId(Long.parseLong(targetId), Long.parseLong(userId));
+            } else if (targetType.equals(TARGET_TYPE_COMMENT)) {
+                return commentLikeRepository.existsByCommentIdAndUserId(Long.parseLong(targetId), Long.parseLong(userId));
+            }
+            return false;
+        }
     }
 
     // 좋아요 수 조회
@@ -72,10 +81,9 @@ public class LikeRedisService {
             } else {
                 throw new IllegalArgumentException("지원하지 않는 대상 타입: " + targetType);
             }
-            // 좋아요 수 뿐만 아니라 중복 체크를 위한 데이터도 포함해야함.!! 자고 일어나서 할 것.
-            redisTemplate.opsForValue().set(likeKey, dbLikeCount);
-            for (String userId : likedUsers){
-                redisTemplate.opsForSet().add(userLikeKey,userId);
+            redisTemplate.opsForValue().set(likeKey, dbLikeCount); // 좋아요 수 등록
+            for (String userId : likedUsers) {
+                redisTemplate.opsForSet().add(userLikeKey, userId); // 중복확인 용
             }
             return dbLikeCount;
         }

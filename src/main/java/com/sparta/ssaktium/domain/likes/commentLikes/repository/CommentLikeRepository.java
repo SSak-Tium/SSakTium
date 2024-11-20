@@ -1,7 +1,9 @@
 package com.sparta.ssaktium.domain.likes.commentLikes.repository;
 
 import com.sparta.ssaktium.domain.likes.commentLikes.entity.CommentLike;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,5 +16,6 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
 
     int countByCommentId(Long l);
 
-    List<String> findUserIdsByCommentId(long L);
+    @Query("SELECT c.userId FROM CommentLike c WHERE c.comment.id = :commentId")
+    List<String> findUserIdsByCommentId(@Param("commentId") Long commentId);
 }
