@@ -50,7 +50,7 @@ public class SecurityConfig {
                                 setMaxAge(0);
                                 setPath("/");
                             }});
-                            response.sendRedirect("/ssaktium/signin"); // 로그아웃 후 로그인 페이지로 리디렉션
+                            response.sendRedirect("/signin"); // 로그아웃 후 로그인 페이지로 리디렉션
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
@@ -65,6 +65,7 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/signin/**", // 로그인 접근 허용
+                                "/signin/*",
                                 "/signin",
                                 "/ssaktium/signup", // 회원가입 접근 허용
                                 "/api/v1/query",
