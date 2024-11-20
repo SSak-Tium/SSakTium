@@ -83,6 +83,7 @@ spring:
 
 app:
   redirectUri: "http://13.124.138.199:8080/ssaktium/signin/"
+  kafka-brokers : "172.31.40.10:19092, 172.31.40.10:19093, 172.31.40.10:19094"
 
 jwt:
   secret:
