@@ -67,7 +67,8 @@ public class SecurityConfig {
                                 "/ssaktium/signin/**", // 로그인 접근 허용
                                 "/ssaktium/signup", // 회원가입 접근 허용
                                 "/api/v1/query",
-                                "/actuator/prometheus"
+                                "/actuator/*"
+
                         ).permitAll()
                         .requestMatchers("/ssaktium/main").authenticated() // 인증 필요 경로
                         .anyRequest().authenticated()
