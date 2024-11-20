@@ -43,8 +43,8 @@ public class LikeEventConsumer {
                 default:
                     log.warn("like-redis 알 수 없는 게시글 이벤트 타입입니다.: {}", eventType);
             }
-        } catch (Exception e){
-            log.error("like-redis 게시글이벤트 처리 중 오류 발생 : {}",e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("like-redis 게시글이벤트 처리 중 오류 발생 : {}", e.getMessage(), e);
         }
     }
 
@@ -76,8 +76,8 @@ public class LikeEventConsumer {
                     log.warn("like-redis 알 수 없는 댓글 이벤트 타입입니다.: {}", eventType);
                     break;
             }
-        } catch (Exception e){
-            log.error("like-redis 댓글이벤트 처리 중 오류 발생 : {}",e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("like-redis 댓글이벤트 처리 중 오류 발생 : {}", e.getMessage(), e);
         }
     }
 }

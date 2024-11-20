@@ -5,7 +5,6 @@ import com.sparta.ssaktium.domain.boards.repository.BoardRepository;
 import com.sparta.ssaktium.domain.likes.LikeEventProducer;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
 import com.sparta.ssaktium.domain.likes.boardLikes.BoardLikeEvent;
-import com.sparta.ssaktium.domain.likes.boardLikes.dto.BoardLikeResponseDto;
 import com.sparta.ssaktium.domain.likes.boardLikes.repository.BoardLikeRepository;
 import com.sparta.ssaktium.domain.likes.exception.AlreadyLikedException;
 import com.sparta.ssaktium.domain.likes.exception.NotFoundBoardLikeException;
@@ -27,7 +26,7 @@ public class BoardLikeService {
 
     // 게시글에 좋아요 등록
     @Transactional
-    public BoardLikeResponseDto postBoardLikes(Long userId, Long boardId) {
+    public void postBoardLikes(Long userId, Long boardId) {
         // 게시글이 있는지 확인
         boardRepository.findById(boardId).
                 orElseThrow(() -> new NotFoundBoardException());
@@ -42,13 +41,7 @@ public class BoardLikeService {
 
         // 좋아요 등록(Kafka -> Redis)
         likeProducer.sendLikeEvent(new BoardLikeEvent(
-                userId.toString(), boardId.toString(), "LIKE"));
-
-        // 좋아요 수 레디스에서 반영
-        int redisLikeCount = likeRedisService.getRedisLikeCount(
-                LikeRedisService.TARGET_TYPE_BOARD, boardId.toString());
-
-        return new BoardLikeResponseDto(boardId, redisLikeCount);
+                userId.toString(), boardId.toString(), LikeEventProducer.EVENT_TYPE_LIKE));
     }
 
     // 게시글에 좋아요 취소
@@ -66,6 +59,6 @@ public class BoardLikeService {
 
         // 카프카 좋아요 취소 이벤트
         likeProducer.sendLikeEvent(new BoardLikeEvent(
-                userId.toString(), boardId.toString(), "CANCEL"));
+                userId.toString(), boardId.toString(), LikeEventProducer.EVENT_TYPE_CANCEL));
     }
 }

@@ -4,7 +4,6 @@ import com.sparta.ssaktium.domain.comments.exception.NotFoundCommentException;
 import com.sparta.ssaktium.domain.comments.repository.CommentRepository;
 import com.sparta.ssaktium.domain.likes.LikeEventProducer;
 import com.sparta.ssaktium.domain.likes.LikeRedisService;
-import com.sparta.ssaktium.domain.likes.boardLikes.BoardLikeEvent;
 import com.sparta.ssaktium.domain.likes.commentLikes.CommentLikeEvent;
 import com.sparta.ssaktium.domain.likes.commentLikes.dto.CommentLikeReponseDto;
 import com.sparta.ssaktium.domain.likes.commentLikes.repository.CommentLikeRepository;

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LikeEventProducer {
 
+    public static final String EVENT_TYPE_LIKE = "LIKE";
+    public static final String EVENT_TYPE_CANCEL = "CANCEL";
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public LikeEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
@@ -21,7 +23,7 @@ public class LikeEventProducer {
 
         try {
             kafkaTemplate.send(topic, likeEvent); // 비동기 전송 + 완료 확인
-        } catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Kafka 메시지 전송 실패 :" + e.getMessage());
         }
     }
