@@ -76,12 +76,12 @@ spring:
     elasticsearch:
       client:
         rest:
-          uris: http://3.34.143.30:9200
+          uris: http://172.31.4.160:9200
       username: ${ES_USERNAME}
       password: ${ES_PASSWORD}
 
     redis:
-      host: 3.35.133.249
+      host: 172.31.10.161
       port: 6379
 
 app:
