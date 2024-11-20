@@ -64,7 +64,7 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/ssaktium/signin/**", // 로그인 접근 허용
+                                "/signin/**", // 로그인 접근 허용
                                 "/signin",
                                 "/ssaktium/signup", // 회원가입 접근 허용
                                 "/api/v1/query",
