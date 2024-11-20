@@ -41,7 +41,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/ssaktium/signin")
+    @GetMapping("/signin")
     public String signin() {
         return "signin";
     }
@@ -96,6 +96,6 @@ public class AuthController {
             // SecurityContextLogoutHandler로 로그아웃 처리
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
-        return "redirect:/ssaktium/signin";  // 로그아웃 후 로그인 페이지로 리디렉션
+        return "redirect:/signin";  // 로그아웃 후 로그인 페이지로 리디렉션
     }
 }

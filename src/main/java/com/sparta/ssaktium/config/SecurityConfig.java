@@ -65,6 +65,7 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/ssaktium/signin/**", // 로그인 접근 허용
+                                "/signin",
                                 "/ssaktium/signup", // 회원가입 접근 허용
                                 "/api/v1/query",
                                 "/actuator/*"
@@ -80,7 +81,7 @@ public class SecurityConfig {
         return (HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) -> {
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().write(
-                    "<script>alert('로그인이 필요합니다.'); location.href='/ssaktium/signin';</script>"
+                    "<script>alert('로그인이 필요합니다.'); location.href='/signin';</script>"
             );
         };
     }

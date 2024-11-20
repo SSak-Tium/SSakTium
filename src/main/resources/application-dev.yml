@@ -29,19 +29,19 @@ spring:
         registration:
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
-            redirect-uri: "http://13.124.138.199:8080/ssaktium/signin/kakao"
+            redirect-uri: "http://www.ssaktium.site/ssaktium/signin/kakao"
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email, birthyear
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: "http://13.124.138.199:8080/ssaktium/signin/google"
+            redirect-uri: "http://www.ssaktium.site/ssaktium/signin/google"
             authorization-grant-type: authorization_code
             scope: email, profile, https://www.googleapis.com/auth/user.birthday.read
           naver:
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: "http://13.124.138.199:8080/ssaktium/signin-naver"
+            redirect-uri: "http://www.ssaktium.site/ssaktium/signin-naver"
             authorization-grant-type: authorization_code
             scope: name, email, birthyear
 
@@ -82,7 +82,7 @@ spring:
       port: 6379
 
 app:
-  redirectUri: "http://13.124.138.199:8080/ssaktium/signin/"
+  redirectUri: "http://www.ssaktium.site/signin/"
   kafka-brokers : "172.31.40.10:19092, 172.31.40.10:19093, 172.31.40.10:19094"
 
 jwt:
