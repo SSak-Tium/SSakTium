@@ -1,4 +1,4 @@
-# 🌱 싹틔움
+![image](https://github.com/user-attachments/assets/4247fa12-a51a-41d9-b3a8-61f94c558544)# 🌱 싹틔움
 ![img](https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Fd09e59a3-13f9-43b4-a2dd-943ea37738e9%2Fimage.png?table=block&id=c5660c2c-2bd8-4c24-b126-7c963b18ccec&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=1170&userId=&cache=v2)
 
 개발기간 : 2024.10.21 ~ 2024.11.22
@@ -285,7 +285,8 @@ Spring Security 의 logout 기능을 사용해 logout 시 Cookie 에 저장된 T
 
 # 🌲 와이어프레임
 ***
-![img](https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Fc3c45ffc-6671-4618-9019-eef6c73d917c%2Fimage.png?table=block&id=81e5633a-0cde-4a9c-9d18-998ca737e5ee&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=1530&userId=&cache=v2)
+![image](https://github.com/user-attachments/assets/c991025f-8199-45ea-a32b-c181fe43b6d9)
+
 
 # 🍀 ERD
 ***
