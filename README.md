@@ -292,7 +292,8 @@ Spring Security 의 logout 기능을 사용해 logout 시 Cookie 에 저장된 T
 ![img](https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Faf60681b-4d82-4d00-9471-c5ade497bc97%2Fimage.png?table=block&id=48419a36-4ee2-4aab-a70d-8f0297aa7d3b&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=610&userId=&cache=v2)
 
 ## 🌹 인프라 설계도
-![img](https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Fdcaeb978-3ac7-4dcd-88c5-42302442a336%2Fv1_%25EC%258B%259C%25EC%258A%25A4%25ED%2585%259C_%25EC%2595%2584%25ED%2582%25A4%25ED%2585%258D%25EC%25B3%2590.png?table=block&id=6c420fb2-e6e7-4855-9bcd-4ca0d487f15b&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=1170&userId=&cache=v2)
+![image](https://github.com/user-attachments/assets/deeedb42-95e4-49cb-93cf-931933a4501f)
+
 
 ## 🌱 주요 기능
 <details>
