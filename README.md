@@ -544,13 +544,11 @@ Spring Security 의 logout 기능을 사용해 logout 시 Cookie 에 저장된 T
 </details>
 
 # 🌲 와이어프레임
-***
 ![image](https://github.com/user-attachments/assets/c991025f-8199-45ea-a32b-c181fe43b6d9)
 
 
 # 🍀 ERD
-***
-![img](https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Faf60681b-4d82-4d00-9471-c5ade497bc97%2Fimage.png?table=block&id=48419a36-4ee2-4aab-a70d-8f0297aa7d3b&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=610&userId=&cache=v2)
+![img](https://img.notionusercontent.com/s3/prod-files-secure%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Ffa44ebc8-f5e2-431e-980a-7572af08ef15%2Fimage.png/size/w=2000?exp=1732326390&sig=BjZS7N1Vj3RGXYaI2pBsPmqljd11qcFqvxVSL5eoNJ4)
 
 ## 🌹 인프라 설계도
 ![image](https://github.com/user-attachments/assets/deeedb42-95e4-49cb-93cf-931933a4501f)
