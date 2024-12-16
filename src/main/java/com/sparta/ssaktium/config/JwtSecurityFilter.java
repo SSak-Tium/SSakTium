@@ -2,6 +2,7 @@ package com.sparta.ssaktium.config;
 
 import com.sparta.ssaktium.domain.common.dto.AuthUser;
 import com.sparta.ssaktium.domain.users.enums.UserRole;
+import com.sparta.ssaktium.domain.users.service.RedisUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -27,6 +28,7 @@ import java.io.IOException;
 public class JwtSecurityFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final RedisUserService redisUserService;
 
     @Override
     protected void doFilterInternal(
@@ -74,12 +76,24 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
 
+                // 만료된 Access Token에서 클레임 추출
+                Claims claims = e.getClaims();
+                Long userId = Long.parseLong(claims.getSubject());
+                String email = claims.get("email", String.class);
+                String userRole = claims.get("UserRole", String.class);
+                String nickname = claims.get("nickname", String.class);
+
+                // Redis에서 Refresh Token 조회
+                String refreshToken = redisUserService.getRefreshToken(userId.toString());
+                refreshToken = jwtUtil.substringToken(refreshToken);
+                // Refresh Token 유효성 검사
+
                 Cookie expiredCookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, null);
                 expiredCookie.setMaxAge(0);
                 expiredCookie.setPath("/");
                 httpResponse.addCookie(expiredCookie);
 
-                httpResponse.sendRedirect("/ssaktium/signin");
+                httpResponse.sendRedirect("/signin");
                 return;
             } catch (UnsupportedJwtException e) {
                 log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
