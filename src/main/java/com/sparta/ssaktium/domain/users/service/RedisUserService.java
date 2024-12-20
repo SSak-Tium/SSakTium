@@ -14,12 +14,14 @@ public class RedisUserService {
 
     // Redis 에 Refresh Token 저장
     public void saveRefreshToken(String userId, String refreshToken, long ttlInMillis) {
-        redisTemplate.opsForValue().set(userId, refreshToken, ttlInMillis, TimeUnit.MILLISECONDS);
+        String key = "refresh_Token : " + userId;
+        redisTemplate.opsForValue().set(key, refreshToken, ttlInMillis, TimeUnit.MILLISECONDS);
     }
 
     // Refresh Token 조회
     public String getRefreshToken(String userId) {
-        return redisTemplate.opsForValue().get(userId);
+        String key = "refresh_Token : " + userId;
+        return redisTemplate.opsForValue().get(key);
     }
 
     // Access Token 갱신
@@ -29,6 +31,7 @@ public class RedisUserService {
 
     // Refresh Token 삭제
     public void deleteRefreshToken(String userId) {
-        redisTemplate.delete(userId);
+        String key = "refresh_Token : " + userId;
+        redisTemplate.delete(key);
     }
 }
